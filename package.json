@@ -5,9 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "services:up": "docker compose up -d",
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write ."
   },
+  "author": "André Freitas",
+  "license": "MIT",
   "dependencies": {
     "next": "14.2.15",
     "prettier": "^3.3.3",
