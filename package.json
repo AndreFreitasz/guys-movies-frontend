@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev && services:up",
     "build": "next build",
     "services:up": "docker compose up -d",
     "lint:check": "prettier --check .",
@@ -12,6 +12,7 @@
   "author": "André Freitas",
   "license": "MIT",
   "dependencies": {
+    "autoprefixer": "^10.4.20",
     "next": "14.2.15",
     "prettier": "^3.3.3",
     "react": "^18",
