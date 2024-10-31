@@ -19,7 +19,7 @@ const NavItem = ({ href, label }: NavItemProps) => {
       >
         {label}
         <div
-          className={`absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-full h-1 rounded-md bg-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+          className={`absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-full h-1 rounded-md bg-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
             isActive ? "opacity-100" : ""
           }`}
         ></div>
