@@ -1,7 +1,8 @@
 import React from "react";
+import Header from "../components/_ui/header";
 
 const Home = () => {
-  return <h1 className="text-white text-4xl font-bold">Guys Movies</h1>;
+  return <Header />;
 };
 
 export default Home;
