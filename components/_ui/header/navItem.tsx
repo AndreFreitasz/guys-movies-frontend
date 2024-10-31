@@ -1,4 +1,3 @@
-// components/_ui/nav-item/index.tsx
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
