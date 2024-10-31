@@ -1,7 +1,6 @@
-import Image from "next/image";
 import NavItem from "./navItem";
 import Button from "../button";
-import ProfileIcon from "../../../public/icons/profileIcons";
+import { FaUser } from "react-icons/fa";
 
 const Header = () => {
   const handleClick = () => {
@@ -9,7 +8,7 @@ const Header = () => {
   };
 
   return (
-    <header className="h-20 flex items-center justify-between px-40 w-full">
+    <header className="h-20 flex items-center justify-between py-12 px-40 w-full">
       <div className="flex items-center">
         <div className="flex items-center ml-2">
           <p className="font-extrabold text-indigo-600 text-5xl">GUY'S</p>
@@ -17,12 +16,12 @@ const Header = () => {
         </div>
       </div>
 
-      <nav className="flex flex-row">
+      <nav className="flex flex-row items-center">
         <ul className="flex space-x-8 mr-12">
           <NavItem href="/" label="Movies" />
           <NavItem href="/series" label="Séries" />
         </ul>
-        <Button label="Log-in" onClick={handleClick} icon={<ProfileIcon />} />
+        <Button label="Entrar" onClick={handleClick} icon={<FaUser />} />
       </nav>
     </header>
   );
