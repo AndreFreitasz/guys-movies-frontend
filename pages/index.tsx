@@ -1,14 +1,17 @@
+// pages/index.tsx
 import React from "react";
 import Header from "../components/_ui/header";
 import Title from "../components/_ui/title";
 import Image from "next/image";
+import Carousel from "../components/_ui/carousel";
+import ProvidersList from "../components/home/providersList";
 
 const Home = () => {
   return (
     <>
       <Header />
-      <div className="flex px-40 w-full my-16">
-        <div className="flex items-center">
+      <div className="flex flex-col px-40 w-full mt-14">
+        <div className="flex items-center mb-4">
           <Image
             src="/icons/popular.png"
             alt="Icon"
@@ -18,6 +21,9 @@ const Home = () => {
           />
           <Title title="Filmes Populares" className="ml-2" />
         </div>
+        <Carousel>
+          <ProvidersList />
+        </Carousel>
       </div>
     </>
   );
