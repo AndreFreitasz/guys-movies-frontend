@@ -12,6 +12,7 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         defaultBackground: "#020617",
+        defaultBackgroundSecond: "#1a1f2e",
       },
       fontFamily: {
         sans: ["Raleway", "sans-serif"],
