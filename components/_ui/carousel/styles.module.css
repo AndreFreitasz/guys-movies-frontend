@@ -1,0 +1,16 @@
+.slick-prev::before,
+.slick-next::before {
+  display: none;
+}
+
+.arrows {
+  height: 28px;
+  width: 28px;
+  color: #3a4565;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.arrows:hover {
+  color: #3a456566;
+}

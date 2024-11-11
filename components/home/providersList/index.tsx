@@ -39,11 +39,11 @@ const ProvidersList = () => {
   }, []);
 
   return (
-    <div className="min-w-64 mr-4">
+    <div className="flex flex-wrap">
       {data.map(({ provider, movies }) => (
         <div
           key={provider.id}
-          className="mb-8 p-3 bg-defaultBackgroundSecond bg-opacity-30 rounded-3xl"
+          className="mb-8 p-3 bg-defaultBackgroundSecond bg-opacity-30 rounded-3xl flex flex-col mr-3"
         >
           <div className="flex items-center">
             <img
@@ -72,7 +72,7 @@ const ProvidersList = () => {
                     className="w-20 h-30 mr-2 rounded-lg"
                   />
                   <span
-                    className="truncate max-w-[15rem] hover:overflow-visible text-xl font-semibold hover:whitespace-normal hover:bg-defaultBackgroundSecond hover:p-2 hover:rounded-lg"
+                    className="truncate max-w-[10rem] hover:overflow-visible text-xl font-semibold hover:whitespace-normal hover:bg-defaultBackgroundSecond hover:p-2 hover:rounded-lg"
                     title={movie.title}
                   >
                     {movie.title}
