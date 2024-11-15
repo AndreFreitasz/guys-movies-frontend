@@ -25,7 +25,7 @@ const ProvidersList = () => {
     async function fetchData() {
       try {
         const response = await fetch(
-          "https://guys-movies-3146ae7558de.herokuapp.com/movies/popularByProviders",
+          `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByProviders`,
         );
         const jsonData = await response.json();
         setData(jsonData);

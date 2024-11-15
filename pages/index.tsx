@@ -4,7 +4,6 @@ import Header from "../components/_ui/header";
 import Title from "../components/_ui/title";
 import Image from "next/image";
 import Carousel from "../components/_ui/carousel";
-import ProvidersList from "../components/home/providersList";
 import { toast } from "react-toastify";
 
 interface Movie {
@@ -31,7 +30,7 @@ const Home = () => {
     async function fetchData() {
       try {
         const response = await fetch(
-          "https://guys-movies-3146ae7558de.herokuapp.com/movies/popularByProviders",
+          `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByProviders`,
         );
         const jsonData = await response.json();
         setData(jsonData);
