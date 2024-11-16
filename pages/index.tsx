@@ -66,7 +66,11 @@ const Home = () => {
             className="text-white mb-2 px-4 flex items-center transform transition-transform duration-300 hover:scale-105 hover:z-10"
           >
             <div className="flex flex-col items-end">
-              <span className="text-white mr-4 opacity-10 text-9xl font-bold">
+              <span
+                className={`text-white mr-4 opacity-10 font-bold ${
+                  index + 1 === 10 ? "text-8xl" : "text-9xl"
+                }`}
+              >
                 {index + 1}
               </span>
             </div>
