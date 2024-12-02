@@ -7,6 +7,7 @@ interface CarouselProps<T> {
   data: T[];
   renderItem: (item: T, index: number) => React.ReactNode;
   settings?: any;
+  slidesToShow: number;
 }
 
 interface ArrowProps {
@@ -45,21 +46,22 @@ const Carousel = <T,>({
   data = [],
   renderItem,
   settings,
+  slidesToShow,
 }: CarouselProps<T>) => {
   const defaultSettings = {
     dots: true,
     infinite: false,
     speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 3,
+    slidesToShow: slidesToShow,
+    slidesToScroll: slidesToShow,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
     responsive: [
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
+          slidesToShow: Math.min(slidesToShow, 2),
+          slidesToScroll: Math.min(slidesToShow, 2),
           infinite: true,
           dots: true,
         },
