@@ -8,6 +8,7 @@ interface CarouselProps<T> {
   renderItem: (item: T, index: number) => React.ReactNode;
   settings?: any;
   slidesToShow: number;
+  infinite?: boolean;
 }
 
 interface ArrowProps {
@@ -47,10 +48,11 @@ const Carousel = <T,>({
   renderItem,
   settings,
   slidesToShow,
+  infinite,
 }: CarouselProps<T>) => {
   const defaultSettings = {
-    dots: true,
-    infinite: false,
+    dots: false,
+    infinite: infinite || false,
     speed: 500,
     slidesToShow: slidesToShow,
     slidesToScroll: slidesToShow,

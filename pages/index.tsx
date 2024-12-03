@@ -71,8 +71,8 @@ const Home = () => {
               src="/icons/popular.png"
               alt="Icon"
               className="mr-2 w-8 h-8"
-              width={32}
-              height={32}
+              width={64}
+              height={64}
             />
             <Title
               title="Filmes Populares Por Streamings"
@@ -91,16 +91,17 @@ const Home = () => {
           />
           <div className="flex items-center my-12">
             <Image
-              src="/icons/popular.png"
+              src="/icons/cinema.png"
               alt="Icon"
               className="mr-2 w-8 h-8"
-              width={32}
-              height={32}
+              width={64}
+              height={64}
             />
             <Title title="Filmes Populares" className="ml-2 text-left" />
           </div>
           <Carousel
             slidesToShow={4}
+            infinite={true}
             data={popularMovies || []}
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />

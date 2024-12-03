@@ -1,19 +1,12 @@
-// components/_ui/MovieCard.tsx
 import React from "react";
 
 interface MovieCardProps {
   id: number;
   title: string;
   poster_path: string;
-  banner_url: string;
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({
-  id,
-  title,
-  poster_path,
-  banner_url,
-}) => {
+const MovieCard: React.FC<MovieCardProps> = ({ id, title, poster_path }) => {
   const getImageUrl = (path: string) => {
     return `https://image.tmdb.org/t/p/w500${path}`;
   };
@@ -25,7 +18,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
         alt={title}
         className="w-80 h-50 rounded-lg"
       />
-      <span className="text-white text-xl font-bold block mt-2" title={title}>
+      <span className="text-white text-xl font-bold block my-4" title={title}>
         {title}
       </span>
     </div>
