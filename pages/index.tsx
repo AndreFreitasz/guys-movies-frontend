@@ -1,5 +1,5 @@
 // pages/index.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Header from "../components/_ui/header";
 import Title from "../components/_ui/title";
 import Image from "next/image";
@@ -8,13 +8,15 @@ import LoadingSpinner from "../components/_ui/loadingSpinner";
 import { toast } from "react-toastify";
 import MoviesProvider from "../components/home/moviesProvider";
 import useFetch from "../hooks/useFetch";
-import MovieCard from "../components/home/popularMovies";
+import MovieCard from "../components/home/movieCard";
 
 interface Movie {
   id: number;
   title: string;
   poster_path: string;
   banner_url: string;
+  overview: string;
+  vote_average: number;
 }
 
 interface Provider {
