@@ -26,7 +26,7 @@ const CircularVoteAverage: React.FC<CircularVoteAverageProps> = ({
     <div className={styles.circularProgressbarContainer}>
       <CircularProgressbar
         value={vote_average * 10}
-        text={`${vote_average.toFixed(1)}`}
+        text={`${vote_average}`}
         styles={buildStyles({
           textColor: getVoteColor(vote_average),
           pathColor: getVoteColor(vote_average),
