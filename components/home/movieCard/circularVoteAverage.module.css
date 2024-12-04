@@ -7,6 +7,6 @@
 
 .circularProgressbarContainer :global(.CircularProgressbar-text) {
   font-family: "Arial";
-  font-weight: 700;
-  font-size: 36px;
+  font-weight: bold;
+  transform: translateY(2px);
 }
