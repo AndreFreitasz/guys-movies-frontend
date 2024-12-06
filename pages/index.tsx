@@ -49,18 +49,21 @@ const Home = () => {
     "Ocorreu um erro ao buscar os filmes populares",
   );
 
-  useEffect(() => {
-    if (popularMovies) {
-      console.log("Popular Movies:", popularMovies);
-    }
-  }, [popularMovies]);
+  const {
+    data: popularMoviesHorror,
+    isLoading: isLoadingMoviesHorror,
+    error: errorMoviesHorror,
+  } = useFetch<Movie[]>(
+    `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/27`,
+    "Ocorreu um erro ao buscar os filmes populares",
+  );
 
   return (
     <>
       <Header />
-      {isLoadingProviders || isLoadingMovies ? (
+      {isLoadingProviders || isLoadingMovies || isLoadingMoviesHorror ? (
         <LoadingSpinner />
-      ) : errorProviders || errorMovies ? (
+      ) : errorProviders || errorMovies || errorMoviesHorror ? (
         <div className="flex justify-center mt-20 h-screen">
           <p className="text-white font-bold text-xl">
             {errorProviders || errorMovies}
@@ -91,6 +94,7 @@ const Home = () => {
               />
             )}
           />
+
           <div className="flex items-center my-12">
             <Image
               src="/icons/cinema.png"
@@ -102,9 +106,28 @@ const Home = () => {
             <Title title="Filmes Populares" className="ml-2 text-left" />
           </div>
           <Carousel
-            slidesToShow={4}
+            slidesToShow={5}
             infinite={true}
             data={popularMovies || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+          />
+
+          <div className="flex items-center my-12">
+            <Image
+              src="/icons/horror.png"
+              alt="Icon"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Terror" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={5}
+            infinite={true}
+            data={popularMoviesHorror || []}
+            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
         </div>

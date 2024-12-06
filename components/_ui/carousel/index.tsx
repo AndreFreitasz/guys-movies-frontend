@@ -9,6 +9,7 @@ interface CarouselProps<T> {
   settings?: any;
   slidesToShow: number;
   infinite?: boolean;
+  className?: string;
 }
 
 interface ArrowProps {
@@ -49,6 +50,7 @@ const Carousel = <T,>({
   settings,
   slidesToShow,
   infinite,
+  className,
 }: CarouselProps<T>) => {
   const defaultSettings = {
     dots: false,
@@ -60,16 +62,21 @@ const Carousel = <T,>({
     prevArrow: <SamplePrevArrow />,
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 1700,
         settings: {
-          slidesToShow: Math.min(slidesToShow, 2),
-          slidesToScroll: Math.min(slidesToShow, 2),
-          infinite: true,
-          dots: true,
+          slidesToShow: Math.min(slidesToShow, 3),
+          slidesToScroll: Math.min(slidesToShow, 3),
         },
       },
       {
-        breakpoint: 600,
+        breakpoint: 1300,
+        settings: {
+          slidesToShow: Math.min(slidesToShow, 2),
+          slidesToScroll: Math.min(slidesToShow, 2),
+        },
+      },
+      {
+        breakpoint: 480,
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
@@ -84,7 +91,7 @@ const Carousel = <T,>({
     <Slider {...mergedSettings}>
       {data.length > 0 ? (
         data.map((item, index) => (
-          <div key={index} className="mx-4">
+          <div key={index} className={`mx-4 ${className}`}>
             {renderItem(item, index)}
           </div>
         ))
