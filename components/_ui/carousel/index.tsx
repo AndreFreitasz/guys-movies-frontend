@@ -56,23 +56,23 @@ const Carousel = <T,>({
     dots: false,
     infinite: infinite || false,
     speed: 500,
-    slidesToShow: slidesToShow,
-    slidesToScroll: slidesToShow,
+    slidesToShow: 7,
+    slidesToScroll: 6,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
     responsive: [
       {
         breakpoint: 1700,
         settings: {
-          slidesToShow: Math.min(slidesToShow, 3),
-          slidesToScroll: Math.min(slidesToShow, 3),
+          slidesToShow: Math.min(slidesToShow, 5),
+          slidesToScroll: Math.min(slidesToShow, 4),
         },
       },
       {
         breakpoint: 1300,
         settings: {
-          slidesToShow: Math.min(slidesToShow, 2),
-          slidesToScroll: Math.min(slidesToShow, 2),
+          slidesToShow: Math.min(slidesToShow, 4),
+          slidesToScroll: Math.min(slidesToShow, 3),
         },
       },
       {
@@ -91,7 +91,7 @@ const Carousel = <T,>({
     <Slider {...mergedSettings}>
       {data.length > 0 ? (
         data.map((item, index) => (
-          <div key={index} className={`mx-4 ${className}`}>
+          <div key={index} className={`mx-1 ${className}`}>
             {renderItem(item, index)}
           </div>
         ))
