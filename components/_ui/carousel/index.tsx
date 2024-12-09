@@ -56,8 +56,8 @@ const Carousel = <T,>({
     dots: false,
     infinite: infinite || false,
     speed: 500,
-    slidesToShow: 7,
-    slidesToScroll: 6,
+    slidesToShow: slidesToShow,
+    slidesToScroll: slidesToShow - 1,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
     responsive: [
