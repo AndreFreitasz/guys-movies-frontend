@@ -54,16 +54,42 @@ const Home = () => {
     isLoading: isLoadingMoviesHorror,
     error: errorMoviesHorror,
   } = useFetch<Movie[]>(
-    `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/27`,
-    "Ocorreu um erro ao buscar os filmes populares",
+    `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/27,9648`,
+    "Ocorreu um erro ao buscar os filmes de terror",
+  );
+
+  const {
+    data: popularMoviesSciFi,
+    isLoading: isLoadingMoviesSciFi,
+    error: errorMoviesSciFi,
+  } = useFetch<Movie[]>(
+    `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/878`,
+    "Ocorreu um erro ao buscar os filmes de ficção científica ",
+  );
+
+  const {
+    data: popularMoviesFamily,
+    isLoading: isLoadingMoviesFamily,
+    error: errorMoviesFamily,
+  } = useFetch<Movie[]>(
+    `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/10751`,
+    "Ocorreu um erro ao buscar os filmes de família",
   );
 
   return (
     <>
       <Header />
-      {isLoadingProviders || isLoadingMovies || isLoadingMoviesHorror ? (
+      {isLoadingProviders ||
+      isLoadingMovies ||
+      isLoadingMoviesHorror ||
+      isLoadingMoviesSciFi ||
+      isLoadingMoviesFamily ? (
         <LoadingSpinner />
-      ) : errorProviders || errorMovies || errorMoviesHorror ? (
+      ) : errorProviders ||
+        errorMovies ||
+        errorMoviesHorror ||
+        errorMoviesSciFi ||
+        errorMoviesFamily ? (
         <div className="flex justify-center mt-20 h-screen">
           <p className="text-white font-bold text-xl">
             {errorProviders || errorMovies}
@@ -95,7 +121,7 @@ const Home = () => {
             )}
           />
 
-          <div className="flex items-center my-12">
+          <div className="flex items-center mt-12 mb-4">
             <Image
               src="/icons/cinema.png"
               alt="Icon"
@@ -106,14 +132,14 @@ const Home = () => {
             <Title title="Filmes Populares" className="ml-2 text-left" />
           </div>
           <Carousel
-            slidesToShow={5}
+            slidesToShow={7}
             infinite={true}
             data={popularMovies || []}
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
 
-          <div className="flex items-center my-12">
+          <div className="flex items-center mt-24 mb-4">
             <Image
               src="/icons/horror.png"
               alt="Icon"
@@ -121,12 +147,48 @@ const Home = () => {
               width={64}
               height={64}
             />
-            <Title title="Terror" className="ml-2 text-left" />
+            <Title title="Terror E Suspense" className="ml-2 text-left" />
           </div>
           <Carousel
-            slidesToShow={5}
+            slidesToShow={7}
             infinite={true}
             data={popularMoviesHorror || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+          />
+
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/scifi.png"
+              alt="Icon"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Ficção Científica" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={7}
+            infinite={true}
+            data={popularMoviesSciFi || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+          />
+
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/family.png"
+              alt="Icon"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Família" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={7}
+            infinite={true}
+            data={popularMoviesFamily || []}
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
