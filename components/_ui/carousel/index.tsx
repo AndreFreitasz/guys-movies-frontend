@@ -96,7 +96,9 @@ const Carousel = <T,>({
           </div>
         ))
       ) : (
-        <div>No items to display</div>
+        <p className="text-white font-bold text-xl">
+          Nenhum dado encontrado, tente novamente mais tarde
+        </p>
       )}
     </Slider>
   );
