@@ -7,7 +7,6 @@ import Carousel from "../components/_ui/carousel";
 import MoviesProvider from "../components/home/moviesProvider";
 import MovieCard from "../components/home/movieCard";
 import { GetServerSideProps } from "next";
-import { error } from "console";
 
 interface Movie {
   id: number;
@@ -35,6 +34,8 @@ interface HomeProps {
   popularMoviesHorror: Movie[];
   popularMoviesSciFi: Movie[];
   popularMoviesFamily: Movie[];
+  topRatedMovies: Movie[];
+  popularMoviesDrama: Movie[];
   error: string | null;
 }
 
@@ -44,6 +45,8 @@ const Home: React.FC<HomeProps> = ({
   popularMoviesHorror,
   popularMoviesSciFi,
   popularMoviesFamily,
+  topRatedMovies,
+  popularMoviesDrama,
   error,
 }) => {
   const [showError, setShowError] = useState(false);
@@ -153,6 +156,24 @@ const Home: React.FC<HomeProps> = ({
 
         <div className="flex items-center mt-24 mb-4">
           <Image
+            src="/icons/home/like.png"
+            alt="Icon"
+            className="mr-2 w-8 h-8"
+            width={64}
+            height={64}
+          />
+          <Title title="Aclamados pela Crítica" className="ml-2 text-left" />
+        </div>
+        <Carousel
+          slidesToShow={6}
+          infinite={true}
+          data={topRatedMovies || []}
+          className="ml-16"
+          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+        />
+
+        <div className="flex items-center mt-24 mb-4">
+          <Image
             src="/icons/family.png"
             alt="Icon"
             className="mr-2 w-8 h-8"
@@ -168,6 +189,24 @@ const Home: React.FC<HomeProps> = ({
           className="ml-16"
           renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
         />
+
+        <div className="flex items-center mt-24 mb-4">
+          <Image
+            src="/icons/home/drama.png"
+            alt="Icon"
+            className="mr-2 w-8 h-8"
+            width={64}
+            height={64}
+          />
+          <Title title="Drama" className="ml-2 text-left" />
+        </div>
+        <Carousel
+          slidesToShow={6}
+          infinite={true}
+          data={popularMoviesDrama || []}
+          className="ml-16"
+          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+        />
       </div>
     </>
   );
@@ -175,25 +214,34 @@ const Home: React.FC<HomeProps> = ({
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    const [providerRes, popularRes, horrorRes, sciFiRes, familyRes] =
-      await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByProviders`),
-        fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popular`),
-        fetch(
-          `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/27,9648`,
-        ),
-        fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/878`),
-        fetch(
-          `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/10751`,
-        ),
-      ]);
+    const [
+      providerRes,
+      popularRes,
+      horrorRes,
+      sciFiRes,
+      familyRes,
+      topRatedRes,
+      dramaRes,
+    ] = await Promise.all([
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByProviders`),
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popular`),
+      fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/27,9648`,
+      ),
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/878`),
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/10751`),
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/topRated`),
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/18`),
+    ]);
 
     if (
       !providerRes.ok ||
       !popularRes.ok ||
       !horrorRes.ok ||
       !sciFiRes.ok ||
-      !familyRes.ok
+      !familyRes.ok ||
+      !topRatedRes.ok ||
+      !dramaRes.ok
     ) {
       throw new Error(
         "Ocorreu um erro ao buscar os dados, tente novamente mais tarde!",
@@ -206,12 +254,16 @@ export const getServerSideProps: GetServerSideProps = async () => {
       popularMoviesHorror,
       popularMoviesSciFi,
       popularMoviesFamily,
+      topRatedMovies,
+      popularMoviesDrama,
     ] = await Promise.all([
       providerRes.json(),
       popularRes.json(),
       horrorRes.json(),
       sciFiRes.json(),
       familyRes.json(),
+      topRatedRes.json(),
+      dramaRes.json(),
     ]);
 
     return {
@@ -221,6 +273,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
         popularMoviesHorror,
         popularMoviesSciFi,
         popularMoviesFamily,
+        topRatedMovies,
+        popularMoviesDrama,
         error: null,
       },
     };
@@ -234,6 +288,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
         popularMoviesHorror: [],
         popularMoviesSciFi: [],
         popularMoviesFamily: [],
+        topRatedMovies: [],
+        popularMoviesDrama: [],
         error: errorMessage,
       },
     };
