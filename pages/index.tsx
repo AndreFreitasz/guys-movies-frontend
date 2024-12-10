@@ -1,4 +1,3 @@
-// pages/index.tsx
 import React, { useState, useEffect } from "react";
 import Header from "../components/_ui/header";
 import Title from "../components/_ui/title";
@@ -7,41 +6,10 @@ import Carousel from "../components/_ui/carousel";
 import MoviesProvider from "../components/home/moviesProvider";
 import MovieCard from "../components/home/movieCard";
 import { GetServerSideProps } from "next";
+import Footer from "../components/_ui/footer";
+import { HomeProps } from "../interfaces/home/types";
 
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string;
-  banner_url: string;
-  overview: string;
-  vote_average: number;
-}
-
-interface Provider {
-  id: number;
-  logoUrl: string;
-  name: string;
-}
-
-interface ProviderData {
-  provider: Provider;
-  movies: Movie[];
-}
-
-interface HomeProps {
-  providerData: ProviderData[];
-  popularMovies: Movie[];
-  popularMoviesHorror: Movie[];
-  popularMoviesSciFi: Movie[];
-  popularMoviesFamily: Movie[];
-  topRatedMovies: Movie[];
-  popularMoviesDrama: Movie[];
-  popularMoviesSciFiDrama: Movie[];
-  popularMoviesComedy: Movie[];
-  error: string | null;
-}
-
-const Home: React.FC<HomeProps> = ({
+const Home = ({
   providerData,
   popularMovies,
   popularMoviesHorror,
@@ -52,7 +20,7 @@ const Home: React.FC<HomeProps> = ({
   popularMoviesSciFiDrama,
   popularMoviesComedy,
   error,
-}) => {
+}: HomeProps) => {
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -248,6 +216,7 @@ const Home: React.FC<HomeProps> = ({
           renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
         />
       </div>
+      <Footer />
     </>
   );
 };
