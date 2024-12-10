@@ -36,6 +36,8 @@ interface HomeProps {
   popularMoviesFamily: Movie[];
   topRatedMovies: Movie[];
   popularMoviesDrama: Movie[];
+  popularMoviesSciFiDrama: Movie[];
+  popularMoviesComedy: Movie[];
   error: string | null;
 }
 
@@ -47,6 +49,8 @@ const Home: React.FC<HomeProps> = ({
   popularMoviesFamily,
   topRatedMovies,
   popularMoviesDrama,
+  popularMoviesSciFiDrama,
+  popularMoviesComedy,
   error,
 }) => {
   const [showError, setShowError] = useState(false);
@@ -79,7 +83,7 @@ const Home: React.FC<HomeProps> = ({
         <div className="flex items-center mb-4">
           <Image
             src="/icons/popular.png"
-            alt="Icon"
+            alt="Ícone de uma estrela"
             className="mr-2 w-8 h-8"
             width={64}
             height={64}
@@ -103,7 +107,7 @@ const Home: React.FC<HomeProps> = ({
         <div className="flex items-center mt-12 mb-4">
           <Image
             src="/icons/cinema.png"
-            alt="Icon"
+            alt="Ícone de um cinema"
             className="mr-2 w-8 h-8"
             width={64}
             height={64}
@@ -121,7 +125,7 @@ const Home: React.FC<HomeProps> = ({
         <div className="flex items-center mt-24 mb-4">
           <Image
             src="/icons/horror.png"
-            alt="Icon"
+            alt="Ícone de Terror"
             className="mr-2 w-8 h-8"
             width={64}
             height={64}
@@ -138,13 +142,13 @@ const Home: React.FC<HomeProps> = ({
 
         <div className="flex items-center mt-24 mb-4">
           <Image
-            src="/icons/scifi.png"
-            alt="Icon"
+            src="/icons/home/scifi.png"
+            alt="Ícone de tecnologia"
             className="mr-2 w-8 h-8"
             width={64}
             height={64}
           />
-          <Title title="Ficção Científica" className="ml-2 text-left" />
+          <Title title="Ficção Cientí­fica" className="ml-2 text-left" />
         </div>
         <Carousel
           slidesToShow={6}
@@ -157,12 +161,12 @@ const Home: React.FC<HomeProps> = ({
         <div className="flex items-center mt-24 mb-4">
           <Image
             src="/icons/home/like.png"
-            alt="Icon"
+            alt="Ícone de um curtir"
             className="mr-2 w-8 h-8"
             width={64}
             height={64}
           />
-          <Title title="Aclamados pela Crítica" className="ml-2 text-left" />
+          <Title title="Aclamados pela Crí­tica" className="ml-2 text-left" />
         </div>
         <Carousel
           slidesToShow={6}
@@ -174,13 +178,13 @@ const Home: React.FC<HomeProps> = ({
 
         <div className="flex items-center mt-24 mb-4">
           <Image
-            src="/icons/family.png"
-            alt="Icon"
+            src="/icons/home/family.png"
+            alt="Ícone de uma família"
             className="mr-2 w-8 h-8"
             width={64}
             height={64}
           />
-          <Title title="Família" className="ml-2 text-left" />
+          <Title title="Famí­lia" className="ml-2 text-left" />
         </div>
         <Carousel
           slidesToShow={6}
@@ -193,7 +197,7 @@ const Home: React.FC<HomeProps> = ({
         <div className="flex items-center mt-24 mb-4">
           <Image
             src="/icons/home/drama.png"
-            alt="Icon"
+            alt="Ícone de drama"
             className="mr-2 w-8 h-8"
             width={64}
             height={64}
@@ -204,6 +208,42 @@ const Home: React.FC<HomeProps> = ({
           slidesToShow={6}
           infinite={true}
           data={popularMoviesDrama || []}
+          className="ml-16"
+          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+        />
+
+        <div className="flex items-center mt-24 mb-4">
+          <Image
+            src="/icons/home/rocket.png"
+            alt="Ícone de um foguete"
+            className="mr-2 w-8 h-8"
+            width={64}
+            height={64}
+          />
+          <Title title="Sci-Fi Dramático" className="ml-2 text-left" />
+        </div>
+        <Carousel
+          slidesToShow={6}
+          infinite={true}
+          data={popularMoviesSciFiDrama || []}
+          className="ml-16"
+          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+        />
+
+        <div className="flex items-center mt-24 mb-4">
+          <Image
+            src="/icons/home/comedy.png"
+            alt="Ícone de comédia"
+            className="mr-2 w-8 h-8"
+            width={64}
+            height={64}
+          />
+          <Title title="Comédia" className="ml-2 text-left" />
+        </div>
+        <Carousel
+          slidesToShow={6}
+          infinite={true}
+          data={popularMoviesComedy || []}
           className="ml-16"
           renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
         />
@@ -222,6 +262,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       familyRes,
       topRatedRes,
       dramaRes,
+      sciFiDramaRes,
+      comedyRes,
     ] = await Promise.all([
       fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByProviders`),
       fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popular`),
@@ -232,6 +274,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/10751`),
       fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/topRated`),
       fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/18`),
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/18,878`),
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/movies/popularByGenres/35`),
     ]);
 
     if (
@@ -241,7 +285,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
       !sciFiRes.ok ||
       !familyRes.ok ||
       !topRatedRes.ok ||
-      !dramaRes.ok
+      !dramaRes.ok ||
+      !sciFiDramaRes.ok ||
+      !comedyRes.ok
     ) {
       throw new Error(
         "Ocorreu um erro ao buscar os dados, tente novamente mais tarde!",
@@ -256,6 +302,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       popularMoviesFamily,
       topRatedMovies,
       popularMoviesDrama,
+      popularMoviesSciFiDrama,
+      popularMoviesComedy,
     ] = await Promise.all([
       providerRes.json(),
       popularRes.json(),
@@ -264,6 +312,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       familyRes.json(),
       topRatedRes.json(),
       dramaRes.json(),
+      sciFiDramaRes.json(),
+      comedyRes.json(),
     ]);
 
     return {
@@ -275,6 +325,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
         popularMoviesFamily,
         topRatedMovies,
         popularMoviesDrama,
+        popularMoviesSciFiDrama,
+        popularMoviesComedy,
         error: null,
       },
     };
@@ -290,6 +342,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
         popularMoviesFamily: [],
         topRatedMovies: [],
         popularMoviesDrama: [],
+        popularMoviesSciFiDrama: [],
+        popularMoviesComedy: [],
         error: errorMessage,
       },
     };
