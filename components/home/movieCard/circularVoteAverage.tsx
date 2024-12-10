@@ -42,8 +42,8 @@ const CircularVoteAverage: React.FC<CircularVoteAverageProps> = ({
             <stop offset="100%" stopColor="#fde047" />
           </linearGradient>
           <linearGradient id="redGradient" gradientTransform="rotate(90)">
-            <stop offset="0%" stopColor="#dc2626" />
-            <stop offset="100%" stopColor="#dc2626" />
+            <stop offset="0%" stopColor="#B91C1C" />
+            <stop offset="100%" stopColor="#F87171" />
           </linearGradient>
         </defs>
       </svg>
