@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "autoprefixer": "^10.4.20",
+    "framer-motion": "^11.15.0",
     "next": "14.2.15",
     "prettier": "^3.3.3",
     "react": "^18",

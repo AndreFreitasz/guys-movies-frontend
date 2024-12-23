@@ -1,17 +1,26 @@
 import React, { useState } from "react";
 import NavItem from "./navItem";
 import Button from "../button";
-import { FaUser, FaBars, FaTimes } from "react-icons/fa";
+import { FaUser, FaBars, FaTimes, FaLock } from "react-icons/fa";
+import Modal from "../modal";
+import Input from "../form/input";
+import ButtonSubmit from "../form/buttonSubmit";
+import ButtonCancel from "../form/buttonCancel";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = () => {
-    alert("Button clicked!");
+    setIsModalOpen(true);
   };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -56,6 +65,38 @@ const Header = () => {
           </ul>
         </div>
       )}
+
+      <Modal isOpen={isModalOpen} onClose={closeModal} title="Entrar">
+        <div>
+          <form className="flex flex-col space-y-6">
+            <Input
+              type="email"
+              placeholder="E-mail"
+              label="E-mail"
+              icon={<FaUser className="text-gray-400" />}
+              className="bg-gray-800 text-white"
+            />
+            <Input
+              type="password"
+              placeholder="Senha"
+              label="Senha"
+              icon={<FaLock className="text-gray-400" />}
+              className="bg-gray-800 text-white"
+            />
+          </form>
+          <div className="flex justify-end">
+            <ButtonCancel
+              label="Cancelar"
+              onClick={closeModal}
+              className="mr-4"
+            />
+            <ButtonSubmit
+              label="Enviar"
+              onClick={() => console.log("Botão clicado")}
+            />
+          </div>
+        </div>
+      </Modal>
     </header>
   );
 };
