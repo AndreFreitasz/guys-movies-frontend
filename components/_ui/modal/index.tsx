@@ -18,7 +18,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.3 }}
             className="relative rounded-xl shadow-lg bg-defaultBackgroundSecond w-full max-w-xl mt-16"
           >
             <div className="flex justify-between items-center mb-4 p-4 border-b border-gray-700">
