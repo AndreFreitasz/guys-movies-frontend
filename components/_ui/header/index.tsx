@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import NavItem from "./navItem";
 import Button from "../button";
-import { FaUser, FaBars, FaTimes, FaLock } from "react-icons/fa";
+import { FaUser, FaBars, FaTimes, FaLock, FaPlus } from "react-icons/fa";
 import Modal from "../modal";
 import Input from "../form/input";
 import ButtonSubmit from "../form/buttonSubmit";
@@ -10,9 +10,14 @@ import ButtonCancel from "../form/buttonCancel";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
-  const handleClick = () => {
+  const handleLoginClick = () => {
     setIsModalOpen(true);
+  };
+
+  const handleRegisterClick = () => {
+    setIsRegisterModalOpen(true);
   };
 
   const toggleMenu = () => {
@@ -21,6 +26,10 @@ const Header = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const closeRegisterModal = () => {
+    setIsRegisterModalOpen(false);
   };
 
   return (
@@ -43,8 +52,14 @@ const Header = () => {
         </ul>
         <Button
           label="Entrar"
-          onClick={handleClick}
+          onClick={handleLoginClick}
           icon={<FaUser />}
+          className="hidden md:block mr-4"
+        />
+        <Button
+          label="Cadastrar"
+          onClick={handleRegisterClick}
+          icon={<FaPlus />}
           className="hidden md:block"
         />
         <button className="md:hidden ml-4" onClick={toggleMenu}>
@@ -61,7 +76,16 @@ const Header = () => {
           <ul className="flex flex-col space-y-4">
             <NavItem href="/" label="Movies" />
             <NavItem href="/series" label="Séries" />
-            <Button label="Entrar" onClick={handleClick} icon={<FaUser />} />
+            <Button
+              label="Entrar"
+              onClick={handleLoginClick}
+              icon={<FaUser />}
+            />
+            <Button
+              label="Cadastrar"
+              onClick={handleRegisterClick}
+              icon={<FaPlus />}
+            />
           </ul>
         </div>
       )}
@@ -92,6 +116,56 @@ const Header = () => {
             />
             <ButtonSubmit
               label="Enviar"
+              onClick={() => console.log("Botão clicado")}
+            />
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isRegisterModalOpen}
+        onClose={closeRegisterModal}
+        title="Cadastrar"
+      >
+        <div>
+          <form className="flex flex-col space-y-6">
+            <Input
+              type="email"
+              placeholder="E-mail"
+              label="E-mail"
+              icon={<FaUser className="text-gray-400" />}
+              className="bg-gray-800 text-white"
+            />
+            <Input
+              type="text"
+              placeholder="Nome de usuário"
+              label="Nome de usuário"
+              icon={<FaUser className="text-gray-400" />}
+              className="bg-gray-800 text-white"
+            />
+            <Input
+              type="password"
+              placeholder="Senha"
+              label="Senha"
+              icon={<FaLock className="text-gray-400" />}
+              className="bg-gray-800 text-white"
+            />
+            <Input
+              type="password"
+              placeholder="Confirmar senha"
+              label="Confirmar senha"
+              icon={<FaLock className="text-gray-400" />}
+              className="bg-gray-800 text-white"
+            />
+          </form>
+          <div className="flex justify-end">
+            <ButtonCancel
+              label="Cancelar"
+              onClick={closeRegisterModal}
+              className="mr-4"
+            />
+            <ButtonSubmit
+              label="Cadastrar"
               onClick={() => console.log("Botão clicado")}
             />
           </div>
