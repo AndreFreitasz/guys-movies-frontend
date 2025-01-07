@@ -1,4 +1,3 @@
-// hooks/useFetch.ts
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 

@@ -37,7 +37,7 @@ const Home = ({
         <Header />
         <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
           <h1 className="text-2xl font-bold text-center mt-24 text-white">
-            {errorMessage}
+            Ocorreu um erro ao executar a página
           </h1>
         </div>
       </>
