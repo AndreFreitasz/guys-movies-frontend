@@ -77,23 +77,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <FaSearch className="absolute left-3 text-gray-400" size={20} />
       </form>
       {searchResults.length > 0 && isExpanded == true && (
-        <ul className="absolute top-full left-0 w-full bg-gray-800 text-white mt-2 rounded-md shadow-lg z-10">
+        <ul className="absolute top-full left-0 w-full bg-gray-800 text-white mt-2 rounded-lg shadow-lg z-10 max-h-screen-60 overflow-y-auto">
           {searchResults.map((movie, index) => (
             <li
               key={index}
-              className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+              className="relative px-4 py-2 hover:bg-gray-700 cursor-pointer"
             >
               <div className="flex flex-row items-center">
-                <img
-                  src={movie.poster_url}
-                  alt={movie.title}
-                  className="w-26 h-32 rounded-md"
-                />
+                <img src={movie.poster_url} className="w-26 h-32 rounded-md" />
                 <p className="font-bold text-lg ml-4">{movie.title}</p>
               </div>
-              <div className="flex justify-end">
-                <p>{movie.release_date}</p>
-              </div>
+              <p className="absolute bottom-2 right-4">{movie.release_date}</p>
             </li>
           ))}
         </ul>

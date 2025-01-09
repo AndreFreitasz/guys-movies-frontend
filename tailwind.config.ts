@@ -17,6 +17,9 @@ const config: Config = {
       fontFamily: {
         sans: ["Raleway", "sans-serif"],
       },
+      maxHeight: {
+        "screen-60": "60vh",
+      },
     },
   },
   plugins: [],
