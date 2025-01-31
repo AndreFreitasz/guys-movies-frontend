@@ -5,22 +5,65 @@ import Image from "next/image";
 import Carousel from "../components/_ui/carousel";
 import MoviesProvider from "../components/home/moviesProvider";
 import MovieCard from "../components/home/movieCard";
-import { GetServerSideProps } from "next";
 import Footer from "../components/_ui/footer";
-import { HomeProps } from "../interfaces/home/types";
+import { GetServerSideProps } from "next";
 
-const Home = ({
-  providerData,
-  popularMovies,
-  popularMoviesHorror,
-  popularMoviesSciFi,
-  popularMoviesFamily,
-  topRatedMovies,
-  popularMoviesDrama,
-  popularMoviesSciFiDrama,
-  popularMoviesComedy,
+interface Movie {
+  id: number;
+  title: string;
+  poster_path: string;
+  overview: string;
+  vote_average: number;
+}
+
+interface HomeProps {
+  initialProviderData: any[];
+  initialPopularMovies: Movie[];
+  initialPopularMoviesHorror: Movie[];
+  initialPopularMoviesSciFi: Movie[];
+  initialPopularMoviesFamily: Movie[];
+  initialTopRatedMovies: Movie[];
+  initialPopularMoviesDrama: Movie[];
+  initialPopularMoviesSciFiDrama: Movie[];
+  initialPopularMoviesComedy: Movie[];
+  error: string | null;
+}
+
+const Home: React.FC<HomeProps> = ({
+  initialProviderData,
+  initialPopularMovies,
+  initialPopularMoviesHorror,
+  initialPopularMoviesSciFi,
+  initialPopularMoviesFamily,
+  initialTopRatedMovies,
+  initialPopularMoviesDrama,
+  initialPopularMoviesSciFiDrama,
+  initialPopularMoviesComedy,
   error,
-}: HomeProps) => {
+}) => {
+  const [providerData, setProviderData] = useState(initialProviderData);
+  const [popularMovies, setPopularMovies] = useState(initialPopularMovies);
+  const [popularMoviesHorror, setPopularMoviesHorror] = useState(
+    initialPopularMoviesHorror,
+  );
+  const [popularMoviesSciFi, setPopularMoviesSciFi] = useState(
+    initialPopularMoviesSciFi,
+  );
+  const [popularMoviesFamily, setPopularMoviesFamily] = useState(
+    initialPopularMoviesFamily,
+  );
+  const [topRatedMovies, setTopRatedMovies] = useState(initialTopRatedMovies);
+  const [popularMoviesDrama, setPopularMoviesDrama] = useState(
+    initialPopularMoviesDrama,
+  );
+  const [popularMoviesSciFiDrama, setPopularMoviesSciFiDrama] = useState(
+    initialPopularMoviesSciFiDrama,
+  );
+  const [popularMoviesComedy, setPopularMoviesComedy] = useState(
+    initialPopularMoviesComedy,
+  );
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -31,13 +74,42 @@ const Home = ({
     }
   }, [error]);
 
+  useEffect(() => {
+    const handleScroll = async () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop !==
+          document.documentElement.offsetHeight ||
+        loading
+      ) {
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/movies/popular?page=${page + 1}`,
+        );
+        const data = await res.json();
+        setPopularMovies((prevMovies) => [...prevMovies, ...data]);
+        setPage((prevPage) => prevPage + 1);
+      } catch (err) {
+        setErrorMessage("Ocorreu um erro ao carregar mais filmes.");
+        setShowError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loading, page]);
+
   if (showError) {
     return (
       <>
         <Header />
         <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
           <h1 className="text-2xl font-bold text-center mt-24 text-white">
-            Ocorreu um erro ao executar a página
+            {errorMessage}
           </h1>
         </div>
       </>
@@ -116,7 +188,7 @@ const Home = ({
             width={64}
             height={64}
           />
-          <Title title="Ficção Cientí­fica" className="ml-2 text-left" />
+          <Title title="Ficção Científica" className="ml-2 text-left" />
         </div>
         <Carousel
           slidesToShow={6}
@@ -134,7 +206,7 @@ const Home = ({
             width={64}
             height={64}
           />
-          <Title title="Aclamados pela Crí­tica" className="ml-2 text-left" />
+          <Title title="Aclamados pela Crítica" className="ml-2 text-left" />
         </div>
         <Carousel
           slidesToShow={6}
@@ -152,7 +224,7 @@ const Home = ({
             width={64}
             height={64}
           />
-          <Title title="Famí­lia" className="ml-2 text-left" />
+          <Title title="Família" className="ml-2 text-left" />
         </div>
         <Carousel
           slidesToShow={6}
@@ -287,15 +359,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
     return {
       props: {
-        providerData,
-        popularMovies,
-        popularMoviesHorror,
-        popularMoviesSciFi,
-        popularMoviesFamily,
-        topRatedMovies,
-        popularMoviesDrama,
-        popularMoviesSciFiDrama,
-        popularMoviesComedy,
+        initialProviderData: providerData,
+        initialPopularMovies: popularMovies,
+        initialPopularMoviesHorror: popularMoviesHorror,
+        initialPopularMoviesSciFi: popularMoviesSciFi,
+        initialPopularMoviesFamily: popularMoviesFamily,
+        initialTopRatedMovies: topRatedMovies,
+        initialPopularMoviesDrama: popularMoviesDrama,
+        initialPopularMoviesSciFiDrama: popularMoviesSciFiDrama,
+        initialPopularMoviesComedy: popularMoviesComedy,
         error: null,
       },
     };
@@ -304,15 +376,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
       err instanceof Error ? err.message : "An unknown error occurred";
     return {
       props: {
-        providerData: [],
-        popularMovies: [],
-        popularMoviesHorror: [],
-        popularMoviesSciFi: [],
-        popularMoviesFamily: [],
-        topRatedMovies: [],
-        popularMoviesDrama: [],
-        popularMoviesSciFiDrama: [],
-        popularMoviesComedy: [],
+        initialProviderData: [],
+        initialPopularMovies: [],
+        initialPopularMoviesHorror: [],
+        initialPopularMoviesSciFi: [],
+        initialPopularMoviesFamily: [],
+        initialTopRatedMovies: [],
+        initialPopularMoviesDrama: [],
+        initialPopularMoviesSciFiDrama: [],
+        initialPopularMoviesComedy: [],
         error: errorMessage,
       },
     };

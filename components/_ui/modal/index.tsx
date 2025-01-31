@@ -15,7 +15,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm text-white">
           <motion.div
-            initial={{ opacity: 0, y: -50 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.3 }}

@@ -15,6 +15,7 @@ import ButtonSubmit from "../form/buttonSubmit";
 import ButtonCancel from "../form/buttonCancel";
 import SearchBar from "../searchBar";
 import { motion, AnimatePresence } from "framer-motion";
+import FormRegister from "./formRegister";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -186,49 +187,7 @@ const Header = () => {
         onClose={closeRegisterModal}
         title="Cadastrar"
       >
-        <div>
-          <form className="flex flex-col space-y-6">
-            <Input
-              type="email"
-              placeholder="E-mail"
-              label="E-mail"
-              icon={<FaUser className="text-gray-400" />}
-              className="bg-gray-800 text-white"
-            />
-            <Input
-              type="text"
-              placeholder="Nome de usuário"
-              label="Nome de usuário"
-              icon={<FaUser className="text-gray-400" />}
-              className="bg-gray-800 text-white"
-            />
-            <Input
-              type="password"
-              placeholder="Senha"
-              label="Senha"
-              icon={<FaLock className="text-gray-400" />}
-              className="bg-gray-800 text-white"
-            />
-            <Input
-              type="password"
-              placeholder="Confirmar senha"
-              label="Confirmar senha"
-              icon={<FaLock className="text-gray-400" />}
-              className="bg-gray-800 text-white"
-            />
-          </form>
-          <div className="flex justify-end">
-            <ButtonCancel
-              label="Cancelar"
-              onClick={closeRegisterModal}
-              className="mr-4"
-            />
-            <ButtonSubmit
-              label="Cadastrar"
-              onClick={() => console.log("Botão clicado")}
-            />
-          </div>
-        </div>
+        <FormRegister />
       </Modal>
     </header>
   );

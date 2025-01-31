@@ -1,6 +1,6 @@
 export interface Serie {
   id: number;
-  title: string;
+  name: string;
   poster_path: string;
   banner_url: string;
   overview: string;

@@ -3,7 +3,7 @@ import React from "react";
 
 interface Serie {
   id: number;
-  title: string;
+  name: string;
   poster_path: string;
 }
 
@@ -57,14 +57,14 @@ const SeriesProvider: React.FC<SeriesProviderProps> = ({ providerData }) => {
             <div className="flex items-center">
               <img
                 src={`https://image.tmdb.org/t/p/w200${serie.poster_path}`}
-                alt={serie.title}
+                alt={serie.name}
                 className="w-20 h-30 mr-2 rounded-lg"
               />
               <span
                 className="truncate max-w-[10rem] hover:overflow-visible text-xl font-semibold hover:whitespace-normal hover:bg-defaultBackgroundSecond hover:p-2 hover:rounded-lg"
-                title={serie.title}
+                title={serie.name}
               >
-                {serie.title}
+                {serie.name}
               </span>
             </div>
           </li>
