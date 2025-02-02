@@ -174,10 +174,7 @@ const Header = () => {
               onClick={closeModal}
               className="mr-4"
             />
-            <ButtonSubmit
-              label="Enviar"
-              onClick={() => console.log("Botão clicado")}
-            />
+            <ButtonSubmit label="Enviar" />
           </div>
         </div>
       </Modal>
@@ -187,7 +184,7 @@ const Header = () => {
         onClose={closeRegisterModal}
         title="Cadastrar"
       >
-        <FormRegister />
+        <FormRegister onClose={closeRegisterModal} />
       </Modal>
     </header>
   );
