@@ -1,21 +1,12 @@
 import React, { useState } from "react";
 import NavItem from "./navItem";
 import Button from "../button";
-import {
-  FaUser,
-  FaBars,
-  FaTimes,
-  FaLock,
-  FaPlus,
-  FaSearch,
-} from "react-icons/fa";
+import { FaUser, FaBars, FaTimes, FaPlus, FaSearch } from "react-icons/fa";
 import Modal from "../modal";
-import Input from "../form/input";
-import ButtonSubmit from "../form/buttonSubmit";
-import ButtonCancel from "../form/buttonCancel";
 import SearchBar from "../searchBar";
 import { motion, AnimatePresence } from "framer-motion";
 import FormRegister from "./formRegister";
+import FormLogin from "./formLogin";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -151,32 +142,7 @@ const Header = () => {
       )}
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title="Entrar">
-        <div>
-          <form className="flex flex-col space-y-6">
-            <Input
-              type="email"
-              placeholder="E-mail"
-              label="E-mail"
-              icon={<FaUser className="text-gray-400" />}
-              className="bg-gray-800 text-white"
-            />
-            <Input
-              type="password"
-              placeholder="Senha"
-              label="Senha"
-              icon={<FaLock className="text-gray-400" />}
-              className="bg-gray-800 text-white"
-            />
-          </form>
-          <div className="flex justify-end">
-            <ButtonCancel
-              label="Cancelar"
-              onClick={closeModal}
-              className="mr-4"
-            />
-            <ButtonSubmit label="Enviar" />
-          </div>
-        </div>
+        <FormLogin onClose={closeModal} />
       </Modal>
 
       <Modal

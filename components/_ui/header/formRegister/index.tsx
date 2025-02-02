@@ -50,18 +50,23 @@ const FormRegister = ({ onClose }: FormRegisterComponentProps) => {
   const onSubmit = async (data: FormRegisterProps) => {
     setIsLoading(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_URL_API}/users`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Erro ao cadastrar um novo usuário.");
+        return;
+      }
       toast.success("Cadastro realizado com sucesso!");
       reset();
       onClose();
     } catch {
-      console.error("Erro ao cadastrar usuário.");
+      toast.error("Estamos com problemas, tente novamente mais tarde.");
     } finally {
       setIsLoading(false);
     }
