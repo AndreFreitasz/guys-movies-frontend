@@ -7,6 +7,7 @@ import SearchBar from "../searchBar";
 import { motion, AnimatePresence } from "framer-motion";
 import FormRegister from "./formRegister";
 import FormLogin from "./formLogin";
+import { useAuth } from "../../../hooks/authContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +15,7 @@ const Header = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const { isAuthenticated, loading, logout } = useAuth();
 
   const handleLoginClick = () => {
     setIsModalOpen(true);
@@ -89,18 +91,29 @@ const Header = () => {
         </AnimatePresence>
         {!isSearchExpanded && (
           <>
-            <Button
-              label="Entrar"
-              onClick={handleLoginClick}
-              icon={<FaUser />}
-              className="hidden md:block mr-4"
-            />
-            <Button
-              label="Cadastrar"
-              onClick={handleRegisterClick}
-              icon={<FaPlus />}
-              className="hidden md:block"
-            />
+            {isAuthenticated ? (
+              <Button
+                label="Sair"
+                onClick={logout}
+                icon={<FaUser />}
+                className="hidden md:block"
+              />
+            ) : (
+              <>
+                <Button
+                  label="Entrar"
+                  onClick={handleLoginClick}
+                  icon={<FaUser />}
+                  className="hidden md:block mr-4"
+                />
+                <Button
+                  label="Cadastrar"
+                  onClick={handleRegisterClick}
+                  icon={<FaPlus />}
+                  className="hidden md:block"
+                />
+              </>
+            )}
           </>
         )}
         <button className="md:hidden ml-4" onClick={toggleMenu}>

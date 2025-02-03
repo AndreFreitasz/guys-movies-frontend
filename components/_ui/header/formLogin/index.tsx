@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
+import { useAuth } from "../../../../hooks/authContext";
 
 interface FormLoginProps {
   email: string;
@@ -27,6 +28,7 @@ const schema = yup.object({
 
 const FormLogin = ({ onClose }: FormLoginComponentProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
@@ -39,26 +41,13 @@ const FormLogin = ({ onClose }: FormLoginComponentProps) => {
   const onSubmit = async (data: FormLoginProps) => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        },
-      );
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Erro ao realizar login.");
-        return;
-      }
+      await login(data.email, data.password);
       toast.success("Login realizado com sucesso!");
       reset();
       onClose();
-    } catch {
-      console.error("Estamos com problemas, tente novamente mais tarde.");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message || "Erro ao realizar login.");
     } finally {
       setIsLoading(false);
     }
