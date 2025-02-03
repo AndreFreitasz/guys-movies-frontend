@@ -27,14 +27,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch("http://localhost:3005/auth/login", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}http://localhost:3005/auth/login`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
         },
-        body: JSON.stringify({ email, password }),
-      });
+      );
 
       if (!response.ok) {
         const data = await response.json();
@@ -50,10 +53,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await fetch("http://localhost:3005/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    await fetch(
+      `${process.env.NEXT_PUBLIC_URL_API}http://localhost:3005/auth/logout`,
+      {
+        method: "POST",
+        credentials: "include",
+      },
+    );
     setUser(null);
     setIsAuthenticated(false);
   };
