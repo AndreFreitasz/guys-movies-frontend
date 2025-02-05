@@ -1,19 +1,17 @@
-import React, {
-  createContext,
-  useState,
-  useContext,
-  ReactNode,
-  useEffect,
-} from "react";
+import { data } from "autoprefixer";
+import React, { createContext, useState, useContext, ReactNode } from "react";
 
 interface UserData {
   username: string;
+  email: string;
+  name: string;
 }
 
 interface AuthContextProps {
   isAuthenticated: boolean;
   user: UserData | null;
   loading: boolean;
+  dataUser: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -25,10 +23,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const dataUser = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/auth/profile`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setUser({
+          username: data.username,
+          email: data.email,
+          name: data.name,
+        });
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const login = async (email: string, password: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}http://localhost:3005/auth/login`,
+        `${process.env.NEXT_PUBLIC_URL_API}/auth/login`,
         {
           method: "POST",
           credentials: "include",
@@ -43,9 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const data = await response.json();
         throw new Error(data.message || "Erro ao realizar login.");
       }
-      const data = await response.json();
-      setUser({ username: data.username });
-      console.log(user);
+      await dataUser();
       setIsAuthenticated(true);
     } catch (error) {
       throw error;
@@ -53,20 +74,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}http://localhost:3005/auth/logout`,
-      {
-        method: "POST",
-        credentials: "include",
-      },
-    );
+    await fetch(`${process.env.NEXT_PUBLIC_URL_API}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
     setUser(null);
     setIsAuthenticated(false);
   };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, loading, login, logout }}
+      value={{ isAuthenticated, user, loading, dataUser, login, logout }}
     >
       {children}
     </AuthContext.Provider>

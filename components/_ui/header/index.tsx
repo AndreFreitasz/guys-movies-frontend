@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import NavItem from "./navItem";
 import Button from "../button";
-import { FaUser, FaBars, FaTimes, FaPlus, FaSearch } from "react-icons/fa";
+import {
+  FaUser,
+  FaBars,
+  FaTimes,
+  FaPlus,
+  FaSearch,
+  FaCaretDown,
+} from "react-icons/fa";
 import Modal from "../modal";
 import SearchBar from "../searchBar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,7 +22,7 @@ const Header = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const { isAuthenticated, loading, logout } = useAuth();
+  const { isAuthenticated, user, loading, logout } = useAuth();
 
   const handleLoginClick = () => {
     setIsModalOpen(true);
@@ -92,12 +99,44 @@ const Header = () => {
         {!isSearchExpanded && (
           <>
             {isAuthenticated ? (
-              <Button
-                label="Sair"
-                onClick={logout}
-                icon={<FaUser />}
-                className="hidden md:block"
-              />
+              <div className="relative">
+                <button
+                  onClick={logout}
+                  className="hidden md:flex items-center text-white"
+                >
+                  {user?.username} <FaCaretDown className="ml-2" />
+                </button>
+                {/* {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                    <ul className="py-1">
+                      <li>
+                        <a
+                          href="/assistidos"
+                          className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                        >
+                          Assistidos
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="/watchlist"
+                          className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                        >
+                          Watchlist
+                        </a>
+                      </li>
+                      <li>
+                        <button
+                          onClick={logout}
+                          className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200"
+                        >
+                          Sair
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                )} */}
+              </div>
             ) : (
               <>
                 <Button
