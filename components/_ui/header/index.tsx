@@ -39,10 +39,6 @@ const Header = () => {
     setIsDropdownOpen((prev) => !prev);
   };
 
-  if (loading) {
-    return null;
-  }
-
   return (
     <header className="h-20 flex items-center justify-between py-4 px-6 md:py-12 md:px-40 w-full">
       <div className="flex items-center">
@@ -83,7 +79,7 @@ const Header = () => {
             </motion.ul>
           )}
         </AnimatePresence>
-        {!isSearchExpanded && (
+        {!isSearchExpanded && !loading && (
           <>
             {isAuthenticated ? (
               <div className="relative" ref={dropdownRef}>

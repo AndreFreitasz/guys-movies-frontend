@@ -1,4 +1,3 @@
-import { data } from "autoprefixer";
 import React, {
   createContext,
   useState,
@@ -30,7 +29,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    dataUser();
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
+    }
+    setLoading(false);
   }, []);
 
   const dataUser = async () => {
@@ -51,6 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           name: data.name,
         });
         setIsAuthenticated(true);
+        localStorage.setItem("user", JSON.stringify(data));
       }
     } catch (error) {
       console.error(error);
@@ -86,12 +91,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_URL_API}/auth/logout`, {
+      await fetch(`http://localhost:3005/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem("user");
     } catch (error) {
       console.error(error);
     } finally {
