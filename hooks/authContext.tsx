@@ -1,5 +1,11 @@
 import { data } from "autoprefixer";
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
 
 interface UserData {
   username: string;
@@ -23,7 +29,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    dataUser();
+  }, []);
+
   const dataUser = async () => {
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL_API}/auth/profile`,
@@ -74,12 +85,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_URL_API}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setUser(null);
-    setIsAuthenticated(false);
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_URL_API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
