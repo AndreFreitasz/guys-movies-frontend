@@ -7,6 +7,7 @@ import MoviesProvider from "../components/home/moviesProvider";
 import MovieCard from "../components/home/movieCard";
 import Footer from "../components/_ui/footer";
 import { GetServerSideProps } from "next";
+import LoadingSpinner from "../components/_ui/loadingSpinner";
 
 interface Movie {
   id: number;
@@ -75,6 +76,7 @@ const Home: React.FC<HomeProps> = ({
   }, [error]);
 
   useEffect(() => {
+    setLoading(true);
     const handleScroll = async () => {
       if (
         window.innerHeight + document.documentElement.scrollTop !==
@@ -83,7 +85,6 @@ const Home: React.FC<HomeProps> = ({
       ) {
         return;
       }
-      setLoading(true);
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_URL_API}/movies/popular?page=${page + 1}`,
@@ -119,175 +120,181 @@ const Home: React.FC<HomeProps> = ({
   return (
     <>
       <Header />
-      <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
-        <div className="flex items-center mb-4">
-          <Image
-            src="/icons/home/popular.png"
-            alt="Ícone de uma estrela"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
-          />
-          <Title
-            title="Filmes Populares Por Streamings"
-            className="ml-2 text-left"
-          />
-        </div>
-        <Carousel
-          data={providerData || []}
-          slidesToShow={3}
-          renderItem={(providerData) => (
-            <MoviesProvider
-              providerData={providerData}
-              key={providerData.provider.id}
+      {!loading ? (
+           <LoadingSpinner />
+        ) : (
+          <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
+          <div className="flex items-center mb-4">
+            <Image
+              src="/icons/home/popular.png"
+              alt="Ícone de uma estrela"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
             />
-          )}
-        />
-
-        <div className="flex items-center mt-12 mb-4">
-          <Image
-            src="/icons/home/cinema.png"
-            alt="Ícone de um cinema"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
+            <Title
+              title="Filmes Populares Por Streamings"
+              className="ml-2 text-left"
+            />
+          </div>
+          <Carousel
+            data={providerData || []}
+            slidesToShow={3}
+            renderItem={(providerData) => (
+              <MoviesProvider
+                providerData={providerData}
+                key={providerData.provider.id}
+              />
+            )}
           />
-          <Title title="Filmes Populares" className="ml-2 text-left" />
-        </div>
-        <Carousel
-          slidesToShow={6}
-          infinite={true}
-          data={popularMovies || []}
-          className="ml-16"
-          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-        />
-
-        <div className="flex items-center mt-24 mb-4">
-          <Image
-            src="/icons/home/horror.png"
-            alt="Ícone de Terror"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
+  
+          <div className="flex items-center mt-12 mb-4">
+            <Image
+              src="/icons/home/cinema.png"
+              alt="Ícone de um cinema"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Filmes Populares" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={6}
+            infinite={true}
+            data={popularMovies || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-          <Title title="Terror E Suspense" className="ml-2 text-left" />
-        </div>
-        <Carousel
-          slidesToShow={6}
-          infinite={true}
-          data={popularMoviesHorror || []}
-          className="ml-16"
-          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-        />
-
-        <div className="flex items-center mt-24 mb-4">
-          <Image
-            src="/icons/home/scifi.png"
-            alt="Ícone de tecnologia"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
+  
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/home/horror.png"
+              alt="Ícone de Terror"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Terror E Suspense" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={6}
+            infinite={true}
+            data={popularMoviesHorror || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-          <Title title="Ficção Científica" className="ml-2 text-left" />
-        </div>
-        <Carousel
-          slidesToShow={6}
-          infinite={true}
-          data={popularMoviesSciFi || []}
-          className="ml-16"
-          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-        />
-
-        <div className="flex items-center mt-24 mb-4">
-          <Image
-            src="/icons/home/like.png"
-            alt="Ícone de um curtir"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
+  
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/home/scifi.png"
+              alt="Ícone de tecnologia"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Ficção Científica" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={6}
+            infinite={true}
+            data={popularMoviesSciFi || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-          <Title title="Aclamados pela Crítica" className="ml-2 text-left" />
-        </div>
-        <Carousel
-          slidesToShow={6}
-          infinite={true}
-          data={topRatedMovies || []}
-          className="ml-16"
-          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-        />
-
-        <div className="flex items-center mt-24 mb-4">
-          <Image
-            src="/icons/home/family.png"
-            alt="Ícone de uma família"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
+  
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/home/like.png"
+              alt="Ícone de um curtir"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Aclamados pela Crítica" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={6}
+            infinite={true}
+            data={topRatedMovies || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-          <Title title="Família" className="ml-2 text-left" />
-        </div>
-        <Carousel
-          slidesToShow={6}
-          infinite={true}
-          data={popularMoviesFamily || []}
-          className="ml-16"
-          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-        />
-
-        <div className="flex items-center mt-24 mb-4">
-          <Image
-            src="/icons/home/drama.png"
-            alt="Ícone de drama"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
+  
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/home/family.png"
+              alt="Ícone de uma família"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Família" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={6}
+            infinite={true}
+            data={popularMoviesFamily || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-          <Title title="Drama" className="ml-2 text-left" />
-        </div>
-        <Carousel
-          slidesToShow={6}
-          infinite={true}
-          data={popularMoviesDrama || []}
-          className="ml-16"
-          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-        />
-
-        <div className="flex items-center mt-24 mb-4">
-          <Image
-            src="/icons/home/rocket.png"
-            alt="Ícone de um foguete"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
+  
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/home/drama.png"
+              alt="Ícone de drama"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Drama" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={6}
+            infinite={true}
+            data={popularMoviesDrama || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-          <Title title="Sci-Fi Dramático" className="ml-2 text-left" />
-        </div>
-        <Carousel
-          slidesToShow={6}
-          infinite={true}
-          data={popularMoviesSciFiDrama || []}
-          className="ml-16"
-          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-        />
-
-        <div className="flex items-center mt-24 mb-4">
-          <Image
-            src="/icons/home/comedy.png"
-            alt="Ícone de comédia"
-            className="mr-2 w-8 h-8"
-            width={64}
-            height={64}
+  
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/home/rocket.png"
+              alt="Ícone de um foguete"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Sci-Fi Dramático" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={6}
+            infinite={true}
+            data={popularMoviesSciFiDrama || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-          <Title title="Comédia" className="ml-2 text-left" />
+  
+          <div className="flex items-center mt-24 mb-4">
+            <Image
+              src="/icons/home/comedy.png"
+              alt="Ícone de comédia"
+              className="mr-2 w-8 h-8"
+              width={64}
+              height={64}
+            />
+            <Title title="Comédia" className="ml-2 text-left" />
+          </div>
+          <Carousel
+            slidesToShow={6}
+            infinite={true}
+            data={popularMoviesComedy || []}
+            className="ml-16"
+            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+          />
         </div>
-        <Carousel
-          slidesToShow={6}
-          infinite={true}
-          data={popularMoviesComedy || []}
-          className="ml-16"
-          renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-        />
-      </div>
+        )
+        }
+     
       <Footer />
     </>
   );

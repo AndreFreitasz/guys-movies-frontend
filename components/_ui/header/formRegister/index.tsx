@@ -50,7 +50,7 @@ const FormRegister = ({ onClose }: FormRegisterComponentProps) => {
   const onSubmit = async (data: FormRegisterProps) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:3005/users`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

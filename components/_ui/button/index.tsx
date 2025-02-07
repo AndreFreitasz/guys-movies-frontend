@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 
 interface ButtonProps {
   label: string;
@@ -7,14 +7,11 @@ interface ButtonProps {
   icon?: React.ReactNode;
 }
 
-const Button: React.FC<ButtonProps> = ({
-  label,
-  onClick,
-  className = "",
-  icon,
-}) => {
+const Button = forwardRef<HTMLButtonElement, ButtonProps> (
+  ({label, onClick, className, icon}, ref) => {
   return (
     <button
+    ref={ref}
       type="button"
       onClick={onClick}
       className={`box-border relative z-30 inline-flex items-center justify-center w-auto px-8 py-3 overflow-hidden font-bold text-white transition-all duration-300 bg-indigo-600 rounded-md cursor-pointer group ring-offset-2 ring-1 ring-indigo-300 ring-offset-indigo-200 hover:ring-offset-indigo-500 ease focus:outline-none ${className}`}
@@ -27,6 +24,7 @@ const Button: React.FC<ButtonProps> = ({
       </span>
     </button>
   );
-};
+}
+)
 
 export default Button;
