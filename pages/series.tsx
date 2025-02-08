@@ -8,7 +8,6 @@ import SerieCard from "../components/series/seriesCard";
 import { GetServerSideProps } from "next";
 import Footer from "../components/_ui/footer";
 import { SerieProps } from "../interfaces/series/types";
-import LoadingSpinner from "../components/_ui/loadingSpinner";
 
 const Serie = ({
   providerData,
@@ -24,14 +23,12 @@ const Serie = ({
 }: SerieProps) => {
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (error) {
       setErrorMessage(error);
       setShowError(true);
-    };
-    setLoading(false);
+    }
   }, [error]);
 
   if (showError) {
@@ -50,7 +47,6 @@ const Serie = ({
   return (
     <>
       <Header />
-      {loading && <LoadingSpinner />}
       <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
         <div className="flex items-center mb-4">
           <Image

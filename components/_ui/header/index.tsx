@@ -15,7 +15,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import FormRegister from "./formRegister";
 import FormLogin from "./formLogin";
 import { useAuth } from "../../../hooks/authContext";
-import ConfirmLogoutModal from "../modal/confirmLogoutModal";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,50 +23,20 @@ const Header = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const { isAuthenticated, user, loading, logout } = useAuth();
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownRef]);
-
   const handleLoginClick = () => setIsModalOpen(true);
-
   const handleRegisterClick = () => setIsRegisterModalOpen(true);
-
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
   const closeModal = () => setIsModalOpen(false);
-
   const closeRegisterModal = () => setIsRegisterModalOpen(false);
-
   const handleSearchFocus = () => setIsSearchExpanded(true);
-
   const handleSearchBlur = () => setIsSearchExpanded(false);
-
   const toggleSearchBar = () => setIsSearchVisible(!isSearchVisible);
-
-  const handleLogoutClick = () => setIsLogoutModalOpen(true);
-
   const toggleDropdown = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     setIsDropdownOpen((prev) => !prev);
-  };
-
-  const handleLogoutConfirm = () => {
-    setIsLogoutModalOpen(false);
-    logout();
   };
 
   return (
@@ -119,7 +88,6 @@ const Header = () => {
                   onClick={toggleDropdown}
                   icon={<FaCaretDown size={24} />}
                   className="hidden md:flex"
-                  ref={buttonRef}
                 />
                 {isDropdownOpen && (
                   <AnimatePresence>
@@ -143,7 +111,7 @@ const Header = () => {
                         </li>
                         <li>
                           <button
-                            onClick={handleLogoutClick}
+                            onClick={logout}
                             className="block w-full px-4 py-2 hover:bg-white/10 transition-colors duration-200"
                           >
                             Sair
@@ -221,13 +189,6 @@ const Header = () => {
       >
         <FormRegister onClose={closeRegisterModal} />
       </Modal>
-
-
-      <ConfirmLogoutModal
-        isOpen={isLogoutModalOpen}
-        onClose={() => setIsLogoutModalOpen(false)}
-        onConfirm={handleLogoutConfirm}
-      />
     </header>
   );
 };
