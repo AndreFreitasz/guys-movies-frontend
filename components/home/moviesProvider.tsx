@@ -1,10 +1,10 @@
-// components/_ui/MoviesProvider.tsx
-import React from "react";
+import React, { useState } from "react";
 
 interface Movie {
   id: number;
   title: string;
   poster_path: string;
+  overview: string;
 }
 
 interface Provider {
@@ -23,6 +23,10 @@ interface MoviesProviderProps {
 }
 
 const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
+  const [isHoveredMovieOverview, setIsHoveredMovieOverview] = useState<
+    number | null
+  >(null);
+
   return (
     <div
       key={providerData.provider.id}
@@ -43,7 +47,9 @@ const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
         {providerData.movies.slice(0, 10).map((movie, index) => (
           <li
             key={movie.id}
-            className="text-white mb-2 px-4 flex items-center transform transition-transform duration-300 hover:scale-105 hover:z-10"
+            onMouseEnter={() => setIsHoveredMovieOverview(movie.id)}
+            onMouseLeave={() => setIsHoveredMovieOverview(null)}
+            className="text-white mb-2 px-4 flex items-center transform transition-transform duration-300 hover:scale-105 hover:z-10 cursor-pointer"
           >
             <div className="flex flex-col items-end">
               <span
@@ -60,12 +66,21 @@ const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
                 alt={movie.title}
                 className="w-20 h-30 mr-2 rounded-lg"
               />
-              <span
-                className="truncate max-w-[10rem] hover:overflow-visible text-xl font-semibold hover:whitespace-normal hover:bg-defaultBackgroundSecond hover:p-2 hover:rounded-lg"
-                title={movie.title}
-              >
-                {movie.title}
-              </span>
+              {isHoveredMovieOverview === movie.id ? (
+                <span
+                  className="w-[14rem] h-[10rem] overflow-hidden text-sm font-semibold bg-defaultBackgroundSecond p-2 rounded-lg"
+                  title={movie.title}
+                >
+                  {movie.overview}
+                </span>
+              ) : (
+                <span
+                  className="truncate max-w-[10rem] hover:overflow-visible text-xl font-semibold hover:whitespace-normal hover:bg-defaultBackgroundSecond hover:p-2 hover:rounded-lg"
+                  title={movie.title}
+                >
+                  {movie.title}
+                </span>
+              )}
             </div>
           </li>
         ))}
