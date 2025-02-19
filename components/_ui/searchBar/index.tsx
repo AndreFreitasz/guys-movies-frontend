@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 interface SearchBarProps {
   onFocus: () => void;
@@ -9,6 +10,7 @@ interface SearchBarProps {
 }
 
 interface Movie {
+  id: number;
   title: string;
   poster_url: string;
   vote_average: number;
@@ -79,16 +81,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
       {searchResults.length > 0 && isExpanded == true && (
         <ul className="absolute top-full left-0 w-full bg-gray-800 text-white mt-2 rounded-lg shadow-lg z-10 max-h-screen-60 overflow-y-auto">
           {searchResults.map((movie, index) => (
-            <li
-              key={index}
-              className="relative px-4 py-2 hover:bg-gray-700 cursor-pointer"
-            >
-              <div className="flex flex-row items-center">
-                <img src={movie.poster_url} className="w-26 h-32 rounded-md" />
-                <p className="font-bold text-lg ml-4">{movie.title}</p>
-              </div>
-              <p className="absolute bottom-2 right-4">{movie.release_date}</p>
-            </li>
+            <Link href={`/movie/${movie.id}`} key={index}>
+              <li
+                key={index}
+                onMouseDown={(e) => e.preventDefault()}
+                className="relative px-4 py-2 hover:bg-gray-700 cursor-pointer"
+              >
+                <div className="flex flex-row items-center">
+                  <img
+                    src={movie.poster_url}
+                    className="w-26 h-32 rounded-md"
+                  />
+                  <p className="font-bold text-lg ml-4">{movie.title}</p>
+                </div>
+                <p className="absolute bottom-2 right-4">
+                  {movie.release_date}
+                </p>
+              </li>
+            </Link>
           ))}
         </ul>
       )}

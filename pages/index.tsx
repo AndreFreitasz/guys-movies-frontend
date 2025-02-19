@@ -8,6 +8,7 @@ import MovieCard from "../components/home/movieCard";
 import Footer from "../components/_ui/footer";
 import { GetServerSideProps } from "next";
 import LoadingSpinner from "../components/_ui/loadingSpinner";
+import Head from "next/head";
 
 interface Movie {
   id: number;
@@ -119,11 +120,14 @@ const Home: React.FC<HomeProps> = ({
 
   return (
     <>
+      <Head>
+        <title>GuysMovies - Filmes</title>
+      </Head>
       <Header />
       {!loading ? (
-           <LoadingSpinner />
-        ) : (
-          <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
+        <LoadingSpinner />
+      ) : (
+        <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
           <div className="flex items-center mb-4">
             <Image
               src="/icons/home/popular.png"
@@ -147,7 +151,7 @@ const Home: React.FC<HomeProps> = ({
               />
             )}
           />
-  
+
           <div className="flex items-center mt-12 mb-4">
             <Image
               src="/icons/home/cinema.png"
@@ -165,7 +169,7 @@ const Home: React.FC<HomeProps> = ({
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-  
+
           <div className="flex items-center mt-24 mb-4">
             <Image
               src="/icons/home/horror.png"
@@ -183,7 +187,7 @@ const Home: React.FC<HomeProps> = ({
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-  
+
           <div className="flex items-center mt-24 mb-4">
             <Image
               src="/icons/home/scifi.png"
@@ -201,7 +205,7 @@ const Home: React.FC<HomeProps> = ({
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-  
+
           <div className="flex items-center mt-24 mb-4">
             <Image
               src="/icons/home/like.png"
@@ -219,7 +223,7 @@ const Home: React.FC<HomeProps> = ({
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-  
+
           <div className="flex items-center mt-24 mb-4">
             <Image
               src="/icons/home/family.png"
@@ -237,7 +241,7 @@ const Home: React.FC<HomeProps> = ({
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-  
+
           <div className="flex items-center mt-24 mb-4">
             <Image
               src="/icons/home/drama.png"
@@ -255,7 +259,7 @@ const Home: React.FC<HomeProps> = ({
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-  
+
           <div className="flex items-center mt-24 mb-4">
             <Image
               src="/icons/home/rocket.png"
@@ -273,7 +277,7 @@ const Home: React.FC<HomeProps> = ({
             className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
-  
+
           <div className="flex items-center mt-24 mb-4">
             <Image
               src="/icons/home/comedy.png"
@@ -292,9 +296,8 @@ const Home: React.FC<HomeProps> = ({
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
           />
         </div>
-        )
-        }
-     
+      )}
+
       <Footer />
     </>
   );

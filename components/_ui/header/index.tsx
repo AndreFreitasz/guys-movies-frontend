@@ -16,6 +16,7 @@ import FormRegister from "./formRegister";
 import FormLogin from "./formLogin";
 import { useAuth } from "../../../hooks/authContext";
 import ConfirmLogoutModal from "../modal/confirmLogoutModal";
+import Link from "next/link";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,7 +32,10 @@ const Header = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -73,14 +77,16 @@ const Header = () => {
   return (
     <header className="h-20 flex items-center justify-between py-4 px-6 md:py-12 md:px-40 w-full">
       <div className="flex items-center">
-        <div className="flex items-center ml-2">
-          <p className="font-extrabold text-indigo-600 text-3xl md:text-5xl">
-            GUY'S
-          </p>
-          <p className="font-extrabold text-white text-3xl md:text-5xl ml-1">
-            Filmes
-          </p>
-        </div>
+        <Link href="/">
+          <div className="flex items-center ml-2">
+            <p className="font-extrabold text-indigo-600 text-3xl md:text-5xl">
+              GUY'S
+            </p>
+            <p className="font-extrabold text-white text-3xl md:text-5xl ml-1">
+              Filmes
+            </p>
+          </div>
+        </Link>
       </div>
 
       <div className="flex-grow flex justify-start ml-6">
@@ -221,7 +227,6 @@ const Header = () => {
       >
         <FormRegister onClose={closeRegisterModal} />
       </Modal>
-
 
       <ConfirmLogoutModal
         isOpen={isLogoutModalOpen}
