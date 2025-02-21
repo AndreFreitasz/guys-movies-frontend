@@ -6,6 +6,7 @@ import Footer from "../components/_ui/footer";
 import { SerieProps } from "../interfaces/series/types";
 import SerieCard from "../components/series/seriesCard";
 import Carousel from "../components/_ui/carousel";
+import Head from "next/head";
 
 const Serie = ({ providerData, error }: SerieProps) => {
   const [showError, setShowError] = useState(false);
@@ -33,6 +34,9 @@ const Serie = ({ providerData, error }: SerieProps) => {
 
   return (
     <>
+      <Head>
+        <title>GuysMovies - Séries</title>
+      </Head>
       <Header />
       <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
         {providerData.map((provider) => (
