@@ -9,7 +9,11 @@ interface ModalLogoutProps {
   onConfirm: () => void;
 }
 
-const ConfirmLogoutModal: React.FC<ModalLogoutProps> = ({ isOpen, onClose, onConfirm }) => {
+const ConfirmLogoutModal: React.FC<ModalLogoutProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+}) => {
   return (
     <AnimatePresence>
       {isOpen && (

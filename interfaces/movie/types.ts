@@ -16,6 +16,8 @@ export interface ProviderDetail {
 
 export interface Providers {
   flatrate?: ProviderDetail[];
+  buy?: ProviderDetail[];
+  rent?: ProviderDetail[];
 }
 
 export interface MovieResponse {
