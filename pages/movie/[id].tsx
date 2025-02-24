@@ -62,28 +62,17 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                   <p className="mt-4 text-gray-300 font-semibold text-lg">
                     {movie.overview}
                   </p>
-                  <div>
-                    {movie.providers.flatrate && (
+                  {(movie.providers.flatrate ||
+                    movie.providers.buy ||
+                    movie.providers.rent) && (
+                    <div className="px-4">
                       <ProvidersMovie
-                        title="STREAM"
-                        providers={movie.providers.flatrate}
+                        flatrate={movie.providers.flatrate}
+                        buy={movie.providers.buy}
+                        rent={movie.providers.rent}
                       />
-                    )}
-
-                    {movie.providers.buy && (
-                      <ProvidersMovie
-                        title="COMPRAR"
-                        providers={movie.providers.buy}
-                      />
-                    )}
-
-                    {movie.providers.rent && (
-                      <ProvidersMovie
-                        title="ALUGAR"
-                        providers={movie.providers.rent}
-                      />
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
