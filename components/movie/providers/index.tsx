@@ -9,7 +9,7 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
       </h2>
       <div className="flex flex-col space-y-4">
         {flatrate && flatrate.length > 0 && (
-          <div className="flex items-center justify-start w-full py-2 border-b-2 border-white border-opacity-30">
+          <div className="flex items-center justify-start w-full py-2">
             <div className="w-[90px] text-right pr-2">
               <span className="text-gray-200 text-xs font-bold bg-indigo-600 bg-opacity-50 p-2 rounded-xl">
                 STREAM
@@ -19,7 +19,7 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
               <div className="flex gap-2">
                 {flatrate.map((provider) => (
                   <img
-                    key={provider.provider_id}
+                    key={`flatrate-${provider.provider_id}`}
                     src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-12 rounded-xl"
@@ -30,7 +30,7 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
           </div>
         )}
         {buy && buy.length > 0 && (
-          <div className="flex items-center py-2 border-b-2 border-white border-opacity-30">
+          <div className="flex items-center py-4 border-b-2 border-t-2 border-white border-opacity-30">
             <div className="w-[90px] text-right pr-2">
               <span className="text-gray-200 text-xs font-bold bg-indigo-600 bg-opacity-50 p-2 rounded-xl">
                 COMPRAR
@@ -40,7 +40,7 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
               <div className="flex gap-2">
                 {buy.map((provider) => (
                   <img
-                    key={provider.provider_id}
+                    key={`buy-${provider.provider_id}`}
                     src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-12 rounded-xl"
@@ -61,7 +61,7 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
               <div className="flex gap-2">
                 {rent.map((provider) => (
                   <img
-                    key={provider.provider_id}
+                    key={`rent-${provider.provider_id}`}
                     src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-12 rounded-xl"

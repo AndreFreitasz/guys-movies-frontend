@@ -6,6 +6,7 @@ import LoadingSpinner from "../../components/_ui/loadingSpinner";
 import Head from "next/head";
 import Footer from "../../components/_ui/footer";
 import ProvidersMovie from "../../components/movie/providers";
+import ReactStars from 'react-stars'
 
 interface MovieProps {
   movie: MovieResponse;
@@ -13,10 +14,14 @@ interface MovieProps {
 
 const Movie: NextPage<MovieProps> = ({ movie }) => {
   const [loading, setLoading] = useState(false);
+  const [rating, setRating] = useState(0);
+
   const formattedDate = new Date(movie.release_date).toLocaleDateString(
     "pt-BR",
   );
-  console.log(movie);
+  const handleRating = (newRating: number) => {
+    setRating(newRating);
+  };
 
   return (
     <>
@@ -40,14 +45,30 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                   "linear-gradient(to right, transparent 0, black 800px, black calc(100% - 800px), transparent 100%)",
               }}
             />
-            <div className="mt-8 w-full px-4 sm:px-6 md:px-8 lg:px-96">
+            <div className="mt-8 w-full px-4 sm:px-6 md:px-8 lg:px-40">
               <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
                 <div className="sm:mx-0 mx-auto">
                   <img
                     src={movie.poster_path}
                     alt={movie.title}
-                    className="block mx-auto w-[140px] sm:w-[320px] rounded-lg shadow-lg"
+                    className="block mx-auto w-[220px] sm:w-[420px] rounded-lg shadow-lg"
                   />
+                  <div className="mt-8 border-b-2 border-gray-600 pb-4">
+                    <h3 className="text-lg font-bold text-gray-600 mb-2">
+                      GÊNEROS
+                    </h3>
+                    <p className="text-gray-400 font-semibold text-md">
+                      {movie.genres.map((genre) => genre).join(", ")}
+                    </p>
+                  </div>
+                  <div className="mt-4 border-b-2 border-gray-600 pb-4">
+                    <h3 className="text-lg font-bold text-gray-600 mb-2">
+                      DIRETOR
+                    </h3>
+                    <p className="text-gray-400 font-semibold text-md">
+                      {movie.director?.name}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex flex-col justify-start gap-4 w-full min-h-48 overflow-y-auto self-start">
                   <div className="flex gap-4 items-end">
@@ -59,20 +80,36 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                       {formattedDate}{" "}
                     </p>
                   </div>
-                  <p className="mt-4 text-gray-300 font-semibold text-lg">
-                    {movie.overview}
-                  </p>
-                  {(movie.providers.flatrate ||
-                    movie.providers.buy ||
-                    movie.providers.rent) && (
-                    <div className="px-4">
-                      <ProvidersMovie
-                        flatrate={movie.providers.flatrate}
-                        buy={movie.providers.buy}
-                        rent={movie.providers.rent}
-                      />
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="w-full sm:w-3/5">
+                      <p className="mt-4 text-gray-300 font-semibold text-lg">
+                        {movie.overview}
+                      </p>
+                      {(movie.providers.flatrate ||
+                        movie.providers.buy ||
+                        movie.providers.rent) && (
+                        <div className="px-4">
+                          <ProvidersMovie
+                            flatrate={movie.providers.flatrate}
+                            buy={movie.providers.buy}
+                            rent={movie.providers.rent}
+                          />
+                        </div>
+                      )}
                     </div>
-                  )}
+                    <div className="w-full sm:w-2/5">
+                      <div className="bg-defaultBackgroundSecond bg-opacity-40 p-4 rounded-lg">
+                        <ReactStars
+                          count={5}
+                          onChange={handleRating}
+                          size={32}
+                          color2={'#4F46E5'}
+                          half={true}
+                          value={rating}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
