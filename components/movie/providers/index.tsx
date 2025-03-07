@@ -17,9 +17,9 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
             </div>
             <div className="w-1/2 pl-2">
               <div className="flex gap-2">
-                {flatrate.map((provider) => (
+                {flatrate.map((provider, index) => (
                   <img
-                    key={`flatrate-${provider.provider_id}`}
+                    key={provider.provider_id ? `flatrate-${provider.provider_id}` : `flatrate-${index}`}
                     src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-12 rounded-xl"
@@ -38,9 +38,9 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
             </div>
             <div className="w-1/2 pl-2">
               <div className="flex gap-2">
-                {buy.map((provider) => (
+                {buy.map((provider, index) => (
                   <img
-                    key={`buy-${provider.provider_id}`}
+                    key={provider.provider_id ? `buy-${provider.provider_id}` : `buy-${index}`}
                     src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-12 rounded-xl"
@@ -59,9 +59,9 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
             </div>
             <div className="w-1/2 pl-2">
               <div className="flex gap-2">
-                {rent.map((provider) => (
+                {rent.map((provider, index) => (
                   <img
-                    key={`rent-${provider.provider_id}`}
+                    key={provider.provider_id ? `rent-${provider.provider_id}` : `rent-${index}`}
                     src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
                     alt={provider.provider_name}
                     className="w-12 rounded-xl"
