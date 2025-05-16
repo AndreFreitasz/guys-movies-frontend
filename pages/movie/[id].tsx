@@ -1,3 +1,4 @@
+import { useAuth } from "../../hooks/authContext";
 import { GetServerSideProps, NextPage } from "next";
 import { MovieResponse } from "../../interfaces/movie/types";
 import Header from "../../components/_ui/header";
@@ -11,16 +12,19 @@ import { FaHeart, FaEye, FaClock, FaPlus } from "react-icons/fa";
 import Modal from "../../components/_ui/modal";
 import BodyModalForm from "../../components/movie/bodyModalForm";
 import CircularVoteAverage from "../../components/home/movieCard/circularVoteAverage";
+import { toast } from "react-toastify";
 
 interface MovieProps {
   movie: MovieResponse;
 }
 
 const Movie: NextPage<MovieProps> = ({ movie }) => {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rating, setRating] = useState(0);
+  const [isWatched, setIsWatched] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -33,6 +37,55 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const handleRating = (newRating: number) => setRating(newRating);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+  const showToast = (type: "success" | "error" | "warn" | "info", message: string) => {
+    switch (type) {
+      case "success":
+        toast.success(message);
+        break;
+      case "error":
+        toast.error(message);
+        break;
+      case "warn":
+        toast.warn(message);
+        break;
+      case "info":
+        toast.info(message);
+        break;
+      default:
+        toast(message);
+    }
+  }
+
+  const handleWatchedClick = async () => {
+    if (!user) return showToast("warn", "Entre em uma conta para marcar o filme como assistido.");
+    const movieData = {
+      watchedAt: new Date().toISOString(),
+      userId: user.id,
+      createMovieDto: {
+        title: movie.title,
+        overview: movie.overview,
+        releaseDate: movie.release_date,
+        idTmdb: movie.id,
+        posterPath: movie.poster_path,
+        director: movie.director?.name,
+        voteAverage: movie.vote_average,
+      },
+    };
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(movieData),
+      });
+      if (response.status === 200) setIsWatched(false);
+      if (response.status === 201) setIsWatched(true);
+
+    } catch (error) {
+      showToast("error", "Erro ao marcar um filme como assistido.");
+    }
+  };
 
   return (
     <>
@@ -132,7 +185,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                             </span>
                           </div>
                           <div className="relative group">
-                            <FaEye className="text-gray-500 text-3xl cursor-pointer hover:text-blue-500" />
+                            <FaEye 
+                              className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`} 
+                              onClick={handleWatchedClick}
+                            />
                             <span className="absolute bottom-full mb-2 bg-gray-700 text-white text-md rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               Assistido
                             </span>

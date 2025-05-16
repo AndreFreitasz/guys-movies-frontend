@@ -10,6 +10,7 @@ interface UserData {
   username: string;
   email: string;
   name: string;
+  id: number;
 }
 
 interface AuthContextProps {
@@ -31,7 +32,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
       setIsAuthenticated(true);
     }
     setLoading(false);
@@ -50,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok) {
         const data = await response.json();
         setUser({
+          id: data.id,
           username: data.username,
           email: data.email,
           name: data.name,
