@@ -25,6 +25,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const [loading, setLoading] = useState(false);
   const [rating, setRating] = useState(0);
   const [isWatched, setIsWatched] = useState(false);
+  const [watchedLoading, setWatchedLoading] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -55,9 +56,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         toast(message);
     }
   }
-
+  
   const handleWatchedClick = async () => {
     if (!user) return showToast("warn", "Entre em uma conta para marcar o filme como assistido.");
+    setWatchedLoading(true);
     const movieData = {
       watchedAt: new Date().toISOString(),
       userId: user.id,
@@ -79,6 +81,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         },
         body: JSON.stringify(movieData),
       });
+      setWatchedLoading(false);
       if (response.status === 200) setIsWatched(false);
       if (response.status === 201) setIsWatched(true);
 
@@ -185,10 +188,14 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                             </span>
                           </div>
                           <div className="relative group">
+                          {watchedLoading ? (
+                            <LoadingSpinner small />
+                          ) : (
                             <FaEye 
                               className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`} 
                               onClick={handleWatchedClick}
                             />
+                          )}
                             <span className="absolute bottom-full mb-2 bg-gray-700 text-white text-md rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               Assistido
                             </span>
