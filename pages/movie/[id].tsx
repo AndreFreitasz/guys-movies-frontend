@@ -73,6 +73,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         voteAverage: movie.vote_average,
       },
     };
+    console.log("movieData =>", movieData);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`, {
         method: 'POST',
@@ -81,6 +82,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         },
         body: JSON.stringify(movieData),
       });
+      console.log("response watched =>", response);
       setWatchedLoading(false);
       if (response.status === 200) setIsWatched(false);
       if (response.status === 201) setIsWatched(true);
