@@ -29,7 +29,19 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    checkIsWatched();
+  }, [user, movie.id]);
+
+  const checkIsWatched = async () => {
+    if (!user) return;
+    console.log()
+    const isWatchedResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?userid=${user.id}&idTmdb=${movie.id}`,
+    );
+    const isWatched = await isWatchedResponse.json();
+    console.log("isWatched =>", isWatched);
+    setIsWatched(isWatched.watched);
+  }
 
   const formattedDate = new Date(movie.release_date).toLocaleDateString(
     "pt-BR",
@@ -73,7 +85,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         voteAverage: movie.vote_average,
       },
     };
-    console.log("movieData =>", movieData);
+    
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`, {
         method: 'POST',
@@ -82,7 +94,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         },
         body: JSON.stringify(movieData),
       });
-      console.log("response watched =>", response);
+      
       setWatchedLoading(false);
       if (response.status === 200) setIsWatched(false);
       if (response.status === 201) setIsWatched(true);
