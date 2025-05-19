@@ -13,6 +13,7 @@ import Modal from "../../components/_ui/modal";
 import BodyModalForm from "../../components/movie/bodyModalForm";
 import CircularVoteAverage from "../../components/home/movieCard/circularVoteAverage";
 import { toast } from "react-toastify";
+import { set } from "react-hook-form";
 
 interface MovieProps {
   movie: MovieResponse;
@@ -26,22 +27,34 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const [rating, setRating] = useState(0);
   const [isWatched, setIsWatched] = useState(false);
   const [watchedLoading, setWatchedLoading] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [isWaitingLoading, setIsWaitingLoading] = useState(false);
+  const [watchedDate, setWatchedDate] = useState("");
 
   useEffect(() => {
     setIsClient(true);
     checkIsWatched();
+    checkIsWaiting();
   }, [user, movie.id]);
+
+  const checkIsWaiting = async () => {
+    if (!user) return;
+    const isWaitingResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie/isWaiting?userid=${user.id}&idTmdb=${movie.id}`,
+    );
+    const isWaiting = await isWaitingResponse.json();
+    setIsWaiting(isWaiting.waiting);
+  };
 
   const checkIsWatched = async () => {
     if (!user) return;
-    console.log()
+    console.log();
     const isWatchedResponse = await fetch(
       `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?userid=${user.id}&idTmdb=${movie.id}`,
     );
     const isWatched = await isWatchedResponse.json();
-    console.log("isWatched =>", isWatched);
     setIsWatched(isWatched.watched);
-  }
+  };
 
   const formattedDate = new Date(movie.release_date).toLocaleDateString(
     "pt-BR",
@@ -50,7 +63,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const handleRating = (newRating: number) => setRating(newRating);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  const showToast = (type: "success" | "error" | "warn" | "info", message: string) => {
+  const showToast = (
+    type: "success" | "error" | "warn" | "info",
+    message: string,
+  ) => {
     switch (type) {
       case "success":
         toast.success(message);
@@ -67,10 +83,18 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       default:
         toast(message);
     }
-  }
-  
+  };
+
   const handleWatchedClick = async () => {
-    if (!user) return showToast("warn", "Entre em uma conta para marcar o filme como assistido.");
+    if (!user)
+      return showToast(
+        "warn",
+        "Entre em uma conta para marcar o filme como assistido.",
+      );
+    if (!isWatched) {
+      openModal();
+      return;
+    }
     setWatchedLoading(true);
     const movieData = {
       watchedAt: new Date().toISOString(),
@@ -85,22 +109,100 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         voteAverage: movie.vote_average,
       },
     };
-    
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(movieData),
         },
-        body: JSON.stringify(movieData),
-      });
-      
+      );
+
       setWatchedLoading(false);
       if (response.status === 200) setIsWatched(false);
       if (response.status === 201) setIsWatched(true);
-
     } catch (error) {
       showToast("error", "Erro ao marcar um filme como assistido.");
+    }
+  };
+
+  const handleWatchedSubmit = async () => {
+    setWatchedLoading(true);
+    const movieData = {
+      watchedAt: watchedDate,
+      createMovieDto: {
+        title: movie.title,
+        overview: movie.overview,
+        releaseDate: movie.release_date,
+        idTmdb: movie.id,
+        posterPath: movie.poster_path,
+        director: movie.director?.name,
+        voteAverage: movie.vote_average,
+      },
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(movieData),
+        },
+      );
+
+      setWatchedLoading(false);
+      setIsModalOpen(false);
+      if (response.status === 201) setIsWatched(true);
+      if (response.status === 200) setIsWatched(false);
+    } catch (error) {
+      showToast("error", "Erro ao marcar o filme como assistido.");
+    }
+  };
+
+  const handleWaitingClick = async () => {
+    if (!user)
+      return showToast(
+        "warn",
+        "Entre em uma conta para adicionar um filme na lista de espera.",
+      );
+    setIsWaitingLoading(true);
+    const movieData = {
+      userId: user.id,
+      createMovieDto: {
+        title: movie.title,
+        overview: movie.overview,
+        releaseDate: movie.release_date,
+        idTmdb: movie.id,
+        posterPath: movie.poster_path,
+        director: movie.director?.name,
+        voteAverage: movie.vote_average,
+      },
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(movieData),
+        },
+      );
+
+      setIsWaitingLoading(false);
+      if (response.status === 200) setIsWaiting(false);
+      if (response.status === 201) setIsWaiting(true);
+    } catch (error) {
+      showToast("error", "Erro ao adicionar o filme na lista de espera.");
     }
   };
 
@@ -202,33 +304,31 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                             </span>
                           </div>
                           <div className="relative group">
-                          {watchedLoading ? (
-                            <LoadingSpinner small />
-                          ) : (
-                            <FaEye 
-                              className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`} 
-                              onClick={handleWatchedClick}
-                            />
-                          )}
+                            {watchedLoading ? (
+                              <LoadingSpinner small />
+                            ) : (
+                              <FaEye
+                                className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`}
+                                onClick={handleWatchedClick}
+                              />
+                            )}
                             <span className="absolute bottom-full mb-2 bg-gray-700 text-white text-md rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               Assistido
                             </span>
                           </div>
                           <div className="relative group">
-                            <FaClock className="text-gray-500 text-3xl cursor-pointer hover:text-yellow-300" />
+                            {isWaitingLoading ? (
+                              <LoadingSpinner small />
+                            ) : (
+                              <FaClock
+                                className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
+                                onClick={handleWaitingClick}
+                              />
+                            )}
                             <span className="absolute bottom-full mb-2 bg-gray-700 text-white text-md rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               Lista de Espera
                             </span>
                           </div>
-                        </div>
-                        <div className="flex justify-center pt-2 border-b-4 border-gray-700">
-                          <button
-                            onClick={openModal}
-                            className="flex items-center text-md font-bold text-white text-opacity-50 mb-2 hover:text-indigo-600 focus:outline-none"
-                          >
-                            <FaPlus className="text-md mr-2" />
-                            Adicionar Informações
-                          </button>
                         </div>
                         <div className="flex flex-col items-center border-b-4 border-gray-700 py-4">
                           <h2 className="text-lg font-bold text-white text-opacity-50 mb-4">
@@ -264,9 +364,14 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title="Informações adicionais"
+        title="Quando você assistiu?"
       >
-        <BodyModalForm />
+        <BodyModalForm
+          watchedDate={watchedDate}
+          setWatchedDate={setWatchedDate}
+          onSubmit={handleWatchedSubmit}
+          loading={watchedLoading}
+        />
       </Modal>
     </>
   );
