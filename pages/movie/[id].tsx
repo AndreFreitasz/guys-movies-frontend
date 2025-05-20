@@ -13,7 +13,7 @@ import Modal from "../../components/_ui/modal";
 import BodyModalForm from "../../components/movie/bodyModalForm";
 import CircularVoteAverage from "../../components/home/movieCard/circularVoteAverage";
 import { toast } from "react-toastify";
-import { set } from "react-hook-form";
+import { send } from "process";
 
 interface MovieProps {
   movie: MovieResponse;
@@ -48,7 +48,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
 
   const checkIsWatched = async () => {
     if (!user) return;
-    console.log();
     const isWatchedResponse = await fetch(
       `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?userid=${user.id}&idTmdb=${movie.id}`,
     );
@@ -85,6 +84,23 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     }
   };
 
+  const sendWatchedRequest = (movieData: any) => {
+    try {
+      const response = fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(movieData),
+      });
+      return response;
+    } catch (error) {
+      console.error(`Erro ao fazer requisição: ${error}`)
+      showToast("error", "Erro ao marcar o filme como assistido.");
+      return null;
+    }
+  }
+
   const handleWatchedClick = async () => {
     if (!user)
       return showToast(
@@ -95,7 +111,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       openModal();
       return;
     }
-    setWatchedLoading(true);
     const movieData = {
       watchedAt: new Date().toISOString(),
       userId: user.id,
@@ -110,28 +125,14 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       },
     };
 
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(movieData),
-        },
-      );
-
-      setWatchedLoading(false);
+    const response = await sendWatchedRequest(movieData);
+    if (response) {
       if (response.status === 200) setIsWatched(false);
       if (response.status === 201) setIsWatched(true);
-    } catch (error) {
-      showToast("error", "Erro ao marcar um filme como assistido.");
     }
   };
 
   const handleWatchedSubmit = async () => {
-    setWatchedLoading(true);
     const movieData = {
       watchedAt: watchedDate,
       createMovieDto: {
@@ -144,25 +145,11 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         voteAverage: movie.vote_average,
       },
     };
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(movieData),
-        },
-      );
-
-      setWatchedLoading(false);
-      setIsModalOpen(false);
+    const response = await sendWatchedRequest(movieData);
+    setIsModalOpen(false);
+    if (response) {
       if (response.status === 201) setIsWatched(true);
       if (response.status === 200) setIsWatched(false);
-    } catch (error) {
-      showToast("error", "Erro ao marcar o filme como assistido.");
     }
   };
 
