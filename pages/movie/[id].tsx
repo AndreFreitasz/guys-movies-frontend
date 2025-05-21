@@ -134,16 +134,15 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         voteAverage: movie.vote_average,
       },
     };
-
+    setWatchedLoading(true);
     const response = await sendWatchedRequest(movieData);
-    if (response) {
-      if (response.status === 200) setIsWatched(false);
-      if (response.status === 201) setIsWatched(true);
-    }
+    setWatchedLoading(false);
+    if (response!.status === 200) setIsWatched(false);
   };
 
   const handleWatchedSubmit = async () => {
     if (!validateUser()) return;
+    setWatchedLoading(true);
     const movieData = {
       watchedAt: watchedDate,
       userId: user!.id,
@@ -158,10 +157,11 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       },
     };
     const response = await sendWatchedRequest(movieData);
+    setWatchedLoading(false);
     setIsModalOpen(false);
-    if (response) {
-      if (response.status === 201) setIsWatched(true);
-      if (response.status === 200) setIsWatched(false);
+    if (response!.status === 201) {
+      setIsWatched(true);
+      showToast("success", "Filme marcado como assistido!");
     }
   };
 
