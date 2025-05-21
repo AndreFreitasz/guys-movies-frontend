@@ -156,15 +156,9 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         voteAverage: movie.vote_average,
       },
     };
-<<<<<<< HEAD
     setIsModalOpen(false);
     const response = await sendWatchedRequest(movieData);
     setWatchedLoading(false);
-=======
-    const response = await sendWatchedRequest(movieData);
-    setWatchedLoading(false);
-    setIsModalOpen(false);
->>>>>>> cb1a5fd85218f6b348d6d8c9e834642de1fbc140
     if (response!.status === 201) {
       setIsWatched(true);
       showToast("success", "Filme marcado como assistido!");
