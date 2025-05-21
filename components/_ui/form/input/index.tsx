@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 
 type InputProps = {
   type: string;
-  placeholder: string;
+  placeholder?: string;
   label: string;
   icon?: React.ReactNode;
   className?: string;

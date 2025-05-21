@@ -59,6 +59,17 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     "pt-BR",
   );
 
+  const validateUser = (): boolean => {
+    if (!user) {
+      showToast(
+        "warn",
+        "Entre em uma conta para marcar o filme como assistido.",
+      );
+      return false;
+    }
+    return true;
+  };
+
   const handleRating = (newRating: number) => setRating(newRating);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -86,34 +97,33 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
 
   const sendWatchedRequest = (movieData: any) => {
     try {
-      const response = fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(movieData),
         },
-        body: JSON.stringify(movieData),
-      });
+      );
       return response;
     } catch (error) {
-      console.error(`Erro ao fazer requisição: ${error}`)
+      console.error(`Erro ao fazer requisição: ${error}`);
       showToast("error", "Erro ao marcar o filme como assistido.");
       return null;
     }
-  }
+  };
 
   const handleWatchedClick = async () => {
-    if (!user)
-      return showToast(
-        "warn",
-        "Entre em uma conta para marcar o filme como assistido.",
-      );
+    if (!validateUser()) return;
     if (!isWatched) {
       openModal();
       return;
     }
     const movieData = {
       watchedAt: new Date().toISOString(),
-      userId: user.id,
+      userId: user!.id,
       createMovieDto: {
         title: movie.title,
         overview: movie.overview,
@@ -133,8 +143,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   };
 
   const handleWatchedSubmit = async () => {
+    if (!validateUser()) return;
     const movieData = {
       watchedAt: watchedDate,
+      userId: user!.id,
       createMovieDto: {
         title: movie.title,
         overview: movie.overview,
@@ -329,14 +341,16 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                           <h2 className="text-lg font-bold text-white text-opacity-50">
                             Avaliação
                           </h2>
-                          <ReactStars
-                            count={5}
-                            onChange={handleRating}
-                            size={40}
-                            color2={"#4F46E5"}
-                            half={true}
-                            value={rating}
-                          />
+                          {isClient && (
+                            <ReactStars
+                              count={5}
+                              onChange={handleRating}
+                              size={40}
+                              color2={"#4F46E5"}
+                              half={true}
+                              value={rating}
+                            />
+                          )}
                         </div>
                       </div>
                     </div>

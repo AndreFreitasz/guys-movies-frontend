@@ -1,4 +1,5 @@
 import React from "react";
+import Input from "../../_ui/form/input";
 
 interface BodyModalFormProps {
   watchedDate: string;
@@ -21,15 +22,13 @@ const BodyModalForm: React.FC<BodyModalFormProps> = ({
       }}
       className="flex flex-col gap-4"
     >
-      <label className="text-white font-semibold">
-        Quando você assistiu?
-        <input
-          type="date"
-          className="mt-2 p-2 rounded bg-gray-800 text-white w-full"
-          value={watchedDate}
-          onChange={(e) => setWatchedDate(e.target.value)}
-        />
-      </label>
+      <Input
+        type="date"
+        label="Quando você assistiu?"
+        value={watchedDate}
+        onChange={(e) => setWatchedDate(e.target.value)}
+        className="mt-2 font-mono"
+      />
       <button
         type="submit"
         className="bg-indigo-600 text-white font-bold py-2 rounded hover:bg-indigo-700"
