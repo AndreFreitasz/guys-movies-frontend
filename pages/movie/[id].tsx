@@ -13,14 +13,13 @@ import Modal from "../../components/_ui/modal";
 import BodyModalForm from "../../components/movie/bodyModalForm";
 import CircularVoteAverage from "../../components/home/movieCard/circularVoteAverage";
 import { toast } from "react-toastify";
-import { send } from "process";
 
 interface MovieProps {
   movie: MovieResponse;
 }
 
 const Movie: NextPage<MovieProps> = ({ movie }) => {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,24 +31,52 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const [watchedDate, setWatchedDate] = useState("");
 
   useEffect(() => {
-    setIsClient(true);
-    checkIsWatched();
-    checkIsWaiting();
-  }, [user, movie.id]);
+    if (!authLoading) {
+      setIsClient(true);
+      checkIsWatched();
+      checkIsWaiting();
+      getRating();
+    }
+  }, [user, movie.id, authLoading]);
+
+  const validateUser = (): boolean => {
+    if (authLoading) return false;
+    if (!user) {
+      showToast("warn", "Entre em uma conta para fazer atualizações no filme");
+      return false;
+    }
+    return true;
+  };
+
+  const getRating = async () => {
+    if (!validateUser()) return;
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/getRate?userId=${user!.id}&idTmdb=${movie.id}`,
+        { credentials: "include" },
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setRating(data.rate ?? 0);
+      }
+    } catch (error) {
+      setRating(0);
+    }
+  };
 
   const checkIsWaiting = async () => {
-    if (!user) return;
+    if (!validateUser()) return;
     const isWaitingResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie/isWaiting?userid=${user.id}&idTmdb=${movie.id}`,
+      `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie/isWaiting?userid=${user!.id}&idTmdb=${movie.id}`,
     );
     const isWaiting = await isWaitingResponse.json();
     setIsWaiting(isWaiting.waiting);
   };
 
   const checkIsWatched = async () => {
-    if (!user) return;
+    if (!validateUser()) return;
     const isWatchedResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?userid=${user.id}&idTmdb=${movie.id}`,
+      `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?userid=${user!.id}&idTmdb=${movie.id}`,
     );
     const isWatched = await isWatchedResponse.json();
     setIsWatched(isWatched.watched);
@@ -59,18 +86,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     "pt-BR",
   );
 
-  const validateUser = (): boolean => {
-    if (!user) {
-      showToast(
-        "warn",
-        "Entre em uma conta para marcar o filme como assistido.",
-      );
-      return false;
-    }
-    return true;
-  };
-
-  const handleRating = (newRating: number) => setRating(newRating);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const showToast = (
@@ -137,7 +152,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     setWatchedLoading(true);
     const response = await sendWatchedRequest(movieData);
     setWatchedLoading(false);
-    if (response!.status === 200) setIsWatched(false);
+    if (response!.status === 200) {
+      setIsWatched(false);
+      setRating(0);
+    }
   };
 
   const handleWatchedSubmit = async () => {
@@ -166,14 +184,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   };
 
   const handleWaitingClick = async () => {
-    if (!user)
-      return showToast(
-        "warn",
-        "Entre em uma conta para adicionar um filme na lista de espera.",
-      );
+    if (!validateUser()) return;
     setIsWaitingLoading(true);
     const movieData = {
-      userId: user.id,
+      userId: user!.id,
       createMovieDto: {
         title: movie.title,
         overview: movie.overview,
@@ -202,6 +216,35 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       if (response.status === 201) setIsWaiting(true);
     } catch (error) {
       showToast("error", "Erro ao adicionar o filme na lista de espera.");
+    }
+  };
+
+  const handleRating = (newRating: number) => {
+    if (!validateUser()) return;
+    if (!isWatched) {
+      showToast(
+        "warn",
+        "Você precisa marcar o filme como assistido para avaliá-lo.",
+      );
+      return;
+    }
+    setRating(newRating);
+    const movieData = {
+      userId: user!.id,
+      idTmdb: movie.id,
+      rating: newRating,
+    };
+
+    try {
+      fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/rate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(movieData),
+      });
+    } catch {
+      showToast("error", "Erro ao enviar a avaliação.");
     }
   };
 
@@ -280,8 +323,47 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                     </div>
                     <div className="w-full sm:w-1/4">
                       <div className="bg-defaultBackgroundSecond bg-opacity-40 pt-3 rounded-lg border-4 border-gray-600">
-                        <div className="flex flex-col items-center border-b-4 border-gray-700 pb-4">
-                          <h2 className="text-xl font-bold text-white text-opacity-50 mb-2">
+                        <div className="flex justify-around py-4 border-b-4 border-gray-700">
+                          <div className="flex flex-col items-center">
+                            <FaHeart className="text-gray-500 text-3xl cursor-pointer hover:text-red-500" />
+                            <span className="text-gray-500 text-sm mt-2 font-semibold">
+                              Favorito
+                            </span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            {watchedLoading ? (
+                              <LoadingSpinner small />
+                            ) : (
+                              <FaEye
+                                className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`}
+                                onClick={handleWatchedClick}
+                              />
+                            )}
+                            <span className="text-gray-500 text-sm mt-2 font-semibold">
+                              Assistido
+                            </span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            {isWaitingLoading ? (
+                              <LoadingSpinner small />
+                            ) : (
+                              <FaClock
+                                className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
+                                onClick={
+                                  isWatched ? undefined : handleWaitingClick
+                                }
+                                style={
+                                  isWatched ? { pointerEvents: "none" } : {}
+                                }
+                              />
+                            )}
+                            <span className="text-gray-500 text-sm mt-2 font-semibold">
+                              Watchlist
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-center border-b-4 border-gray-700 pb-4 pt-4">
+                          <h2 className="text-xl font-bold text-white text-opacity-50">
                             Avaliar
                           </h2>
                           {isClient && (
@@ -292,42 +374,9 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                               color2={"#4F46E5"}
                               half={true}
                               value={rating}
+                              edit={isWatched}
                             />
                           )}
-                        </div>
-                        <div className="flex justify-around py-4 border-b-4 border-gray-700">
-                          <div className="relative group">
-                            <FaHeart className="text-gray-500 text-3xl cursor-pointer hover:text-red-500" />
-                            <span className="absolute bottom-full mb-2 bg-gray-700 text-white text-md rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              Favorito
-                            </span>
-                          </div>
-                          <div className="relative group">
-                            {watchedLoading ? (
-                              <LoadingSpinner small />
-                            ) : (
-                              <FaEye
-                                className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`}
-                                onClick={handleWatchedClick}
-                              />
-                            )}
-                            <span className="absolute bottom-full mb-2 bg-gray-700 text-white text-md rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              Assistido
-                            </span>
-                          </div>
-                          <div className="relative group">
-                            {isWaitingLoading ? (
-                              <LoadingSpinner small />
-                            ) : (
-                              <FaClock
-                                className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
-                                onClick={handleWaitingClick}
-                              />
-                            )}
-                            <span className="absolute bottom-full mb-2 bg-gray-700 text-white text-md rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              Lista de Espera
-                            </span>
-                          </div>
                         </div>
                         <div className="flex flex-col items-center border-b-4 border-gray-700 py-4">
                           <h2 className="text-lg font-bold text-white text-opacity-50 mb-4">
@@ -336,21 +385,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                           <CircularVoteAverage
                             vote_average={movie.vote_average}
                           />
-                        </div>
-                        <div className="flex flex-col items-center py-4">
-                          <h2 className="text-lg font-bold text-white text-opacity-50">
-                            Avaliação
-                          </h2>
-                          {isClient && (
-                            <ReactStars
-                              count={5}
-                              onChange={handleRating}
-                              size={40}
-                              color2={"#4F46E5"}
-                              half={true}
-                              value={rating}
-                            />
-                          )}
                         </div>
                       </div>
                     </div>

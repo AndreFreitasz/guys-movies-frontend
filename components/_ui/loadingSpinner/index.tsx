@@ -5,9 +5,15 @@ interface LoadingSpinnerProps {
   small?: boolean;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({small}) => {
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ small }) => {
   return (
-    <div className={small ? "flex justify-center items-center" : "flex justify-center items-center h-screen"}>
+    <div
+      className={
+        small
+          ? "flex justify-center items-center"
+          : "flex justify-center items-center h-screen"
+      }
+    >
       <svg
         className={`animate-spin ${small ? "h-6 w-6" : "h-10 w-10"} text-indigo-600`}
         xmlns="http://www.w3.org/2000/svg"

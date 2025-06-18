@@ -17,6 +17,7 @@ interface AuthContextProps {
   isAuthenticated: boolean;
   user: UserData | null;
   loading: boolean;
+  authLoading: boolean;
   dataUser: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -37,6 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(true);
     }
     setLoading(false);
+    setAuthLoading(false);
   }, []);
 
   const dataUser = async () => {
@@ -65,6 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error(error);
     } finally {
       setLoading(false);
+      setAuthLoading(false);
     }
   };
 
@@ -90,6 +94,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(true);
     } catch (error) {
       throw error;
+    } finally {
+      setLoading(false);
+      setAuthLoading(false);
     }
   };
 
@@ -106,12 +113,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error(error);
     } finally {
       setLoading(false);
+      setAuthLoading(false);
     }
   };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, loading, dataUser, login, logout }}
+      value={{
+        isAuthenticated,
+        user,
+        loading,
+        authLoading,
+        dataUser,
+        login,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
