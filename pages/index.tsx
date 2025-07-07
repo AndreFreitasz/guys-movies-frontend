@@ -80,12 +80,13 @@ const Home: React.FC<HomeProps> = ({
     setLoading(true);
     const handleScroll = async () => {
       if (
-        window.innerHeight + document.documentElement.scrollTop !==
-          document.documentElement.offsetHeight ||
+        window.innerHeight + document.documentElement.scrollTop <
+          document.documentElement.offsetHeight - 100 ||
         loading
       ) {
         return;
       }
+      setLoading(true);
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_URL_API}/movies/popular?page=${page + 1}`,
@@ -124,10 +125,10 @@ const Home: React.FC<HomeProps> = ({
         <title>GuysMovies - Filmes</title>
       </Head>
       <Header />
-      {!loading ? (
+      {!initialProviderData.length ? (
         <LoadingSpinner />
       ) : (
-        <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
+        <div className="flex flex-col px-4 md:px-8 lg:px-20 xl:px-40 w-full mt-14 overflow-x-hidden">
           <div className="flex items-center mb-4">
             <Image
               src="/icons/home/popular.png"
@@ -150,6 +151,21 @@ const Home: React.FC<HomeProps> = ({
                 key={providerData.provider.id}
               />
             )}
+            responsive={[
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 2,
+                },
+              },
+              {
+                breakpoint: 600,
+                settings: {
+                  slidesToShow: 1,
+                  arrows: false,
+                },
+              },
+            ]}
           />
 
           <div className="flex items-center mt-12 mb-4">
@@ -166,8 +182,35 @@ const Home: React.FC<HomeProps> = ({
             slidesToShow={6}
             infinite={true}
             data={popularMovies || []}
-            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+            responsive={[
+              {
+                breakpoint: 1280,
+                settings: {
+                  slidesToShow: 5,
+                },
+              },
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 4,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 3,
+                  arrows: false,
+                },
+              },
+              {
+                breakpoint: 640,
+                settings: {
+                  slidesToShow: 2,
+                  arrows: false,
+                },
+              },
+            ]}
           />
 
           <div className="flex items-center mt-24 mb-4">
@@ -184,8 +227,35 @@ const Home: React.FC<HomeProps> = ({
             slidesToShow={6}
             infinite={true}
             data={popularMoviesHorror || []}
-            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+            responsive={[
+              {
+                breakpoint: 1280,
+                settings: {
+                  slidesToShow: 5,
+                },
+              },
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 4,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 3,
+                  arrows: false,
+                },
+              },
+              {
+                breakpoint: 640,
+                settings: {
+                  slidesToShow: 2,
+                  arrows: false,
+                },
+              },
+            ]}
           />
 
           <div className="flex items-center mt-24 mb-4">
@@ -202,8 +272,35 @@ const Home: React.FC<HomeProps> = ({
             slidesToShow={6}
             infinite={true}
             data={popularMoviesSciFi || []}
-            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+            responsive={[
+              {
+                breakpoint: 1280,
+                settings: {
+                  slidesToShow: 5,
+                },
+              },
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 4,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 3,
+                  arrows: false,
+                },
+              },
+              {
+                breakpoint: 640,
+                settings: {
+                  slidesToShow: 2,
+                  arrows: false,
+                },
+              },
+            ]}
           />
 
           <div className="flex items-center mt-24 mb-4">
@@ -220,8 +317,35 @@ const Home: React.FC<HomeProps> = ({
             slidesToShow={6}
             infinite={true}
             data={topRatedMovies || []}
-            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+            responsive={[
+              {
+                breakpoint: 1280,
+                settings: {
+                  slidesToShow: 5,
+                },
+              },
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 4,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 3,
+                  arrows: false,
+                },
+              },
+              {
+                breakpoint: 640,
+                settings: {
+                  slidesToShow: 2,
+                  arrows: false,
+                },
+              },
+            ]}
           />
 
           <div className="flex items-center mt-24 mb-4">
@@ -238,8 +362,35 @@ const Home: React.FC<HomeProps> = ({
             slidesToShow={6}
             infinite={true}
             data={popularMoviesFamily || []}
-            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+            responsive={[
+              {
+                breakpoint: 1280,
+                settings: {
+                  slidesToShow: 5,
+                },
+              },
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 4,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 3,
+                  arrows: false,
+                },
+              },
+              {
+                breakpoint: 640,
+                settings: {
+                  slidesToShow: 2,
+                  arrows: false,
+                },
+              },
+            ]}
           />
 
           <div className="flex items-center mt-24 mb-4">
@@ -256,8 +407,35 @@ const Home: React.FC<HomeProps> = ({
             slidesToShow={6}
             infinite={true}
             data={popularMoviesDrama || []}
-            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+            responsive={[
+              {
+                breakpoint: 1280,
+                settings: {
+                  slidesToShow: 5,
+                },
+              },
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 4,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 3,
+                  arrows: false,
+                },
+              },
+              {
+                breakpoint: 640,
+                settings: {
+                  slidesToShow: 2,
+                  arrows: false,
+                },
+              },
+            ]}
           />
 
           <div className="flex items-center mt-24 mb-4">
@@ -274,8 +452,35 @@ const Home: React.FC<HomeProps> = ({
             slidesToShow={6}
             infinite={true}
             data={popularMoviesSciFiDrama || []}
-            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+            responsive={[
+              {
+                breakpoint: 1280,
+                settings: {
+                  slidesToShow: 5,
+                },
+              },
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 4,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 3,
+                  arrows: false,
+                },
+              },
+              {
+                breakpoint: 640,
+                settings: {
+                  slidesToShow: 2,
+                  arrows: false,
+                },
+              },
+            ]}
           />
 
           <div className="flex items-center mt-24 mb-4">
@@ -292,8 +497,35 @@ const Home: React.FC<HomeProps> = ({
             slidesToShow={6}
             infinite={true}
             data={popularMoviesComedy || []}
-            className="ml-16"
             renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
+            responsive={[
+              {
+                breakpoint: 1280,
+                settings: {
+                  slidesToShow: 5,
+                },
+              },
+              {
+                breakpoint: 1024,
+                settings: {
+                  slidesToShow: 4,
+                },
+              },
+              {
+                breakpoint: 768,
+                settings: {
+                  slidesToShow: 3,
+                  arrows: false,
+                },
+              },
+              {
+                breakpoint: 640,
+                settings: {
+                  slidesToShow: 2,
+                  arrows: false,
+                },
+              },
+            ]}
           />
         </div>
       )}

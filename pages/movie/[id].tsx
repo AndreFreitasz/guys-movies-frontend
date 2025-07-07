@@ -259,61 +259,63 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         <LoadingSpinner />
       ) : (
         <>
-          <div className="text-white">
-            <img
-              src={movie.wallpaper_path}
-              alt={movie.title}
-              className="block w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px] object-cover object-top opacity-40"
-              style={{
-                WebkitMaskImage:
-                  "linear-gradient(to right, transparent 0, black 800px, black calc(100% - 800px), transparent 100%)",
-                maskImage:
-                  "linear-gradient(to right, transparent 0, black 800px, black calc(100% - 800px), transparent 100%)",
-              }}
-            />
-            <div className="mt-8 w-full px-4 sm:px-6 md:px-8 lg:px-40 overflow-x-hidden">
-              <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                <div className="sm:mx-0 mx-auto">
+          <div className="relative text-white">
+            <div className="absolute inset-0">
+              <img
+                src={movie.wallpaper_path}
+                alt={movie.title}
+                className="block w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px] object-cover object-top opacity-40"
+                style={{
+                  WebkitMaskImage:
+                    "linear-gradient(to top, transparent 0%, black 100%)",
+                  maskImage:
+                    "linear-gradient(to top, transparent 0%, black 100%)",
+                }}
+              />
+            </div>
+            <div className="relative pt-8 w-full px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40 overflow-x-hidden">
+              <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+                <div className="w-full max-w-[220px] sm:max-w-[280px] md:max-w-[320px] lg:max-w-sm flex-shrink-0">
                   <img
                     src={movie.poster_path}
                     alt={movie.title}
-                    className="block mx-auto w-[220px] sm:w-[280px] md:w-[320px] lg:w-[420px] rounded-lg shadow-lg"
+                    className="block mx-auto w-full rounded-lg shadow-lg"
                   />
                   <div className="mt-8 border-b-2 border-gray-600 pb-4">
-                    <h3 className="text-lg font-bold text-gray-600 mb-2">
+                    <h3 className="text-lg font-bold text-gray-600 mb-2 text-center lg:text-left">
                       GÊNEROS
                     </h3>
-                    <p className="text-gray-400 font-semibold text-md">
+                    <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
                       {movie.genres.map((genre) => genre).join(", ")}
                     </p>
                   </div>
                   <div className="mt-4 border-b-2 border-gray-600 pb-4">
-                    <h3 className="text-lg font-bold text-gray-600 mb-2">
+                    <h3 className="text-lg font-bold text-gray-600 mb-2 text-center lg:text-left">
                       DIRETOR
                     </h3>
-                    <p className="text-gray-400 font-semibold text-md">
+                    <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
                       {movie.director?.name}
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col justify-start gap-4 w-full min-h-48 self-start">
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 items-center">
-                    <h1 className="w-fit text-2xl sm:text-4xl font-extrabold pb-1 sm:pb-2 border-b-4 border-indigo-600 text-center sm:text-left">
+                <div className="flex flex-col justify-start gap-4 w-full">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 items-center justify-center lg:justify-start">
+                    <h1 className="w-fit text-xl sm:text-4xl font-extrabold pb-1 sm:pb-2 border-b-4 border-indigo-600 text-center sm:text-left">
                       {movie.title}
                     </h1>
-                    <p className="font-bold font-mono text-2xl text-gray-300 text-center sm:text-left">
+                    <p className="font-bold font-mono text-xl sm:text-2xl text-gray-300 text-center sm:text-left">
                       {formattedDate}
                     </p>
                   </div>
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="w-full md:w-3/4 flex-wrap">
-                      <p className="mt-4 text-gray-300 font-semibold text-lg">
+                  <div className="flex flex-col md:flex-row gap-8">
+                    <div className="w-full md:w-3/4 flex flex-col gap-4">
+                      <p className="mt-4 text-gray-300 font-semibold text-lg text-center md:text-left">
                         {movie.overview}
                       </p>
                       {(movie.providers.flatrate ||
                         movie.providers.buy ||
                         movie.providers.rent) && (
-                        <div className="px-4">
+                        <div className="px-0 md:px-4">
                           <ProvidersMovie
                             flatrate={movie.providers.flatrate}
                             buy={movie.providers.buy}
