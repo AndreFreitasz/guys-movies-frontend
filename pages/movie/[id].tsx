@@ -33,11 +33,14 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   useEffect(() => {
     if (!authLoading) {
       setIsClient(true);
-      checkIsWatched();
-      checkIsWaiting();
-      getRating();
+      fetchData();
     }
   }, [user, movie.id, authLoading]);
+
+  const fetchData = async () => {
+    if (!validateUser()) return;
+    await Promise.all([checkIsWatched(), checkIsWaiting(), getRating()]);
+  };
 
   const validateUser = (): boolean => {
     if (authLoading) return false;
@@ -49,7 +52,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   };
 
   const getRating = async () => {
-    if (!validateUser()) return;
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/getRate?userId=${user!.id}&idTmdb=${movie.id}`,
@@ -65,7 +67,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   };
 
   const checkIsWaiting = async () => {
-    if (!validateUser()) return;
     const isWaitingResponse = await fetch(
       `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie/isWaiting?userid=${user!.id}&idTmdb=${movie.id}`,
     );
@@ -74,12 +75,12 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   };
 
   const checkIsWatched = async () => {
-    if (!validateUser()) return;
     const isWatchedResponse = await fetch(
       `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?userid=${user!.id}&idTmdb=${movie.id}`,
     );
-    const isWatched = await isWatchedResponse.json();
-    setIsWatched(isWatched.watched);
+    const watched = await isWatchedResponse.json();
+    setIsWatched(watched.watched);
+    console.log(isWatched);
   };
 
   const formattedDate = new Date(movie.release_date).toLocaleDateString(
@@ -262,7 +263,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
             <img
               src={movie.wallpaper_path}
               alt={movie.title}
-              className="hidden sm:block w-full h-[300px] sm:h-[500px] object-cover object-top opacity-40"
+              className="block w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px] object-cover object-top opacity-40"
               style={{
                 WebkitMaskImage:
                   "linear-gradient(to right, transparent 0, black 800px, black calc(100% - 800px), transparent 100%)",
@@ -276,7 +277,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                   <img
                     src={movie.poster_path}
                     alt={movie.title}
-                    className="block mx-auto w-[220px] sm:w-[420px] rounded-lg shadow-lg"
+                    className="block mx-auto w-[220px] sm:w-[280px] md:w-[320px] lg:w-[420px] rounded-lg shadow-lg"
                   />
                   <div className="mt-8 border-b-2 border-gray-600 pb-4">
                     <h3 className="text-lg font-bold text-gray-600 mb-2">
@@ -304,8 +305,8 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                       {formattedDate}
                     </p>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="w-full sm:w-3/4">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="w-full md:w-3/4 flex-wrap">
                       <p className="mt-4 text-gray-300 font-semibold text-lg">
                         {movie.overview}
                       </p>
@@ -321,15 +322,9 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                         </div>
                       )}
                     </div>
-                    <div className="w-full sm:w-1/4">
+                    <div className="w-full md:w-1/4">
                       <div className="bg-defaultBackgroundSecond bg-opacity-40 pt-3 rounded-lg border-4 border-gray-600">
                         <div className="flex justify-around py-4 border-b-4 border-gray-700">
-                          <div className="flex flex-col items-center">
-                            <FaHeart className="text-gray-500 text-3xl cursor-pointer hover:text-red-500" />
-                            <span className="text-gray-500 text-sm mt-2 font-semibold">
-                              Favorito
-                            </span>
-                          </div>
                           <div className="flex flex-col items-center">
                             {watchedLoading ? (
                               <LoadingSpinner small />
@@ -349,12 +344,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                             ) : (
                               <FaClock
                                 className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
-                                onClick={
-                                  isWatched ? undefined : handleWaitingClick
-                                }
-                                style={
-                                  isWatched ? { pointerEvents: "none" } : {}
-                                }
+                                onClick={handleWaitingClick}
                               />
                             )}
                             <span className="text-gray-500 text-sm mt-2 font-semibold">
@@ -374,7 +364,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                               color2={"#4F46E5"}
                               half={true}
                               value={rating}
-                              edit={isWatched}
                             />
                           )}
                         </div>
