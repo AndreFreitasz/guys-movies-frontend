@@ -1,5 +1,5 @@
 import React from "react";
-import Slider from "react-slick";
+import Slider, { Settings } from "react-slick";
 import styles from "./styles.module.css";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 
@@ -10,6 +10,7 @@ interface CarouselProps<T> {
   slidesToShow: number;
   infinite?: boolean;
   className?: string;
+  responsive?: Array<{ breakpoint: number; settings: Partial<Settings> }>;
 }
 
 interface ArrowProps {
@@ -51,35 +52,46 @@ const Carousel = <T,>({
   slidesToShow,
   infinite,
   className,
+  responsive,
 }: CarouselProps<T>) => {
   const defaultSettings = {
     dots: false,
     infinite: infinite || false,
     speed: 500,
     slidesToShow: slidesToShow,
-    slidesToScroll: slidesToShow - 1,
+    slidesToScroll: slidesToShow > 1 ? slidesToShow - 1 : 1,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
-    responsive: [
+    swipeToSlide: true,
+    responsive: responsive || [
       {
         breakpoint: 1700,
         settings: {
           slidesToShow: Math.min(slidesToShow, 5),
-          slidesToScroll: Math.min(slidesToShow, 4),
+          slidesToScroll: Math.min(slidesToShow > 1 ? slidesToShow - 1 : 1, 4),
         },
       },
       {
         breakpoint: 1300,
         settings: {
           slidesToShow: Math.min(slidesToShow, 4),
-          slidesToScroll: Math.min(slidesToShow, 3),
+          slidesToScroll: Math.min(slidesToShow > 1 ? slidesToShow - 1 : 1, 3),
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: Math.min(slidesToShow, 3),
+          slidesToScroll: Math.min(slidesToShow > 1 ? slidesToShow - 1 : 1, 2),
+          arrows: false,
         },
       },
       {
         breakpoint: 480,
         settings: {
-          slidesToShow: 1,
+          slidesToShow: 2,
           slidesToScroll: 1,
+          arrows: false,
         },
       },
     ],
