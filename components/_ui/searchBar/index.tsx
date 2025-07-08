@@ -7,6 +7,7 @@ interface SearchBarProps {
   onFocus: () => void;
   onBlur: () => void;
   isExpanded: boolean;
+  isMobile?: boolean;
 }
 
 interface Movie {
@@ -21,6 +22,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onFocus,
   onBlur,
   isExpanded,
+  isMobile = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
@@ -59,7 +61,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }, [searchQuery]);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <form
         onSubmit={handleSearchSubmit}
         className="flex items-center relative"
@@ -69,16 +71,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder="Buscar..."
-          className="bg-defaultBackgroundSecond bg-opacity-60 text-white pl-10 pr-4 py-3 rounded-md text-md focus:outline-none"
-          initial={{ width: 300 }}
-          animate={{ width: isExpanded ? 500 : 300 }}
+          className="bg-defaultBackgroundSecond bg-opacity-60 text-white pl-10 pr-4 py-3 rounded-md text-md focus:outline-none w-full"
+          initial={!isMobile ? { width: 300 } : {}}
+          animate={!isMobile ? { width: isExpanded ? 500 : 300 } : {}}
           transition={{ duration: 0.3 }}
           onFocus={onFocus}
           onBlur={onBlur}
         />
         <FaSearch className="absolute left-3 text-gray-400" size={20} />
       </form>
-      {searchResults.length > 0 && isExpanded == true && (
+      {searchResults.length > 0 && isExpanded && (
         <ul className="absolute top-full left-0 w-full bg-gray-800 text-white mt-2 rounded-lg shadow-lg z-10 max-h-screen-60 overflow-y-auto">
           {searchResults.map((movie, index) => (
             <Link href={`/movie/${movie.id}`} key={index}>

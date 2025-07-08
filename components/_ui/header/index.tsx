@@ -46,11 +46,20 @@ const Header = () => {
     };
   }, [dropdownRef]);
 
-  const handleLoginClick = () => setIsModalOpen(true);
+  const handleLoginClick = () => {
+    setIsMenuOpen(false);
+    setIsModalOpen(true);
+  };
 
-  const handleRegisterClick = () => setIsRegisterModalOpen(true);
+  const handleRegisterClick = () => {
+    setIsMenuOpen(false);
+    setIsRegisterModalOpen(true);
+  };
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    setIsSearchVisible(false);
+  };
 
   const closeModal = () => setIsModalOpen(false);
 
@@ -60,9 +69,15 @@ const Header = () => {
 
   const handleSearchBlur = () => setIsSearchExpanded(false);
 
-  const toggleSearchBar = () => setIsSearchVisible(!isSearchVisible);
+  const toggleSearchBar = () => {
+    setIsSearchVisible(!isSearchVisible);
+    setIsMenuOpen(false);
+  };
 
-  const handleLogoutClick = () => setIsLogoutModalOpen(true);
+  const handleLogoutClick = () => {
+    setIsMenuOpen(false);
+    setIsLogoutModalOpen(true);
+  };
 
   const toggleDropdown = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -75,7 +90,7 @@ const Header = () => {
   };
 
   return (
-    <header className="h-20 flex items-center justify-between py-4 px-6 md:py-12 md:px-40 w-full">
+    <header className="h-20 flex items-center justify-between py-4 px-6 md:py-12 md:px-40 w-full z-30 relative">
       <div className="flex items-center">
         <Link href="/">
           <div className="flex items-center ml-2">
@@ -89,7 +104,7 @@ const Header = () => {
         </Link>
       </div>
 
-      <div className="flex-grow flex justify-start ml-6">
+      <div className="flex-grow flex justify-start ml-6 md:ml-10">
         <div className="hidden md:block">
           <SearchBar
             onFocus={handleSearchFocus}
@@ -127,8 +142,8 @@ const Header = () => {
                   className="hidden md:flex"
                   ref={buttonRef}
                 />
-                {isDropdownOpen && (
-                  <AnimatePresence>
+                <AnimatePresence>
+                  {isDropdownOpen && (
                     <motion.div
                       key="dropdown"
                       initial={{ opacity: 0, y: -10 }}
@@ -157,8 +172,8 @@ const Header = () => {
                         </li>
                       </ul>
                     </motion.div>
-                  </AnimatePresence>
-                )}
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <>
@@ -178,7 +193,7 @@ const Header = () => {
             )}
           </>
         )}
-        <button className="md:hidden ml-4" onClick={toggleMenu}>
+        <button className="md:hidden ml-4 z-10" onClick={toggleMenu}>
           {isMenuOpen ? (
             <FaTimes className="text-white text-xl" />
           ) : (
@@ -187,34 +202,72 @@ const Header = () => {
         </button>
       </nav>
 
-      {isMenuOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-defaultBackgroundSecond p-4">
-          <ul className="flex flex-col space-y-4">
-            <NavItem href="/" label="Filmes" />
-            <NavItem href="/series" label="Séries" />
-            <Button
-              label="Entrar"
-              onClick={handleLoginClick}
-              icon={<FaUser />}
-            />
-            <Button
-              label="Cadastrar"
-              onClick={handleRegisterClick}
-              icon={<FaPlus />}
-            />
-          </ul>
-        </div>
-      )}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden absolute top-0 left-0 w-full h-screen bg-defaultBackgroundSecond pt-24 p-4"
+          >
+            <ul className="flex flex-col items-center text-center space-y-6">
+              <NavItem href="/" label="Filmes" />
+              <NavItem href="/series" label="Séries" />
+              <div className="border-t border-gray-700 w-full my-4" />
+              {isAuthenticated ? (
+                <>
+                  <li className="text-lg font-semibold text-white w-full">
+                    <a className="block py-2">Assistidos</a>
+                  </li>
+                  <li className="text-lg font-semibold text-white w-full">
+                    <a className="block py-2">Watchlist</a>
+                  </li>
+                  <Button
+                    label="Sair"
+                    onClick={handleLogoutClick}
+                    className="w-full justify-center"
+                  />
+                </>
+              ) : (
+                <>
+                  <Button
+                    label="Entrar"
+                    onClick={handleLoginClick}
+                    icon={<FaUser />}
+                    className="w-full justify-center"
+                  />
+                  <Button
+                    label="Cadastrar"
+                    onClick={handleRegisterClick}
+                    icon={<FaPlus />}
+                    className="w-full justify-center"
+                  />
+                </>
+              )}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {isSearchVisible && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-defaultBackgroundSecond p-4">
-          <SearchBar
-            onFocus={handleSearchFocus}
-            onBlur={handleSearchBlur}
-            isExpanded={isSearchExpanded}
-          />
-        </div>
-      )}
+      <AnimatePresence>
+        {isSearchVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden absolute top-20 left-0 w-full bg-defaultBackgroundSecond p-4"
+          >
+            <SearchBar
+              onFocus={() => setIsSearchExpanded(true)}
+              onBlur={() => setIsSearchExpanded(false)}
+              isExpanded={isSearchExpanded}
+              isMobile={true}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title="Entrar">
         <FormLogin onClose={closeModal} />

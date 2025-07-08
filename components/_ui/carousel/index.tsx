@@ -8,6 +8,7 @@ interface CarouselProps<T> {
   renderItem: (item: T, index: number) => React.ReactNode;
   settings?: any;
   slidesToShow: number;
+  slidesToScroll?: number;
   infinite?: boolean;
   className?: string;
   responsive?: Array<{ breakpoint: number; settings: Partial<Settings> }>;
@@ -53,16 +54,18 @@ const Carousel = <T,>({
   infinite,
   className,
   responsive,
+  slidesToScroll,
 }: CarouselProps<T>) => {
   const defaultSettings = {
     dots: false,
     infinite: infinite || false,
     speed: 500,
     slidesToShow: slidesToShow,
-    slidesToScroll: slidesToShow > 1 ? slidesToShow - 1 : 1,
+    slidesToScroll: slidesToScroll || 1,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
     swipeToSlide: true,
+    touchThreshold: 5,
     responsive: responsive || [
       {
         breakpoint: 1700,
@@ -82,7 +85,7 @@ const Carousel = <T,>({
         breakpoint: 768,
         settings: {
           slidesToShow: Math.min(slidesToShow, 3),
-          slidesToScroll: Math.min(slidesToShow > 1 ? slidesToShow - 1 : 1, 2),
+          slidesToScroll: 1,
           arrows: false,
         },
       },
