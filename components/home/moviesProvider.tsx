@@ -44,8 +44,8 @@ const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
         </h2>
       </div>
       <div className="border-b-4 my-4 rounded-lg border-defaultBackgroundSecond"></div>
-      <ul className="max-h-96 overflow-x-hidden overflow-y-auto">
-        {providerData.movies.slice(0, 10).map((movie, index) => (
+      <ul className="max-h-96 overflow-x-hidden">
+        {providerData.movies.slice(0, 5).map((movie, index) => (
           <Link href={`/movie/${movie.id}`} key={movie.id}>
             <li
               key={movie.id}
