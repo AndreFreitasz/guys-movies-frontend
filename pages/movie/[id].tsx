@@ -264,7 +264,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
               <img
                 src={movie.wallpaper_path}
                 alt={movie.title}
-                className="block w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px] object-cover object-top opacity-40"
+                className="block w-full h-[350px] sm:h-[500px] md:h-[600px] lg:h-[700px] object-cover object-top opacity-40"
                 style={{
                   WebkitMaskImage:
                     "linear-gradient(to top, transparent 0%, black 100%)",

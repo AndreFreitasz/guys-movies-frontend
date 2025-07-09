@@ -1,46 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
+import Link from "next/link";
+import { Serie } from "../../../interfaces/series/types";
+import Image from "next/image";
 import CircularVoteAverage from "./circularVoteAverage";
 
-interface SerieCardProps {
-  id: number;
-  name: string;
-  poster_path: string;
-  overview: string;
-  vote_average: number;
-}
-
-const SerieCard: React.FC<SerieCardProps> = ({
+const SerieCard = ({
   id,
   name,
   poster_path,
   overview,
   vote_average,
-}) => {
-  const getImageUrl = (path: string) => {
-    return `https://image.tmdb.org/t/p/w500${path}`;
-  };
+}: Serie) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const imageUrl = poster_path
+    ? `https://image.tmdb.org/t/p/w500${poster_path}`
+    : "/path/to/default/image.jpg";
 
   return (
-    <>
-      <div className="relative group" key={id}>
-        <img
-          src={getImageUrl(poster_path)}
-          alt={name}
-          className="w-60 h-30 rounded-lg transition-opacity duration-300 group-hover:opacity-50"
+    <Link href={`/serie/${id}`} passHref>
+      <div
+        className="relative p-2 cursor-pointer transform transition-transform duration-300 hover:scale-105"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <Image
+          src={imageUrl}
+          alt={`Poster de ${name}`}
+          width={500}
+          height={750}
+          className="rounded-lg shadow-lg"
+          priority
         />
-        <div className="absolute inset-0 flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-defaultBackground via-transparent to-transparent rounded-lg p-4 w-60 h-30 cursor-pointer">
-          <h3 className="text-white text-xl font-bold mb-2 text-center">
-            {name}
-          </h3>
-          <p className="text-white text-sm mb-2 line-clamp-5 font-semibold text-center">
-            {overview}
-          </p>
-          <div className="w-12 h-12 mt-2">
-            <CircularVoteAverage vote_average={vote_average} />
+        {isHovered && (
+          <div className="absolute inset-0 bg-black bg-opacity-75 flex flex-col justify-center items-center p-4 rounded-lg">
+            <h3 className="text-white text-lg font-bold text-center">{name}</h3>
+            <p className="text-white text-sm mt-2 text-center">
+              {overview?.substring(0, 100)}...
+            </p>
+            <div className="mt-2">
+              <CircularVoteAverage vote_average={vote_average || 0} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    </>
+    </Link>
   );
 };
 

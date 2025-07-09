@@ -56,7 +56,16 @@ const Serie = ({ providerData, error }: SerieProps) => {
               slidesToShow={6}
               infinite={true}
               data={provider.series}
-              renderItem={(serie) => <SerieCard key={serie.id} {...serie} />}
+              renderItem={(serie) => (
+                <SerieCard
+                  key={serie.id}
+                  id={serie.id}
+                  name={serie.name}
+                  poster_path={serie.poster_path}
+                  overview={serie.overview}
+                  vote_average={serie.vote_average}
+                />
+              )}
             />
           </div>
         ))}
