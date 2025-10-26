@@ -8,7 +8,7 @@ import Head from "next/head";
 import Footer from "../../components/_ui/footer";
 import ProvidersMovie from "../../components/movie/providers";
 import ReactStars from "react-stars";
-import { FaHeart, FaEye, FaClock, FaPlus } from "react-icons/fa";
+import { FaEye, FaClock, FaPlus } from "react-icons/fa";
 import Modal from "../../components/_ui/modal";
 import BodyModalForm from "../../components/movie/bodyModalForm";
 import CircularVoteAverage from "../../components/home/movieCard/circularVoteAverage";
@@ -80,7 +80,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     );
     const watched = await isWatchedResponse.json();
     setIsWatched(watched.watched);
-    console.log(isWatched);
   };
 
   const formattedDate = new Date(movie.release_date).toLocaleDateString(
@@ -259,131 +258,280 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         <LoadingSpinner />
       ) : (
         <>
-          <div className="relative text-white">
+          <section className="relative isolate overflow-hidden bg-[#050812] text-white">
             <div className="absolute inset-0">
               <img
                 src={movie.wallpaper_path}
                 alt={movie.title}
-                className="block w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px] object-cover object-top opacity-40"
-                style={{
-                  WebkitMaskImage:
-                    "linear-gradient(to top, transparent 0%, black 100%)",
-                  maskImage:
-                    "linear-gradient(to top, transparent 0%, black 100%)",
-                }}
+                className="h-full w-full object-cover object-top"
               />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-[#050812]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-[#050812]" />
+              <div className="absolute inset-0 backdrop-blur-[2px]" />
             </div>
-            <div className="relative pt-8 w-full px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40 overflow-x-hidden">
-              <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
-                <div className="w-full max-w-[220px] sm:max-w-[280px] md:max-w-[320px] lg:max-w-sm flex-shrink-0">
-                  <img
-                    src={movie.poster_path}
-                    alt={movie.title}
-                    className="block mx-auto w-full rounded-lg shadow-lg"
-                  />
-                  <div className="mt-8 border-b-2 border-gray-600 pb-4">
-                    <h3 className="text-lg font-bold text-gray-600 mb-2 text-center lg:text-left">
-                      GÊNEROS
+
+            <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10 px-3 pb-14 pt-18 sm:px-5 lg:px-8">
+              <div className="grid gap-12 lg:grid-cols-[minmax(0,300px)_1fr]">
+                <aside className="flex flex-col gap-8">
+                  <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-2xl shadow-indigo-900/40 backdrop-blur">
+                    <img
+                      src={movie.poster_path}
+                      alt={movie.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <button
+                      type="button"
+                      onClick={handleWaitingClick}
+                      disabled={isWaitingLoading}
+                      className={`group/button absolute right-4 top-4 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold uppercase tracking-wide backdrop-blur transition ${
+                        isWaiting
+                          ? "bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/60 hover:bg-emerald-400/30"
+                          : "bg-white/10 text-white hover:bg-white/20"
+                      } ${isWaitingLoading ? "opacity-70" : ""}`}
+                    >
+                      <FaPlus
+                        className={`text-base transition duration-300 ${
+                          isWaiting ? "rotate-45 text-emerald-200" : ""
+                        }`}
+                      />
+                      <span>{isWaiting ? "Na watchlist" : "Watchlist"}</span>
+                    </button>
+                  </div>
+
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-200">
+                      Detalhes rápidos
                     </h3>
-                    <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
-                      {movie.genres.map((genre) => genre).join(", ")}
-                    </p>
+                    <div className="mt-5 grid gap-4 text-sm text-white/80">
+                      <div className="rounded-2xl bg-white/5 p-3">
+                        <span className="text-xs uppercase tracking-[0.2em] text-white/50">
+                          Lançamento
+                        </span>
+                        <p className="mt-2 text-base font-semibold text-white">
+                          {formattedDate}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-white/5 p-3">
+                        <span className="text-xs uppercase tracking-[0.2em] text-white/50">
+                          Diretor
+                        </span>
+                        <p className="mt-2 text-base font-semibold text-white">
+                          {movie.director?.name ?? "Não informado"}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-white/5 p-3">
+                        <span className="text-xs uppercase tracking-[0.2em] text-white/50">
+                          Gêneros
+                        </span>
+                        <p className="mt-2 text-sm font-semibold leading-relaxed text-white">
+                          {movie.genres.join(" • ")}
+                        </p>
+                      </div>
+                      {movie.adult && (
+                        <div className="flex items-center justify-center rounded-2xl border border-red-400/60 bg-red-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-red-200">
+                          +18
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="mt-4 border-b-2 border-gray-600 pb-4">
-                    <h3 className="text-lg font-bold text-gray-600 mb-2 text-center lg:text-left">
-                      DIRETOR
-                    </h3>
-                    <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
-                      {movie.director?.name}
+                </aside>
+
+                <div className="flex flex-col gap-10">
+                  <header className="space-y-6">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                      <div className="space-y-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-indigo-200">
+                          Filme
+                        </p>
+                        <h1 className="text-3xl font-black sm:text-5xl md:text-6xl">
+                          {movie.title}
+                        </h1>
+                      </div>
+                      <div className="flex items-center gap-4 rounded-full border border-white/10 bg-white/5 px-4 py-3 backdrop-blur">
+                        <CircularVoteAverage
+                          vote_average={movie.vote_average}
+                        />
+                        <div className="flex flex-col text-xs uppercase tracking-[0.3em] text-white/60">
+                          <span>Score</span>
+                          <span className="font-semibold text-white">TMDB</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="max-w-3xl text-lg leading-relaxed text-white/75">
+                      {movie.overview}
                     </p>
-                  </div>
-                </div>
-                <div className="flex flex-col justify-start gap-4 w-full">
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 items-center justify-center lg:justify-start">
-                    <h1 className="w-fit text-xl sm:text-4xl font-extrabold pb-1 sm:pb-2 border-b-4 border-indigo-600 text-center sm:text-left">
-                      {movie.title}
-                    </h1>
-                    <p className="font-bold font-mono text-xl sm:text-2xl text-gray-300 text-center sm:text-left">
-                      {formattedDate}
-                    </p>
-                  </div>
-                  <div className="flex flex-col md:flex-row gap-8">
-                    <div className="w-full md:w-3/4 flex flex-col gap-4">
-                      <p className="mt-4 text-gray-300 font-semibold text-lg text-center md:text-left">
-                        {movie.overview}
-                      </p>
-                      {(movie.providers.flatrate ||
-                        movie.providers.buy ||
-                        movie.providers.rent) && (
-                        <div className="px-0 md:px-4">
+                  </header>
+
+                  <div className="flex flex-col gap-6 xl:gap-8">
+                    <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-indigo-400/10 to-transparent p-5 md:p-6 xl:p-7 backdrop-blur">
+                      <div className="flex flex-col gap-5 md:gap-6">
+                        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                          <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
+                            Sua experiência
+                          </h2>
+                          <p className="text-xs text-white/60 md:max-w-sm">
+                            Gerencie rapidamente o que já assistiu, o que quer
+                            ver e registre sua nota personalizando suas
+                            recomendações.
+                          </p>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <button
+                            type="button"
+                            onClick={handleWatchedClick}
+                            disabled={watchedLoading}
+                            className={`group flex items-center gap-3 rounded-2xl border border-white/10 px-4 py-3 text-left transition ${
+                              isWatched
+                                ? "bg-emerald-500/20 text-emerald-100 hover:bg-emerald-500/30"
+                                : "bg-white/5 text-white hover:bg-white/10"
+                            } ${watchedLoading ? "opacity-70" : ""}`}
+                          >
+                            {watchedLoading ? (
+                              <LoadingSpinner small />
+                            ) : (
+                              <FaEye
+                                className={`text-xl transition duration-300 ${
+                                  isWatched
+                                    ? "text-emerald-200"
+                                    : "text-indigo-200"
+                                }`}
+                              />
+                            )}
+                            <div className="space-y-1">
+                              <p className="text-[10px] uppercase tracking-[0.3em] text-white/60">
+                                Assistido
+                              </p>
+                              <p className="text-sm font-semibold">
+                                {isWatched
+                                  ? "Remover do assistido"
+                                  : "Marcar como assistido"}
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleWaitingClick}
+                            disabled={isWaitingLoading}
+                            className={`group flex items-center gap-3 rounded-2xl border border-white/10 px-4 py-3 text-left transition ${
+                              isWaiting
+                                ? "bg-amber-400/20 text-amber-100 hover:bg-amber-400/25"
+                                : "bg-white/5 text-white hover:bg-white/10"
+                            } ${isWaitingLoading ? "opacity-70" : ""}`}
+                          >
+                            {isWaitingLoading ? (
+                              <LoadingSpinner small />
+                            ) : (
+                              <FaClock
+                                className={`text-xl transition duration-300 ${
+                                  isWaiting
+                                    ? "text-amber-200"
+                                    : "text-indigo-200"
+                                }`}
+                              />
+                            )}
+                            <div className="space-y-1">
+                              <p className="text-[10px] uppercase tracking-[0.3em] text-white/60">
+                                Watchlist
+                              </p>
+                              <p className="text-sm font-semibold">
+                                {isWaiting
+                                  ? "Remover da watchlist"
+                                  : "Adicionar à watchlist"}
+                              </p>
+                            </div>
+                          </button>
+                        </div>
+
+                        <div className="rounded-2xl border border-white/5 bg-black/30 p-4 md:p-5 backdrop-blur">
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-white">
+                                Avalie este filme
+                              </p>
+                              <p className="text-xs text-white/60">
+                                Compartilhe sua nota e melhore suas
+                                recomendações.
+                              </p>
+                            </div>
+                            {isClient && (
+                              <div className="flex items-center">
+                                <ReactStars
+                                  count={5}
+                                  onChange={handleRating}
+                                  size={36}
+                                  color2={"#F97316"}
+                                  half={true}
+                                  value={rating}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {(movie.providers.flatrate ||
+                      movie.providers.buy ||
+                      movie.providers.rent) && (
+                      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 xl:p-7 backdrop-blur-sm">
+                        <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
+                          Onde assistir
+                        </h2>
+                        <div className="mt-6">
                           <ProvidersMovie
                             flatrate={movie.providers.flatrate}
                             buy={movie.providers.buy}
                             rent={movie.providers.rent}
                           />
                         </div>
-                      )}
-                    </div>
-                    <div className="w-full md:w-1/4">
-                      <div className="bg-defaultBackgroundSecond bg-opacity-40 pt-3 rounded-lg border-4 border-gray-600">
-                        <div className="flex justify-around py-4 border-b-4 border-gray-700">
-                          <div className="flex flex-col items-center">
-                            {watchedLoading ? (
-                              <LoadingSpinner small />
-                            ) : (
-                              <FaEye
-                                className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`}
-                                onClick={handleWatchedClick}
-                              />
-                            )}
-                            <span className="text-gray-500 text-sm mt-2 font-semibold">
-                              Assistido
-                            </span>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            {isWaitingLoading ? (
-                              <LoadingSpinner small />
-                            ) : (
-                              <FaClock
-                                className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
-                                onClick={handleWaitingClick}
-                              />
-                            )}
-                            <span className="text-gray-500 text-sm mt-2 font-semibold">
-                              Watchlist
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-center border-b-4 border-gray-700 pb-4 pt-4">
-                          <h2 className="text-xl font-bold text-white text-opacity-50">
-                            Avaliar
-                          </h2>
-                          {isClient && (
-                            <ReactStars
-                              count={5}
-                              onChange={handleRating}
-                              size={40}
-                              color2={"#4F46E5"}
-                              half={true}
-                              value={rating}
-                            />
-                          )}
-                        </div>
-                        <div className="flex flex-col items-center border-b-4 border-gray-700 py-4">
-                          <h2 className="text-lg font-bold text-white text-opacity-50 mb-4">
-                            Avaliação TMDB
-                          </h2>
-                          <CircularVoteAverage
-                            vote_average={movie.vote_average}
-                          />
+                      </div>
+                    )}
+
+                    {movie.cast && movie.cast.length > 0 && (
+                      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 xl:p-7 backdrop-blur-sm">
+                        <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
+                          Elenco principal
+                        </h2>
+                        <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                          {movie.cast.slice(0, 8).map((member) => (
+                            <div
+                              key={`${member.name}-${member.character}`}
+                              className="flex items-start gap-3 rounded-2xl bg-white/5 p-3"
+                            >
+                              <div className="relative h-12 w-12 overflow-hidden rounded-full border border-white/10 bg-black/40 flex-shrink-0">
+                                {member.profile_path ? (
+                                  <img
+                                    src={`https://image.tmdb.org/t/p/w185${member.profile_path}`}
+                                    alt={member.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <span className="flex h-full w-full items-center justify-center text-xs font-semibold uppercase text-white/60">
+                                    {member.name.substring(0, 2)}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-sm font-semibold leading-snug text-white break-words">
+                                  {member.name}
+                                </p>
+                                <p className="text-xs uppercase tracking-[0.2em] text-white/50">
+                                  {member.character}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         </>
       )}
       <Footer />
