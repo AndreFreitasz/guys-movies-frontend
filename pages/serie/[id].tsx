@@ -92,7 +92,22 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     type: "success" | "error" | "warn" | "info",
     message: string,
   ) => {
-    toast[type](message);
+    switch (type) {
+      case "success":
+        toast.success(message);
+        break;
+      case "error":
+        toast.error(message);
+        break;
+      case "warn":
+        toast.warn(message);
+        break;
+      case "info":
+        toast.info(message);
+        break;
+      default:
+        toast(message);
+    }
   };
 
   const sendWatchedRequest = (serieData: any) => {
@@ -129,6 +144,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
         idTmdb: serie.id,
         posterPath: serie.poster_path,
         voteAverage: serie.vote_average,
+        numberOfSeasons: serie.number_of_seasons,
       },
     };
     setWatchedLoading(true);
@@ -153,6 +169,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
         idTmdb: serie.id,
         posterPath: serie.poster_path,
         voteAverage: serie.vote_average,
+        numberOfSeasons: serie.number_of_seasons,
       },
     };
     setIsModalOpen(false);
@@ -176,6 +193,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
         idTmdb: serie.id,
         posterPath: serie.poster_path,
         voteAverage: serie.vote_average,
+        numberOfSeasons: serie.number_of_seasons,
       },
     };
 
@@ -243,6 +261,8 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
                 style={{
                   maskImage:
                     "linear-gradient(to top, transparent 0%, black 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to top, transparent 0%, black 100%)",
                 }}
               />
             </div>
@@ -259,7 +279,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
                       GÊNEROS
                     </h3>
                     <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
-                      {serie.genres.map((genre) => genre).join(", ")}
+                      {serie.genres.join(", ")}
                     </p>
                   </div>
                   <div className="mt-4 border-b-2 border-gray-600 pb-4">
@@ -267,153 +287,101 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
                       CRIADORES
                     </h3>
                     <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
-                      {serie.created_by
-                        .map((creator) => creator.name)
-                        .join(", ")}
+                      {serie.created_by.length > 0
+                        ? serie.created_by
+                            .map((creator) => creator.name)
+                            .join(", ")
+                        : "-"}
+                    </p>
+                  </div>
+                  <div className="mt-4 border-b-2 border-gray-600 pb-4">
+                    <h3 className="text-lg font-bold text-gray-600 mb-2 text-center lg:text-left">
+                      TEMPORADAS
+                    </h3>
+                    <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
+                      {serie.number_of_seasons}{" "}
+                      {serie.number_of_seasons > 1 ? "Temporadas" : "Temporada"}
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col justify-start gap-4 w-full">
+                <div className="flex flex-col justify-start gap-6 w-full">
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 items-center justify-center lg:justify-start">
                     <h1 className="w-fit text-xl sm:text-4xl font-extrabold pb-1 sm:pb-2 border-b-4 border-indigo-600 text-center sm:text-left">
                       {serie.name}
                     </h1>
-                    <p className="font-bold font-mono text-xl sm:text-2xl text-gray-300 text-center sm:text-left">
+                    {/* <p className="font-bold font-mono text-xl sm:text-2xl text-gray-300 text-center sm:text-left">
                       {formattedDate}
-                    </p>
+                    </p> */}
                   </div>
-                  <div className="flex justify-center lg:justify-start">
-                    <p className="text-lg font-bold text-gray-300 bg-gray-700 bg-opacity-50 px-4 py-1 rounded-full">
-                      {serie.number_of_seasons}{" "}
-                      {serie.number_of_seasons > 1 ? "Temporadas" : "Temporada"}
-                    </p>
-                  </div>{" "}
-                  <div className="flex flex-col gap-8">
-                    <p className="mt-4 text-gray-300 font-semibold text-lg text-center md:text-left">
-                      {serie.overview}
-                    </p>
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="w-full md:hidden mb-4">
-                        <div className="bg-defaultBackgroundSecond bg-opacity-40 pt-3 rounded-lg border-4 border-gray-600">
-                          <div className="flex justify-around py-4 border-b-4 border-gray-700">
-                            <div className="flex flex-col items-center">
-                              {watchedLoading ? (
-                                <LoadingSpinner small />
-                              ) : (
-                                <FaEye
-                                  className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`}
-                                  onClick={handleWatchedClick}
-                                />
-                              )}
-                              <span className="text-gray-500 text-sm mt-2 font-semibold">
-                                Assistido
-                              </span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                              {isWaitingLoading ? (
-                                <LoadingSpinner small />
-                              ) : (
-                                <FaClock
-                                  className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
-                                  onClick={handleWaitingClick}
-                                />
-                              )}
-                              <span className="text-gray-500 text-sm mt-2 font-semibold">
-                                Watchlist
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-center border-b-4 border-gray-700 pb-4 pt-4">
-                            <h2 className="text-xl font-bold text-white text-opacity-50">
-                              Avaliar
-                            </h2>
-                            {isClient && (
-                              <ReactStars
-                                count={5}
-                                onChange={handleRating}
-                                size={40}
-                                color2={"#4F46E5"}
-                                half={true}
-                                value={rating}
+                  <div className="flex flex-col md:flex-row gap-8">
+                    <div className="w-full md:w-3/4 flex flex-col gap-6">
+                      <p className="mt-4 text-gray-300 font-semibold text-lg text-center md:text-left">
+                        {serie.overview}
+                      </p>
+                      {(serie.providers.flatrate ||
+                        serie.providers.buy ||
+                        serie.providers.rent) && (
+                        <div className="px-0 md:px-4">
+                          <ProvidersMovie
+                            flatrate={serie.providers.flatrate}
+                            buy={serie.providers.buy}
+                            rent={serie.providers.rent}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-full md:w-1/4">
+                      <div className="bg-defaultBackgroundSecond bg-opacity-40 pt-3 rounded-lg border-4 border-gray-600">
+                        <div className="flex justify-around py-4 border-b-4 border-gray-700">
+                          <div className="flex flex-col items-center">
+                            {watchedLoading ? (
+                              <LoadingSpinner small />
+                            ) : (
+                              <FaEye
+                                className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`}
+                                onClick={handleWatchedClick}
                               />
                             )}
+                            <span className="text-gray-500 text-sm mt-2 font-semibold">
+                              Assistido
+                            </span>
                           </div>
-                          <div className="flex flex-col items-center border-b-4 border-gray-700 py-4">
-                            <h2 className="text-lg font-bold text-white text-opacity-50 mb-4">
-                              Avaliação TMDB
-                            </h2>
-                            <CircularVoteAverage
-                              vote_average={serie.vote_average}
-                            />
+                          <div className="flex flex-col items-center">
+                            {isWaitingLoading ? (
+                              <LoadingSpinner small />
+                            ) : (
+                              <FaClock
+                                className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
+                                onClick={handleWaitingClick}
+                              />
+                            )}
+                            <span className="text-gray-500 text-sm mt-2 font-semibold">
+                              Watchlist
+                            </span>
                           </div>
                         </div>
-                      </div>
-                      <div className="w-full md:w-2/3">
-                        {(serie.providers.flatrate ||
-                          serie.providers.buy ||
-                          serie.providers.rent) && (
-                          <div className="mt-2 md:mt-8">
-                            <ProvidersMovie
-                              flatrate={serie.providers.flatrate}
-                              buy={serie.providers.buy}
-                              rent={serie.providers.rent}
+                        <div className="flex flex-col items-center border-b-4 border-gray-700 pb-4 pt-4">
+                          <h2 className="text-xl font-bold text-white text-opacity-50">
+                            Avaliar
+                          </h2>
+                          {isClient && (
+                            <ReactStars
+                              count={5}
+                              onChange={handleRating}
+                              size={40}
+                              color2={"#4F46E5"}
+                              half
+                              value={rating}
                             />
-                          </div>
-                        )}
-                      </div>
-                      <div className="hidden md:block w-full md:w-1/3">
-                        <div className="bg-defaultBackgroundSecond bg-opacity-40 pt-3 rounded-lg border-4 border-gray-600 sticky top-4">
-                          <div className="flex justify-around py-4 border-b-4 border-gray-700">
-                            <div className="flex flex-col items-center">
-                              {watchedLoading ? (
-                                <LoadingSpinner small />
-                              ) : (
-                                <FaEye
-                                  className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`}
-                                  onClick={handleWatchedClick}
-                                />
-                              )}
-                              <span className="text-gray-500 text-sm mt-2 font-semibold">
-                                Assistido
-                              </span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                              {isWaitingLoading ? (
-                                <LoadingSpinner small />
-                              ) : (
-                                <FaClock
-                                  className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
-                                  onClick={handleWaitingClick}
-                                />
-                              )}
-                              <span className="text-gray-500 text-sm mt-2 font-semibold">
-                                Watchlist
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-center border-b-4 border-gray-700 pb-4 pt-4">
-                            <h2 className="text-xl font-bold text-white text-opacity-50">
-                              Avaliar
-                            </h2>
-                            {isClient && (
-                              <ReactStars
-                                count={5}
-                                onChange={handleRating}
-                                size={40}
-                                color2={"#4F46E5"}
-                                half={true}
-                                value={rating}
-                              />
-                            )}
-                          </div>
-                          <div className="flex flex-col items-center border-b-4 border-gray-700 py-4">
-                            <h2 className="text-lg font-bold text-white text-opacity-50 mb-4">
-                              Avaliação TMDB
-                            </h2>
-                            <CircularVoteAverage
-                              vote_average={serie.vote_average}
-                            />
-                          </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col items-center border-b-4 border-gray-700 py-4">
+                          <h2 className="text-lg font-bold text-white text-opacity-50 mb-4">
+                            Avaliação TMDB
+                          </h2>
+                          <CircularVoteAverage
+                            vote_average={serie.vote_average ?? 0}
+                          />
                         </div>
                       </div>
                     </div>

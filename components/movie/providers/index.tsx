@@ -1,89 +1,71 @@
 import React from "react";
 import { Providers } from "../../../interfaces/movie/types";
 
+const labelStyles = {
+  flatrate: "from-emerald-400/70 to-emerald-500/70 text-emerald-50",
+  buy: "from-sky-400/70 to-sky-500/70 text-sky-50",
+  rent: "from-amber-400/70 to-amber-500/70 text-amber-50",
+};
+
+const readableLabel = {
+  flatrate: "Streaming",
+  buy: "Comprar",
+  rent: "Alugar",
+};
+
 const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
+  const sections = [
+    { key: "flatrate" as const, providers: flatrate },
+    { key: "buy" as const, providers: buy },
+    { key: "rent" as const, providers: rent },
+  ].filter((section) => section.providers && section.providers.length > 0);
+
+  if (sections.length === 0) {
+    return (
+      <p className="rounded-2xl border border-white/10 bg-black/40 px-4 py-6 text-sm text-white/60 backdrop-blur">
+        Ainda não temos informações sobre onde este título está disponível.
+      </p>
+    );
+  }
+
   return (
-    <div className="bg-defaultBackgroundSecond bg-opacity-30 rounded-2xl my-4 border-2 border-white border-opacity-30">
-      <h2 className="text-sm font-bold bg-defaultBackgroundSecond bg-opacity-50 rounded-t-2xl text-gray-300 border-b-2 border-white border-opacity-30 py-2 px-4">
-        Onde assistir?
-      </h2>
-      <div className="flex flex-col space-y-4">
-        {flatrate && flatrate.length > 0 && (
-          <div className="flex items-center justify-start w-full py-2">
-            <div className="w-[90px] text-right pr-2">
-              <span className="text-gray-200 text-xs font-bold bg-indigo-600 bg-opacity-50 p-2 rounded-xl">
-                STREAM
-              </span>
-            </div>
-            <div className="w-1/2 pl-2">
-              <div className="flex gap-2">
-                {flatrate.map((provider, index) => (
+    <div className="space-y-4">
+      {sections.map(({ key, providers }) => (
+        <div
+          key={key}
+          className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/30 p-4 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <span
+              className={`inline-flex items-center rounded-full bg-gradient-to-r px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] ${labelStyles[key]}`}
+            >
+              {readableLabel[key]}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {providers!.map((provider) => (
+              <div
+                key={
+                  provider.provider_id
+                    ? `${key}-${provider.provider_id}`
+                    : `${key}-${provider.provider_name}`
+                }
+                className="group relative"
+                title={provider.provider_name}
+              >
+                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-lg transition-transform duration-300 group-hover:scale-105">
                   <img
-                    key={
-                      provider.provider_id
-                        ? `flatrate-${provider.provider_id}`
-                        : `flatrate-${index}`
-                    }
                     src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
                     alt={provider.provider_name}
-                    className="w-12 rounded-xl"
+                    className="h-12 w-12 object-contain"
+                    loading="lazy"
                   />
-                ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        )}
-        {buy && buy.length > 0 && (
-          <div className="flex items-center py-4 border-b-2 border-t-2 border-white border-opacity-30">
-            <div className="w-[90px] text-right pr-2">
-              <span className="text-gray-200 text-xs font-bold bg-indigo-600 bg-opacity-50 p-2 rounded-xl">
-                COMPRAR
-              </span>
-            </div>
-            <div className="w-1/2 pl-2">
-              <div className="flex gap-2">
-                {buy.map((provider, index) => (
-                  <img
-                    key={
-                      provider.provider_id
-                        ? `buy-${provider.provider_id}`
-                        : `buy-${index}`
-                    }
-                    src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
-                    alt={provider.provider_name}
-                    className="w-12 rounded-xl"
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-        {rent && rent.length > 0 && (
-          <div className="flex items-center py-2">
-            <div className="w-[90px] text-right px-2">
-              <span className="text-gray-200 text-xs font-bold bg-indigo-600 bg-opacity-50 p-2 rounded-xl">
-                ALUGAR
-              </span>
-            </div>
-            <div className="w-1/2 pl-2">
-              <div className="flex gap-2">
-                {rent.map((provider, index) => (
-                  <img
-                    key={
-                      provider.provider_id
-                        ? `rent-${provider.provider_id}`
-                        : `rent-${index}`
-                    }
-                    src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
-                    alt={provider.provider_name}
-                    className="w-12 rounded-xl"
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      ))}
     </div>
   );
 };
