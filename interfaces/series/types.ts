@@ -2,31 +2,32 @@ export interface Serie {
   id: number;
   name: string;
   poster_path: string;
-  banner_url: string;
-  overview: string;
-  vote_average: number;
+  overview?: string;
+  first_air_date?: string;
+  vote_average?: number;
 }
 
-export interface Provider {
-  id: number;
-  logoUrl: string;
-  name: string;
+import { CastMember, Providers } from "../movie/types";
+
+export interface SerieResponse extends Serie {
+  wallpaper_path: string;
+  genres: string[];
+  number_of_seasons: number;
+  created_by: { name: string }[];
+  providers: Providers;
+  cast?: CastMember[];
 }
 
-export interface ProviderData {
-  provider: Provider;
+export interface ProviderSeries {
+  provider: {
+    id: number;
+    name: string;
+    logoUrl: string;
+  };
   series: Serie[];
 }
 
 export interface SerieProps {
-  providerData: ProviderData[];
-  popularSeries: Serie[];
-  popularSeriesHorror: Serie[];
-  popularSeriesSciFi: Serie[];
-  popularSeriesFamily: Serie[];
-  topRatedSeries: Serie[];
-  popularSeriesDrama: Serie[];
-  popularSeriesSciFiDrama: Serie[];
-  popularSeriesComedy: Serie[];
-  error: string | null;
+  providerData: ProviderSeries[];
+  error?: string;
 }

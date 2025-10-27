@@ -52,7 +52,7 @@ const CircularVoteAverage: React.FC<CircularVoteAverageProps> = ({
         text={`${(vote_average * 10).toFixed(0)}%`}
         styles={buildStyles({
           textColor: getVoteColor(vote_average),
-          pathColor: `url(#${getGradientId(vote_average)})`,
+          pathColor: getVoteColor(vote_average),
           trailColor: "rgba(255, 255, 255, 0.2)",
           textSize: "30px",
         })}

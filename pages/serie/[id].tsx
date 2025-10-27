@@ -19,22 +19,26 @@ import {
   QuickDetailItem,
 } from "../../components/mediaDetails";
 import { useAuth } from "../../hooks/authContext";
-import { MovieResponse } from "../../interfaces/movie/types";
+import { SerieResponse } from "../../interfaces/series/types";
 
-interface MovieProps {
-  movie: MovieResponse;
+interface SerieProps {
+  serie: SerieResponse;
 }
 
-const Movie: NextPage<MovieProps> = ({ movie }) => {
+const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const { user, authLoading } = useAuth();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
+
   const [rating, setRating] = useState(0);
   const [isWatched, setIsWatched] = useState(false);
   const [watchedLoading, setWatchedLoading] = useState(false);
+
   const [isWaiting, setIsWaiting] = useState(false);
   const [isWaitingLoading, setIsWaitingLoading] = useState(false);
+
   const [watchedDate, setWatchedDate] = useState("");
 
   const showToast = useCallback(
@@ -62,46 +66,44 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const validateUser = useCallback((): boolean => {
     if (authLoading) return false;
     if (!user) {
-      showToast("warn", "Entre em uma conta para fazer atualizações no filme");
+      showToast("warn", "Entre em uma conta para fazer atualizações na série");
       return false;
     }
     return true;
   }, [authLoading, showToast, user]);
 
-  const buildMoviePayload = useCallback(
+  const buildSeriePayload = useCallback(
     () => ({
-      title: movie.title,
-      overview: movie.overview,
-      releaseDate: movie.release_date,
-      idTmdb: movie.id,
-      posterPath: movie.poster_path,
-      director: movie.director?.name,
-      voteAverage: movie.vote_average,
+      name: serie.name,
+      overview: serie.overview,
+      firstAirDate: serie.first_air_date,
+      idTmdb: serie.id,
+      posterPath: serie.poster_path,
+      voteAverage: serie.vote_average,
+      numberOfSeasons: serie.number_of_seasons,
     }),
     [
-      movie.director?.name,
-      movie.id,
-      movie.overview,
-      movie.poster_path,
-      movie.release_date,
-      movie.title,
-      movie.vote_average,
+      serie.first_air_date,
+      serie.id,
+      serie.name,
+      serie.number_of_seasons,
+      serie.overview,
+      serie.poster_path,
+      serie.vote_average,
     ],
   );
 
   const sendWatchedRequest = useCallback(
-    (movieData: any) => {
+    (serieData: any) => {
       try {
-        return fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`, {
+        return fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedSerie`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(movieData),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(serieData),
         });
       } catch (error) {
         console.error(`Erro ao fazer requisição: ${error}`);
-        showToast("error", "Erro ao marcar o filme como assistido.");
+        showToast("error", "Erro ao marcar a série como assistida.");
         return null;
       }
     },
@@ -111,7 +113,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const getRating = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/getRate?userId=${user!.id}&idTmdb=${movie.id}`,
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/getRate?userId=${user!.id}&idTmdb=${serie.id}`,
         { credentials: "include" },
       );
       if (response.ok) {
@@ -119,27 +121,28 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         setRating(data.rate ?? 0);
       }
     } catch (error) {
+      console.error("Erro ao buscar avaliação da série:", error);
       setRating(0);
     }
-  }, [movie.id, user]);
+  }, [serie.id, user]);
 
   const checkIsWaiting = useCallback(async () => {
-    const isWaitingResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie/isWaiting?userid=${user!.id}&idTmdb=${movie.id}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_API}/waitingSerie/isWaiting?userid=${user!.id}&idTmdb=${serie.id}`,
     );
-    const isWaitingData = await isWaitingResponse.json();
-    setIsWaiting(isWaitingData.waiting);
-  }, [movie.id, user]);
+    const data = await response.json();
+    setIsWaiting(Boolean(data.waiting));
+  }, [serie.id, user]);
 
   const checkIsWatched = useCallback(async () => {
-    const isWatchedResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?userid=${user!.id}&idTmdb=${movie.id}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/isWatched?userid=${user!.id}&idTmdb=${serie.id}`,
     );
-    const watched = await isWatchedResponse.json();
-    setIsWatched(watched.watched);
-  }, [movie.id, user]);
+    const data = await response.json();
+    setIsWatched(Boolean(data.watched));
+  }, [serie.id, user]);
 
-  const fetchData = useCallback(async () => {
+  const fetchInitialData = useCallback(async () => {
     if (!validateUser()) return;
     await Promise.all([checkIsWatched(), checkIsWaiting(), getRating()]);
   }, [checkIsWaiting, checkIsWatched, getRating, validateUser]);
@@ -147,38 +150,42 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   useEffect(() => {
     if (!authLoading) {
       setIsClient(true);
-      fetchData();
+      fetchInitialData();
     }
-  }, [authLoading, fetchData]);
+  }, [authLoading, fetchInitialData]);
 
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   const handleWatchedClick = useCallback(async () => {
     if (!validateUser()) return;
+
     if (!isWatched) {
       openModal();
       return;
     }
 
-    const movieData = {
+    const serieData = {
       watchedAt: new Date().toISOString(),
       userId: user!.id,
-      createMovieDto: buildMoviePayload(),
+      createSerieDto: buildSeriePayload(),
     };
+
     setWatchedLoading(true);
-    const response = await sendWatchedRequest(movieData);
+    const response = await sendWatchedRequest(serieData);
     setWatchedLoading(false);
 
     if (response?.status === 200) {
       setIsWatched(false);
       setRating(0);
+      showToast("info", "Série removida da lista de assistidos.");
     }
   }, [
-    buildMoviePayload,
+    buildSeriePayload,
     isWatched,
     openModal,
     sendWatchedRequest,
+    showToast,
     user,
     validateUser,
   ]);
@@ -187,22 +194,22 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     if (!validateUser()) return;
 
     setWatchedLoading(true);
-    const movieData = {
+    const serieData = {
       watchedAt: watchedDate,
       userId: user!.id,
-      createMovieDto: buildMoviePayload(),
+      createSerieDto: buildSeriePayload(),
     };
 
     setIsModalOpen(false);
-    const response = await sendWatchedRequest(movieData);
+    const response = await sendWatchedRequest(serieData);
     setWatchedLoading(false);
 
     if (response?.status === 201) {
       setIsWatched(true);
-      showToast("success", "Filme marcado como assistido!");
+      showToast("success", "Série marcada como assistida!");
     }
   }, [
-    buildMoviePayload,
+    buildSeriePayload,
     sendWatchedRequest,
     showToast,
     user,
@@ -214,118 +221,129 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     if (!validateUser()) return;
 
     setIsWaitingLoading(true);
-    const movieData = {
+    const serieData = {
       userId: user!.id,
-      createMovieDto: buildMoviePayload(),
+      createSerieDto: buildSeriePayload(),
     };
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie`,
+        `${process.env.NEXT_PUBLIC_URL_API}/waitingSerie`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(movieData),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(serieData),
         },
       );
 
-      if (response.status === 200) setIsWaiting(false);
-      if (response.status === 201) setIsWaiting(true);
+      if (response.status === 200) {
+        setIsWaiting(false);
+        showToast("info", "Série removida da watchlist.");
+      }
+      if (response.status === 201) {
+        setIsWaiting(true);
+        showToast("success", "Série adicionada à watchlist!");
+      }
     } catch (error) {
-      showToast("error", "Erro ao adicionar o filme na lista de espera.");
+      console.error("Erro ao atualizar watchlist da série:", error);
+      showToast("error", "Erro ao atualizar a watchlist.");
     } finally {
       setIsWaitingLoading(false);
     }
-  }, [buildMoviePayload, showToast, user, validateUser]);
+  }, [buildSeriePayload, showToast, user, validateUser]);
 
   const handleRating = useCallback(
     (newRating: number) => {
       if (!validateUser()) return;
+
       if (!isWatched) {
         showToast(
           "warn",
-          "Você precisa marcar o filme como assistido para avaliá-lo.",
+          "Você precisa marcar a série como assistida para avaliá-la.",
         );
         return;
       }
 
       setRating(newRating);
-      const movieData = {
+      const serieData = {
         userId: user!.id,
-        idTmdb: movie.id,
+        idTmdb: serie.id,
         rating: newRating,
       };
 
       try {
-        fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/rate`, {
+        fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/rate`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(movieData),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(serieData),
         });
-      } catch {
+      } catch (error) {
+        console.error("Erro ao enviar avaliação da série:", error);
         showToast("error", "Erro ao enviar a avaliação.");
       }
     },
-    [isWatched, movie.id, showToast, user, validateUser],
+    [isWatched, serie.id, showToast, user, validateUser],
   );
 
   const formattedDate = useMemo(() => {
-    const date = new Date(movie.release_date);
+    if (!serie.first_air_date) {
+      return "Data não informada";
+    }
+    const date = new Date(serie.first_air_date);
     if (Number.isNaN(date.getTime())) {
       return "Data não informada";
     }
     return date.toLocaleDateString("pt-BR");
-  }, [movie.release_date]);
+  }, [serie.first_air_date]);
+
+  const creators = useMemo(() => {
+    if (!serie.created_by || serie.created_by.length === 0) {
+      return "Não informado";
+    }
+    return serie.created_by.map((creator) => creator.name).join(" • ");
+  }, [serie.created_by]);
+
+  const seasonsLabel = useMemo(() => {
+    if (!serie.number_of_seasons) return "Não informado";
+    return `${serie.number_of_seasons} ${
+      serie.number_of_seasons > 1 ? "temporadas" : "temporada"
+    }`;
+  }, [serie.number_of_seasons]);
 
   const genresLabel = useMemo(() => {
-    if (!movie.genres?.length) return "Não informado";
-    return movie.genres.join(" • ");
-  }, [movie.genres]);
+    if (!serie.genres?.length) return "Não informado";
+    return serie.genres.join(" • ");
+  }, [serie.genres]);
 
   const quickDetails = useMemo<QuickDetailItem[]>(
     () => [
       { label: "Lançamento", value: formattedDate },
-      {
-        label: "Diretor",
-        value: movie.director?.name ?? "Não informado",
-      },
+      { label: "Criadores", value: creators },
+      { label: "Temporadas", value: seasonsLabel },
       { label: "Gêneros", value: genresLabel },
     ],
-    [formattedDate, genresLabel, movie.director?.name],
+    [creators, formattedDate, genresLabel, seasonsLabel],
   );
 
-  const adultBadge = useMemo(() => {
-    if (!movie.adult) return null;
-    return (
-      <div className="flex items-center justify-center rounded-2xl border border-red-400/60 bg-red-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-red-200">
-        +18
-      </div>
-    );
-  }, [movie.adult]);
-
-  const castMembers = useMemo(() => movie.cast ?? [], [movie.cast]);
+  const castMembers = useMemo(() => serie.cast ?? [], [serie.cast]);
 
   return (
     <>
       <Head>
-        <title>GuysMovie: {movie.title}</title>
+        <title>GuysMovie: {serie.name}</title>
       </Head>
       <Header />
       {loading ? (
         <LoadingSpinner />
       ) : (
         <MediaDetailLayout
-          backdropUrl={movie.wallpaper_path}
-          backdropAlt={movie.title}
+          backdropUrl={serie.wallpaper_path}
+          backdropAlt={serie.name}
           aside={
             <>
               <MediaPosterCard
-                posterUrl={movie.poster_path}
-                title={movie.title}
+                posterUrl={serie.poster_path}
+                title={serie.name}
                 onWatchlistToggle={handleWaitingClick}
                 isInWatchlist={isWaiting}
                 isLoading={isWaitingLoading}
@@ -337,22 +355,21 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
               <MediaQuickDetails
                 title="Detalhes rápidos"
                 items={quickDetails}
-                extra={adultBadge}
               />
             </>
           }
         >
           <MediaHeroHeader
-            badgeLabel="Filme"
-            title={movie.title}
-            overview={movie.overview}
-            voteAverage={movie.vote_average}
+            badgeLabel="Série"
+            title={serie.name}
+            overview={serie.overview ?? ""}
+            voteAverage={serie.vote_average ?? 0}
           />
 
           <div className="flex flex-col gap-6 xl:gap-8">
             <MediaExperiencePanel
               heading="Sua experiência"
-              description="Gerencie rapidamente o que já assistiu, o que quer ver e registre sua nota personalizando suas recomendações."
+              description="Gerencie o que você já assistiu, organize sua watchlist e registre sua avaliação personalizada."
               watchedConfig={{
                 isActive: isWatched,
                 isLoading: watchedLoading,
@@ -372,7 +389,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                 icon: "clock",
               }}
               ratingConfig={{
-                title: "Avalie este filme",
+                title: "Avalie esta série",
                 description:
                   "Compartilhe sua nota e melhore suas recomendações.",
                 value: rating,
@@ -383,7 +400,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
 
             <MediaProvidersSection
               title="Onde assistir"
-              providers={movie.providers}
+              providers={serie.providers}
             />
 
             <MediaCastSection title="Elenco principal" cast={castMembers} />
@@ -411,15 +428,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params!;
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_URL_API}/movie/${id}`,
+    `${process.env.NEXT_PUBLIC_URL_API}/serie/${id}`,
   );
-  const movie = await response.json();
+  const serie = await response.json();
 
   return {
     props: {
-      movie: movie,
+      serie,
     },
   };
 };
 
-export default Movie;
+export default SeriePage;
