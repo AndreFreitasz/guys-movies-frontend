@@ -1,18 +1,25 @@
-import { useAuth } from "../../hooks/authContext";
-import { GetServerSideProps, NextPage } from "next";
-import { SerieResponse } from "../../interfaces/series/types";
-import Header from "../../components/_ui/header";
-import { useEffect, useState } from "react";
-import LoadingSpinner from "../../components/_ui/loadingSpinner";
 import Head from "next/head";
-import Footer from "../../components/_ui/footer";
-import ProvidersMovie from "../../components/movie/providers";
-import ReactStars from "react-stars";
-import { FaEye, FaClock } from "react-icons/fa";
-import Modal from "../../components/_ui/modal";
-import BodyModalForm from "../../components/movie/bodyModalForm";
-import CircularVoteAverage from "../../components/home/movieCard/circularVoteAverage";
+import { GetServerSideProps, NextPage } from "next";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
+
+import Footer from "../../components/_ui/footer";
+import Header from "../../components/_ui/header";
+import LoadingSpinner from "../../components/_ui/loadingSpinner";
+import BodyModalForm from "../../components/movie/bodyModalForm";
+import Modal from "../../components/_ui/modal";
+import {
+  MediaCastSection,
+  MediaDetailLayout,
+  MediaExperiencePanel,
+  MediaHeroHeader,
+  MediaPosterCard,
+  MediaProvidersSection,
+  MediaQuickDetails,
+  QuickDetailItem,
+} from "../../components/mediaDetails";
+import { useAuth } from "../../hooks/authContext";
+import { SerieResponse } from "../../interfaces/series/types";
 
 interface SerieProps {
   serie: SerieResponse;
@@ -20,38 +27,90 @@ interface SerieProps {
 
 const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const { user, authLoading } = useAuth();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
+
   const [rating, setRating] = useState(0);
   const [isWatched, setIsWatched] = useState(false);
   const [watchedLoading, setWatchedLoading] = useState(false);
+
   const [isWaiting, setIsWaiting] = useState(false);
   const [isWaitingLoading, setIsWaitingLoading] = useState(false);
+
   const [watchedDate, setWatchedDate] = useState("");
 
-  useEffect(() => {
-    if (!authLoading) {
-      setIsClient(true);
-      fetchData();
-    }
-  }, [user, serie.id, authLoading]);
+  const showToast = useCallback(
+    (type: "success" | "error" | "warn" | "info", message: string) => {
+      switch (type) {
+        case "success":
+          toast.success(message);
+          break;
+        case "error":
+          toast.error(message);
+          break;
+        case "warn":
+          toast.warn(message);
+          break;
+        case "info":
+          toast.info(message);
+          break;
+        default:
+          toast(message);
+      }
+    },
+    [],
+  );
 
-  const fetchData = async () => {
-    if (!validateUser()) return;
-    await Promise.all([checkIsWatched(), checkIsWaiting(), getRating()]);
-  };
-
-  const validateUser = (): boolean => {
+  const validateUser = useCallback((): boolean => {
     if (authLoading) return false;
     if (!user) {
       showToast("warn", "Entre em uma conta para fazer atualizações na série");
       return false;
     }
     return true;
-  };
+  }, [authLoading, showToast, user]);
 
-  const getRating = async () => {
+  const buildSeriePayload = useCallback(
+    () => ({
+      name: serie.name,
+      overview: serie.overview,
+      firstAirDate: serie.first_air_date,
+      idTmdb: serie.id,
+      posterPath: serie.poster_path,
+      voteAverage: serie.vote_average,
+      numberOfSeasons: serie.number_of_seasons,
+    }),
+    [
+      serie.first_air_date,
+      serie.id,
+      serie.name,
+      serie.number_of_seasons,
+      serie.overview,
+      serie.poster_path,
+      serie.vote_average,
+    ],
+  );
+
+  const sendWatchedRequest = useCallback(
+    (serieData: any) => {
+      try {
+        return fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedSerie`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(serieData),
+        });
+      } catch (error) {
+        console.error(`Erro ao fazer requisição: ${error}`);
+        showToast("error", "Erro ao marcar a série como assistida.");
+        return null;
+      }
+    },
+    [showToast],
+  );
+
+  const getRating = useCallback(async () => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/getRate?userId=${user!.id}&idTmdb=${serie.id}`,
@@ -62,139 +121,109 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
         setRating(data.rate ?? 0);
       }
     } catch (error) {
+      console.error("Erro ao buscar avaliação da série:", error);
       setRating(0);
     }
-  };
+  }, [serie.id, user]);
 
-  const checkIsWaiting = async () => {
-    const isWaitingResponse = await fetch(
+  const checkIsWaiting = useCallback(async () => {
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_URL_API}/waitingSerie/isWaiting?userid=${user!.id}&idTmdb=${serie.id}`,
     );
-    const isWaiting = await isWaitingResponse.json();
-    setIsWaiting(isWaiting.waiting);
-  };
+    const data = await response.json();
+    setIsWaiting(Boolean(data.waiting));
+  }, [serie.id, user]);
 
-  const checkIsWatched = async () => {
-    const isWatchedResponse = await fetch(
+  const checkIsWatched = useCallback(async () => {
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/isWatched?userid=${user!.id}&idTmdb=${serie.id}`,
     );
-    const watched = await isWatchedResponse.json();
-    setIsWatched(watched.watched);
-  };
+    const data = await response.json();
+    setIsWatched(Boolean(data.watched));
+  }, [serie.id, user]);
 
-  const formattedDate = new Date(serie.first_air_date).toLocaleDateString(
-    "pt-BR",
-  );
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-  const showToast = (
-    type: "success" | "error" | "warn" | "info",
-    message: string,
-  ) => {
-    switch (type) {
-      case "success":
-        toast.success(message);
-        break;
-      case "error":
-        toast.error(message);
-        break;
-      case "warn":
-        toast.warn(message);
-        break;
-      case "info":
-        toast.info(message);
-        break;
-      default:
-        toast(message);
-    }
-  };
-
-  const sendWatchedRequest = (serieData: any) => {
-    try {
-      const response = fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(serieData),
-        },
-      );
-      return response;
-    } catch (error) {
-      console.error(`Erro ao fazer requisição: ${error}`);
-      showToast("error", "Erro ao marcar a série como assistida.");
-      return null;
-    }
-  };
-
-  const handleWatchedClick = async () => {
+  const fetchInitialData = useCallback(async () => {
     if (!validateUser()) return;
+    await Promise.all([checkIsWatched(), checkIsWaiting(), getRating()]);
+  }, [checkIsWaiting, checkIsWatched, getRating, validateUser]);
+
+  useEffect(() => {
+    if (!authLoading) {
+      setIsClient(true);
+      fetchInitialData();
+    }
+  }, [authLoading, fetchInitialData]);
+
+  const openModal = useCallback(() => setIsModalOpen(true), []);
+  const closeModal = useCallback(() => setIsModalOpen(false), []);
+
+  const handleWatchedClick = useCallback(async () => {
+    if (!validateUser()) return;
+
     if (!isWatched) {
       openModal();
       return;
     }
+
     const serieData = {
       watchedAt: new Date().toISOString(),
       userId: user!.id,
-      createSerieDto: {
-        name: serie.name,
-        overview: serie.overview,
-        firstAirDate: serie.first_air_date,
-        idTmdb: serie.id,
-        posterPath: serie.poster_path,
-        voteAverage: serie.vote_average,
-        numberOfSeasons: serie.number_of_seasons,
-      },
+      createSerieDto: buildSeriePayload(),
     };
+
     setWatchedLoading(true);
     const response = await sendWatchedRequest(serieData);
     setWatchedLoading(false);
+
     if (response?.status === 200) {
       setIsWatched(false);
       setRating(0);
+      showToast("info", "Série removida da lista de assistidos.");
     }
-  };
+  }, [
+    buildSeriePayload,
+    isWatched,
+    openModal,
+    sendWatchedRequest,
+    showToast,
+    user,
+    validateUser,
+  ]);
 
-  const handleWatchedSubmit = async () => {
+  const handleWatchedSubmit = useCallback(async () => {
     if (!validateUser()) return;
+
     setWatchedLoading(true);
     const serieData = {
       watchedAt: watchedDate,
       userId: user!.id,
-      createSerieDto: {
-        name: serie.name,
-        overview: serie.overview,
-        firstAirDate: serie.first_air_date,
-        idTmdb: serie.id,
-        posterPath: serie.poster_path,
-        voteAverage: serie.vote_average,
-        numberOfSeasons: serie.number_of_seasons,
-      },
+      createSerieDto: buildSeriePayload(),
     };
+
     setIsModalOpen(false);
     const response = await sendWatchedRequest(serieData);
     setWatchedLoading(false);
+
     if (response?.status === 201) {
       setIsWatched(true);
       showToast("success", "Série marcada como assistida!");
     }
-  };
+  }, [
+    buildSeriePayload,
+    sendWatchedRequest,
+    showToast,
+    user,
+    validateUser,
+    watchedDate,
+  ]);
 
-  const handleWaitingClick = async () => {
+  const handleWaitingClick = useCallback(async () => {
     if (!validateUser()) return;
+
     setIsWaitingLoading(true);
     const serieData = {
       userId: user!.id,
-      createSerieDto: {
-        name: serie.name,
-        overview: serie.overview,
-        firstAirDate: serie.first_air_date,
-        idTmdb: serie.id,
-        posterPath: serie.poster_path,
-        voteAverage: serie.vote_average,
-        numberOfSeasons: serie.number_of_seasons,
-      },
+      createSerieDto: buildSeriePayload(),
     };
 
     try {
@@ -207,40 +236,96 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
         },
       );
 
-      setIsWaitingLoading(false);
-      if (response.status === 200) setIsWaiting(false);
-      if (response.status === 201) setIsWaiting(true);
+      if (response.status === 200) {
+        setIsWaiting(false);
+        showToast("info", "Série removida da watchlist.");
+      }
+      if (response.status === 201) {
+        setIsWaiting(true);
+        showToast("success", "Série adicionada à watchlist!");
+      }
     } catch (error) {
-      showToast("error", "Erro ao adicionar a série na lista de espera.");
+      console.error("Erro ao atualizar watchlist da série:", error);
+      showToast("error", "Erro ao atualizar a watchlist.");
+    } finally {
+      setIsWaitingLoading(false);
     }
-  };
+  }, [buildSeriePayload, showToast, user, validateUser]);
 
-  const handleRating = (newRating: number) => {
-    if (!validateUser()) return;
-    if (!isWatched) {
-      showToast(
-        "warn",
-        "Você precisa marcar a série como assistida para avaliá-la.",
-      );
-      return;
-    }
-    setRating(newRating);
-    const serieData = {
-      userId: user!.id,
-      idTmdb: serie.id,
-      rating: newRating,
-    };
+  const handleRating = useCallback(
+    (newRating: number) => {
+      if (!validateUser()) return;
 
-    try {
-      fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/rate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(serieData),
-      });
-    } catch {
-      showToast("error", "Erro ao enviar a avaliação.");
+      if (!isWatched) {
+        showToast(
+          "warn",
+          "Você precisa marcar a série como assistida para avaliá-la.",
+        );
+        return;
+      }
+
+      setRating(newRating);
+      const serieData = {
+        userId: user!.id,
+        idTmdb: serie.id,
+        rating: newRating,
+      };
+
+      try {
+        fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/rate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(serieData),
+        });
+      } catch (error) {
+        console.error("Erro ao enviar avaliação da série:", error);
+        showToast("error", "Erro ao enviar a avaliação.");
+      }
+    },
+    [isWatched, serie.id, showToast, user, validateUser],
+  );
+
+  const formattedDate = useMemo(() => {
+    if (!serie.first_air_date) {
+      return "Data não informada";
     }
-  };
+    const date = new Date(serie.first_air_date);
+    if (Number.isNaN(date.getTime())) {
+      return "Data não informada";
+    }
+    return date.toLocaleDateString("pt-BR");
+  }, [serie.first_air_date]);
+
+  const creators = useMemo(() => {
+    if (!serie.created_by || serie.created_by.length === 0) {
+      return "Não informado";
+    }
+    return serie.created_by.map((creator) => creator.name).join(" • ");
+  }, [serie.created_by]);
+
+  const seasonsLabel = useMemo(() => {
+    if (!serie.number_of_seasons) return "Não informado";
+    return `${serie.number_of_seasons} ${
+      serie.number_of_seasons > 1 ? "temporadas" : "temporada"
+    }`;
+  }, [serie.number_of_seasons]);
+
+  const genresLabel = useMemo(() => {
+    if (!serie.genres?.length) return "Não informado";
+    return serie.genres.join(" • ");
+  }, [serie.genres]);
+
+  const quickDetails = useMemo<QuickDetailItem[]>(
+    () => [
+      { label: "Lançamento", value: formattedDate },
+      { label: "Criadores", value: creators },
+      { label: "Temporadas", value: seasonsLabel },
+      { label: "Gêneros", value: genresLabel },
+    ],
+    [creators, formattedDate, genresLabel, seasonsLabel],
+  );
+
+  const castMembers = useMemo(() => serie.cast ?? [], [serie.cast]);
 
   return (
     <>
@@ -251,146 +336,76 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <>
-          <div className="relative text-white">
-            <div className="absolute inset-0">
-              <img
-                src={serie.wallpaper_path}
-                alt={serie.name}
-                className="block w-full h-[350px] sm:h-[500px] md:h-[600px] lg:h-[700px] object-cover object-top opacity-40"
-                style={{
-                  maskImage:
-                    "linear-gradient(to top, transparent 0%, black 100%)",
-                  WebkitMaskImage:
-                    "linear-gradient(to top, transparent 0%, black 100%)",
+        <MediaDetailLayout
+          backdropUrl={serie.wallpaper_path}
+          backdropAlt={serie.name}
+          aside={
+            <>
+              <MediaPosterCard
+                posterUrl={serie.poster_path}
+                title={serie.name}
+                onWatchlistToggle={handleWaitingClick}
+                isInWatchlist={isWaiting}
+                isLoading={isWaitingLoading}
+                watchlistLabels={{
+                  active: "Na watchlist",
+                  inactive: "Watchlist",
                 }}
               />
-            </div>
-            <div className="relative pt-8 w-full px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40 overflow-x-hidden">
-              <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
-                <div className="w-full max-w-[220px] sm:max-w-[280px] md:max-w-[320px] lg:max-w-sm flex-shrink-0">
-                  <img
-                    src={serie.poster_path}
-                    alt={serie.name}
-                    className="block mx-auto w-full rounded-lg shadow-lg"
-                  />
-                  <div className="mt-8 border-b-2 border-gray-600 pb-4">
-                    <h3 className="text-lg font-bold text-gray-600 mb-2 text-center lg:text-left">
-                      GÊNEROS
-                    </h3>
-                    <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
-                      {serie.genres.join(", ")}
-                    </p>
-                  </div>
-                  <div className="mt-4 border-b-2 border-gray-600 pb-4">
-                    <h3 className="text-lg font-bold text-gray-600 mb-2 text-center lg:text-left">
-                      CRIADORES
-                    </h3>
-                    <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
-                      {serie.created_by.length > 0
-                        ? serie.created_by
-                            .map((creator) => creator.name)
-                            .join(", ")
-                        : "-"}
-                    </p>
-                  </div>
-                  <div className="mt-4 border-b-2 border-gray-600 pb-4">
-                    <h3 className="text-lg font-bold text-gray-600 mb-2 text-center lg:text-left">
-                      TEMPORADAS
-                    </h3>
-                    <p className="text-gray-400 font-semibold text-md text-center lg:text-left">
-                      {serie.number_of_seasons}{" "}
-                      {serie.number_of_seasons > 1 ? "Temporadas" : "Temporada"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col justify-start gap-6 w-full">
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 items-center justify-center lg:justify-start">
-                    <h1 className="w-fit text-xl sm:text-4xl font-extrabold pb-1 sm:pb-2 border-b-4 border-indigo-600 text-center sm:text-left">
-                      {serie.name}
-                    </h1>
-                    {/* <p className="font-bold font-mono text-xl sm:text-2xl text-gray-300 text-center sm:text-left">
-                      {formattedDate}
-                    </p> */}
-                  </div>
-                  <div className="flex flex-col md:flex-row gap-8">
-                    <div className="w-full md:w-3/4 flex flex-col gap-6">
-                      <p className="mt-4 text-gray-300 font-semibold text-lg text-center md:text-left">
-                        {serie.overview}
-                      </p>
-                      {(serie.providers.flatrate ||
-                        serie.providers.buy ||
-                        serie.providers.rent) && (
-                        <div className="px-0 md:px-4">
-                          <ProvidersMovie
-                            flatrate={serie.providers.flatrate}
-                            buy={serie.providers.buy}
-                            rent={serie.providers.rent}
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <div className="w-full md:w-1/4">
-                      <div className="bg-defaultBackgroundSecond bg-opacity-40 pt-3 rounded-lg border-4 border-gray-600">
-                        <div className="flex justify-around py-4 border-b-4 border-gray-700">
-                          <div className="flex flex-col items-center">
-                            {watchedLoading ? (
-                              <LoadingSpinner small />
-                            ) : (
-                              <FaEye
-                                className={`text-3xl cursor-pointer ${isWatched ? "text-blue-500" : "text-gray-500"} hover:text-blue-500`}
-                                onClick={handleWatchedClick}
-                              />
-                            )}
-                            <span className="text-gray-500 text-sm mt-2 font-semibold">
-                              Assistido
-                            </span>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            {isWaitingLoading ? (
-                              <LoadingSpinner small />
-                            ) : (
-                              <FaClock
-                                className={`text-3xl cursor-pointer ${isWaiting ? "text-yellow-500" : "text-gray-500"} hover:text-yellow-500`}
-                                onClick={handleWaitingClick}
-                              />
-                            )}
-                            <span className="text-gray-500 text-sm mt-2 font-semibold">
-                              Watchlist
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-center border-b-4 border-gray-700 pb-4 pt-4">
-                          <h2 className="text-xl font-bold text-white text-opacity-50">
-                            Avaliar
-                          </h2>
-                          {isClient && (
-                            <ReactStars
-                              count={5}
-                              onChange={handleRating}
-                              size={40}
-                              color2={"#4F46E5"}
-                              half
-                              value={rating}
-                            />
-                          )}
-                        </div>
-                        <div className="flex flex-col items-center border-b-4 border-gray-700 py-4">
-                          <h2 className="text-lg font-bold text-white text-opacity-50 mb-4">
-                            Avaliação TMDB
-                          </h2>
-                          <CircularVoteAverage
-                            vote_average={serie.vote_average ?? 0}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <MediaQuickDetails
+                title="Detalhes rápidos"
+                items={quickDetails}
+              />
+            </>
+          }
+        >
+          <MediaHeroHeader
+            badgeLabel="Série"
+            title={serie.name}
+            overview={serie.overview ?? ""}
+            voteAverage={serie.vote_average ?? 0}
+          />
+
+          <div className="flex flex-col gap-6 xl:gap-8">
+            <MediaExperiencePanel
+              heading="Sua experiência"
+              description="Gerencie o que você já assistiu, organize sua watchlist e registre sua avaliação personalizada."
+              watchedConfig={{
+                isActive: isWatched,
+                isLoading: watchedLoading,
+                onClick: handleWatchedClick,
+                title: "Assistido",
+                activeLabel: "Remover do assistido",
+                inactiveLabel: "Marcar como assistido",
+                icon: "eye",
+              }}
+              waitingConfig={{
+                isActive: isWaiting,
+                isLoading: isWaitingLoading,
+                onClick: handleWaitingClick,
+                title: "Watchlist",
+                activeLabel: "Remover da watchlist",
+                inactiveLabel: "Adicionar à watchlist",
+                icon: "clock",
+              }}
+              ratingConfig={{
+                title: "Avalie esta série",
+                description:
+                  "Compartilhe sua nota e melhore suas recomendações.",
+                value: rating,
+                onChange: handleRating,
+                isClient,
+              }}
+            />
+
+            <MediaProvidersSection
+              title="Onde assistir"
+              providers={serie.providers}
+            />
+
+            <MediaCastSection title="Elenco principal" cast={castMembers} />
           </div>
-        </>
+        </MediaDetailLayout>
       )}
       <Footer />
       <Modal
@@ -419,7 +434,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      serie: serie,
+      serie,
     },
   };
 };

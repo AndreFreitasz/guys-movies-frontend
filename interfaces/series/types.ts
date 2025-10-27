@@ -7,16 +7,15 @@ export interface Serie {
   vote_average?: number;
 }
 
+import { CastMember, Providers } from "../movie/types";
+
 export interface SerieResponse extends Serie {
   wallpaper_path: string;
   genres: string[];
   number_of_seasons: number;
   created_by: { name: string }[];
-  providers: {
-    flatrate: any[];
-    buy: any[];
-    rent: any[];
-  };
+  providers: Providers;
+  cast?: CastMember[];
 }
 
 export interface ProviderSeries {
