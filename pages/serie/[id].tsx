@@ -20,6 +20,7 @@ import {
 } from "../../components/mediaDetails";
 import { useAuth } from "../../hooks/authContext";
 import { SerieResponse } from "../../interfaces/series/types";
+import { setPublicCache } from "../../utils/httpCache";
 
 interface SerieProps {
   serie: SerieResponse;
@@ -431,6 +432,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     `${process.env.NEXT_PUBLIC_URL_API}/serie/${id}`,
   );
   const serie = await response.json();
+
+  if (response.ok) {
+    setPublicCache(context.res, 3600, 86400);
+  }
 
   return {
     props: {

@@ -46,8 +46,8 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
             {providers!.map((provider) => (
               <div
                 key={
-                  provider.provider_id
-                    ? `${key}-${provider.provider_id}`
+                  provider.id_provider
+                    ? `${key}-${provider.id_provider}`
                     : `${key}-${provider.provider_name}`
                 }
                 className="group relative"
@@ -55,7 +55,7 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
               >
                 <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-lg transition-transform duration-300 group-hover:scale-105">
                   <img
-                    src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
+                    src={provider.logo_path}
                     alt={provider.provider_name}
                     className="h-12 w-12 object-contain"
                     loading="lazy"

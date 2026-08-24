@@ -20,6 +20,7 @@ import {
 } from "../../components/mediaDetails";
 import { useAuth } from "../../hooks/authContext";
 import { MovieResponse } from "../../interfaces/movie/types";
+import { setPublicCache } from "../../utils/httpCache";
 
 interface MovieProps {
   movie: MovieResponse;
@@ -414,6 +415,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     `${process.env.NEXT_PUBLIC_URL_API}/movie/${id}`,
   );
   const movie = await response.json();
+
+  if (response.ok) {
+    setPublicCache(context.res, 3600, 86400);
+  }
 
   return {
     props: {

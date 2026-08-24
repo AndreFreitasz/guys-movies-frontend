@@ -7,6 +7,7 @@ import { SerieProps } from "../interfaces/series/types";
 import SerieCard from "../components/series/seriesCard";
 import Carousel from "../components/_ui/carousel";
 import Head from "next/head";
+import { setPublicCache } from "../utils/httpCache";
 
 const Serie = ({ providerData, error }: SerieProps) => {
   const [showError, setShowError] = useState(false);
@@ -75,7 +76,7 @@ const Serie = ({ providerData, error }: SerieProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   try {
     const [providerRes] = await Promise.all([
       fetch(`${process.env.NEXT_PUBLIC_URL_API}/series/popularByProviders`),
@@ -88,6 +89,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
     }
 
     const [providerData] = await Promise.all([providerRes.json()]);
+
+    setPublicCache(res, 300, 1800);
 
     return {
       props: {

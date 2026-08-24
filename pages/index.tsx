@@ -9,6 +9,7 @@ import Footer from "../components/_ui/footer";
 import { GetServerSideProps } from "next";
 import LoadingSpinner from "../components/_ui/loadingSpinner";
 import Head from "next/head";
+import { setPublicCache } from "../utils/httpCache";
 
 interface Movie {
   id: number;
@@ -538,7 +539,7 @@ const Home: React.FC<HomeProps> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   try {
     const [
       providerRes,
@@ -601,6 +602,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       sciFiDramaRes.json(),
       comedyRes.json(),
     ]);
+
+    setPublicCache(res, 300, 1800);
 
     return {
       props: {

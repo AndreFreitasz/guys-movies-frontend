@@ -12,7 +12,7 @@ export interface Director {
 export interface ProviderDetail {
   provider_name: string;
   logo_path: string;
-  provider_id: number;
+  id_provider: number;
 }
 
 export interface Providers {
