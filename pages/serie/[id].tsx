@@ -95,16 +95,23 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   );
 
   const sendWatchedRequest = useCallback(
-    (serieData: any) => {
+    async (serieData: unknown) => {
       try {
-        return fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedSerie`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(serieData),
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(serieData),
+          },
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
+
+        return (await response.json()) as { unmarked?: boolean };
       } catch (error) {
-        console.error(`Erro ao fazer requisição: ${error}`);
-        showToast("error", "Erro ao marcar a série como assistida.");
+        showToast("error", "Erro ao atualizar a série como assistida.");
         return null;
       }
     },
@@ -114,7 +121,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const getRating = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/getRate?userId=${user!.id}&idTmdb=${serie.id}`,
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/getRate?idTmdb=${serie.id}`,
         { credentials: "include" },
       );
       if (response.ok) {
@@ -125,23 +132,35 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       console.error("Erro ao buscar avaliação da série:", error);
       setRating(0);
     }
-  }, [serie.id, user]);
+  }, [serie.id]);
 
   const checkIsWaiting = useCallback(async () => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}/waitingSerie/isWaiting?userid=${user!.id}&idTmdb=${serie.id}`,
-    );
-    const data = await response.json();
-    setIsWaiting(Boolean(data.waiting));
-  }, [serie.id, user]);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/waitingSerie/isWaiting?idTmdb=${serie.id}`,
+        { credentials: "include" },
+      );
+      if (!response.ok) return;
+      const data = await response.json();
+      setIsWaiting(Boolean(data.waiting));
+    } catch {
+      setIsWaiting(false);
+    }
+  }, [serie.id]);
 
   const checkIsWatched = useCallback(async () => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/isWatched?userid=${user!.id}&idTmdb=${serie.id}`,
-    );
-    const data = await response.json();
-    setIsWatched(Boolean(data.watched));
-  }, [serie.id, user]);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/isWatched?idTmdb=${serie.id}`,
+        { credentials: "include" },
+      );
+      if (!response.ok) return;
+      const data = await response.json();
+      setIsWatched(Boolean(data.watched));
+    } catch {
+      setIsWatched(false);
+    }
+  }, [serie.id]);
 
   const fetchInitialData = useCallback(async () => {
     if (!validateUser()) return;
@@ -149,11 +168,12 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   }, [checkIsWaiting, checkIsWatched, getRating, validateUser]);
 
   useEffect(() => {
-    if (!authLoading) {
-      setIsClient(true);
-      fetchInitialData();
-    }
-  }, [authLoading, fetchInitialData]);
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!authLoading && user) fetchInitialData();
+  }, [authLoading, fetchInitialData, user]);
 
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
@@ -166,17 +186,14 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       return;
     }
 
-    const serieData = {
-      watchedAt: new Date().toISOString(),
-      userId: user!.id,
-      createSerieDto: buildSeriePayload(),
-    };
-
     setWatchedLoading(true);
-    const response = await sendWatchedRequest(serieData);
+    const result = await sendWatchedRequest({
+      watchedAt: new Date().toISOString(),
+      createSerieDto: buildSeriePayload(),
+    });
     setWatchedLoading(false);
 
-    if (response?.status === 200) {
+    if (result?.unmarked) {
       setIsWatched(false);
       setRating(0);
       showToast("info", "Série removida da lista de assistidos.");
@@ -187,25 +204,27 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     openModal,
     sendWatchedRequest,
     showToast,
-    user,
     validateUser,
   ]);
 
   const handleWatchedSubmit = useCallback(async () => {
     if (!validateUser()) return;
 
-    setWatchedLoading(true);
-    const serieData = {
-      watchedAt: watchedDate,
-      userId: user!.id,
-      createSerieDto: buildSeriePayload(),
-    };
+    if (!watchedDate) {
+      showToast("warn", "Informe a data em que você assistiu.");
+      return;
+    }
 
+    setWatchedLoading(true);
     setIsModalOpen(false);
-    const response = await sendWatchedRequest(serieData);
+
+    const result = await sendWatchedRequest({
+      watchedAt: new Date(watchedDate).toISOString(),
+      createSerieDto: buildSeriePayload(),
+    });
     setWatchedLoading(false);
 
-    if (response?.status === 201) {
+    if (result && !result.unmarked) {
       setIsWatched(true);
       showToast("success", "Série marcada como assistida!");
     }
@@ -213,7 +232,6 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     buildSeriePayload,
     sendWatchedRequest,
     showToast,
-    user,
     validateUser,
     watchedDate,
   ]);
@@ -222,39 +240,37 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     if (!validateUser()) return;
 
     setIsWaitingLoading(true);
-    const serieData = {
-      userId: user!.id,
-      createSerieDto: buildSeriePayload(),
-    };
 
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL_API}/waitingSerie`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(serieData),
+          body: JSON.stringify({ createSerieDto: buildSeriePayload() }),
         },
       );
 
-      if (response.status === 200) {
-        setIsWaiting(false);
-        showToast("info", "Série removida da watchlist.");
-      }
-      if (response.status === 201) {
-        setIsWaiting(true);
-        showToast("success", "Série adicionada à watchlist!");
-      }
+      if (!response.ok) throw new Error("Requisição rejeitada");
+
+      const data = await response.json();
+      setIsWaiting(!data.unmarked);
+      showToast(
+        data.unmarked ? "info" : "success",
+        data.unmarked
+          ? "Série removida da watchlist."
+          : "Série adicionada à watchlist!",
+      );
     } catch (error) {
-      console.error("Erro ao atualizar watchlist da série:", error);
       showToast("error", "Erro ao atualizar a watchlist.");
     } finally {
       setIsWaitingLoading(false);
     }
-  }, [buildSeriePayload, showToast, user, validateUser]);
+  }, [buildSeriePayload, showToast, validateUser]);
 
   const handleRating = useCallback(
-    (newRating: number) => {
+    async (newRating: number) => {
       if (!validateUser()) return;
 
       if (!isWatched) {
@@ -265,25 +281,27 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
         return;
       }
 
+      const previousRating = rating;
       setRating(newRating);
-      const serieData = {
-        userId: user!.id,
-        idTmdb: serie.id,
-        rating: newRating,
-      };
 
       try {
-        fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/rate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(serieData),
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/rate`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idTmdb: serie.id, rating: newRating }),
+          },
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
       } catch (error) {
-        console.error("Erro ao enviar avaliação da série:", error);
+        setRating(previousRating);
         showToast("error", "Erro ao enviar a avaliação.");
       }
     },
-    [isWatched, serie.id, showToast, user, validateUser],
+    [isWatched, rating, serie.id, showToast, validateUser],
   );
 
   const formattedDate = useMemo(() => {
@@ -428,20 +446,27 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params!;
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_URL_API}/serie/${id}`,
-  );
-  const serie = await response.json();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_API}/serie/${id}`,
+    );
 
-  if (response.ok) {
+    if (!response.ok) {
+      return { notFound: true };
+    }
+
+    const serie = await response.json();
+
+    if (!serie?.id) {
+      return { notFound: true };
+    }
+
     setPublicCache(context.res, 3600, 86400);
-  }
 
-  return {
-    props: {
-      serie,
-    },
-  };
+    return { props: { serie } };
+  } catch {
+    return { notFound: true };
+  }
 };
 
 export default SeriePage;

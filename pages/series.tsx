@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Header from "../components/_ui/header";
 import Title from "../components/_ui/title";
 import { GetServerSideProps } from "next";
@@ -10,17 +10,7 @@ import Head from "next/head";
 import { setPublicCache } from "../utils/httpCache";
 
 const Serie = ({ providerData, error }: SerieProps) => {
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    if (error) {
-      setErrorMessage(error);
-      setShowError(true);
-    }
-  }, [error]);
-
-  if (showError) {
+  if (error) {
     return (
       <>
         <Header />
@@ -46,6 +36,10 @@ const Serie = ({ providerData, error }: SerieProps) => {
               <img
                 src={provider.provider.logoUrl}
                 alt={`Logo da ${provider.provider.name}`}
+                width={56}
+                height={56}
+                loading="lazy"
+                decoding="async"
                 className="mr-2 w-14 h-14 rounded-lg"
               />
               <Title
@@ -95,6 +89,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     return {
       props: {
         providerData,
+        error: null,
       },
     };
   } catch (err) {

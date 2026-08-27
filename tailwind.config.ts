@@ -15,7 +15,7 @@ const config: Config = {
         defaultBackgroundSecond: "#1a1f2e",
       },
       fontFamily: {
-        sans: ["Raleway", "sans-serif"],
+        sans: ["var(--font-raleway)", "Raleway", "sans-serif"],
       },
       maxHeight: {
         "screen-60": "60vh",

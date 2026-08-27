@@ -4,6 +4,8 @@ import React, {
   useContext,
   ReactNode,
   useEffect,
+  useCallback,
+  useMemo,
 } from "react";
 
 interface UserData {
@@ -25,113 +27,128 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
+const STORAGE_KEY = "user";
+
+const readStoredUser = (): UserData | null => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    return stored ? (JSON.parse(stored) as UserData) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(true);
+  const clearSession = useCallback(() => {
+    setUser(null);
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      return;
     }
-    setLoading(false);
-    setAuthLoading(false);
   }, []);
 
-  const dataUser = async () => {
+  const persistUser = useCallback((data: UserData) => {
+    setUser(data);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      return;
+    }
+  }, []);
+
+  const dataUser = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL_API}/auth/profile`,
-        {
-          method: "GET",
-          credentials: "include",
-        },
+        { method: "GET", credentials: "include" },
       );
-      console.log("response =>", response);
-      if (response.ok) {
-        const data = await response.json();
-        setUser({
-          id: data.id,
-          username: data.username,
-          email: data.email,
-          name: data.name,
-        });
-        setIsAuthenticated(true);
-        localStorage.setItem("user", JSON.stringify(data));
+
+      if (!response.ok) {
+        clearSession();
+        return;
       }
-    } catch (error) {
-      console.error(error);
+
+      const data = await response.json();
+      persistUser({
+        id: data.id,
+        username: data.username,
+        email: data.email,
+        name: data.name,
+      });
+    } catch {
+      clearSession();
     } finally {
       setLoading(false);
       setAuthLoading(false);
     }
-  };
+  }, [clearSession, persistUser]);
 
-  const login = async (email: string, password: string) => {
-    try {
+  useEffect(() => {
+    const stored = readStoredUser();
+    if (stored) setUser(stored);
+
+    dataUser();
+  }, [dataUser]);
+
+  const login = useCallback(
+    async (email: string, password: string) => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL_API}/auth/login`,
         {
           method: "POST",
           credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
         },
       );
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         throw new Error(data.message || "Erro ao realizar login.");
       }
-      await dataUser();
-      setIsAuthenticated(true);
-    } catch (error) {
-      throw error;
-    } finally {
-      setLoading(false);
-      setAuthLoading(false);
-    }
-  };
 
-  const logout = async () => {
+      await dataUser();
+    },
+    [dataUser],
+  );
+
+  const logout = useCallback(async () => {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_URL_API}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
-      setUser(null);
-      setIsAuthenticated(false);
-      localStorage.removeItem("user");
-    } catch (error) {
-      console.error(error);
+    } catch {
+      return;
     } finally {
+      clearSession();
       setLoading(false);
       setAuthLoading(false);
     }
-  };
+  }, [clearSession]);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        user,
-        loading,
-        authLoading,
-        dataUser,
-        login,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      isAuthenticated: Boolean(user),
+      user,
+      loading,
+      authLoading,
+      dataUser,
+      login,
+      logout,
+    }),
+    [authLoading, dataUser, loading, login, logout, user],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

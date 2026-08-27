@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Serie } from "../../../interfaces/series/types";
-import Image from "next/image";
 import CircularVoteAverage from "./circularVoteAverage";
+
+const POSTER_BASE_URL = "https://image.tmdb.org/t/p/w342";
+const FALLBACK_POSTER = "/icons/home/cinema.png";
 
 const SerieCard = ({
   id,
@@ -13,23 +15,24 @@ const SerieCard = ({
 }: Serie) => {
   const [isHovered, setIsHovered] = useState(false);
   const imageUrl = poster_path
-    ? `https://image.tmdb.org/t/p/w500${poster_path}`
-    : "/path/to/default/image.jpg";
+    ? `${POSTER_BASE_URL}${poster_path}`
+    : FALLBACK_POSTER;
 
   return (
-    <Link href={`/serie/${id}`} passHref>
+    <Link href={`/serie/${id}`} prefetch={false}>
       <div
         className="relative p-2 cursor-pointer transform transition-transform duration-300 hover:scale-105"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Image
+        <img
           src={imageUrl}
           alt={`Poster de ${name}`}
-          width={500}
-          height={750}
-          className="rounded-lg shadow-lg"
-          priority
+          width={342}
+          height={513}
+          loading="lazy"
+          decoding="async"
+          className="rounded-lg shadow-lg w-full h-auto"
         />
         {isHovered && (
           <div className="absolute inset-0 bg-black bg-opacity-75 flex flex-col justify-center items-center p-4 rounded-lg">
@@ -47,4 +50,4 @@ const SerieCard = ({
   );
 };
 
-export default SerieCard;
+export default React.memo(SerieCard);

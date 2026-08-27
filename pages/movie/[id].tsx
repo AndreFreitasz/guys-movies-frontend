@@ -91,18 +91,23 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   );
 
   const sendWatchedRequest = useCallback(
-    (movieData: any) => {
+    async (movieData: unknown) => {
       try {
-        return fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(movieData),
           },
-          body: JSON.stringify(movieData),
-        });
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
+
+        return (await response.json()) as { unmarked?: boolean };
       } catch (error) {
-        console.error(`Erro ao fazer requisição: ${error}`);
-        showToast("error", "Erro ao marcar o filme como assistido.");
+        showToast("error", "Erro ao atualizar o filme como assistido.");
         return null;
       }
     },
@@ -112,7 +117,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const getRating = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/getRate?userId=${user!.id}&idTmdb=${movie.id}`,
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/getRate?idTmdb=${movie.id}`,
         { credentials: "include" },
       );
       if (response.ok) {
@@ -122,23 +127,35 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     } catch (error) {
       setRating(0);
     }
-  }, [movie.id, user]);
+  }, [movie.id]);
 
   const checkIsWaiting = useCallback(async () => {
-    const isWaitingResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie/isWaiting?userid=${user!.id}&idTmdb=${movie.id}`,
-    );
-    const isWaitingData = await isWaitingResponse.json();
-    setIsWaiting(isWaitingData.waiting);
-  }, [movie.id, user]);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie/isWaiting?idTmdb=${movie.id}`,
+        { credentials: "include" },
+      );
+      if (!response.ok) return;
+      const data = await response.json();
+      setIsWaiting(Boolean(data.waiting));
+    } catch {
+      setIsWaiting(false);
+    }
+  }, [movie.id]);
 
   const checkIsWatched = useCallback(async () => {
-    const isWatchedResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?userid=${user!.id}&idTmdb=${movie.id}`,
-    );
-    const watched = await isWatchedResponse.json();
-    setIsWatched(watched.watched);
-  }, [movie.id, user]);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?idTmdb=${movie.id}`,
+        { credentials: "include" },
+      );
+      if (!response.ok) return;
+      const data = await response.json();
+      setIsWatched(Boolean(data.watched));
+    } catch {
+      setIsWatched(false);
+    }
+  }, [movie.id]);
 
   const fetchData = useCallback(async () => {
     if (!validateUser()) return;
@@ -146,11 +163,12 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   }, [checkIsWaiting, checkIsWatched, getRating, validateUser]);
 
   useEffect(() => {
-    if (!authLoading) {
-      setIsClient(true);
-      fetchData();
-    }
-  }, [authLoading, fetchData]);
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!authLoading && user) fetchData();
+  }, [authLoading, fetchData, user]);
 
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
@@ -162,16 +180,14 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       return;
     }
 
-    const movieData = {
-      watchedAt: new Date().toISOString(),
-      userId: user!.id,
-      createMovieDto: buildMoviePayload(),
-    };
     setWatchedLoading(true);
-    const response = await sendWatchedRequest(movieData);
+    const result = await sendWatchedRequest({
+      watchedAt: new Date().toISOString(),
+      createMovieDto: buildMoviePayload(),
+    });
     setWatchedLoading(false);
 
-    if (response?.status === 200) {
+    if (result?.unmarked) {
       setIsWatched(false);
       setRating(0);
     }
@@ -180,25 +196,27 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     isWatched,
     openModal,
     sendWatchedRequest,
-    user,
     validateUser,
   ]);
 
   const handleWatchedSubmit = useCallback(async () => {
     if (!validateUser()) return;
 
-    setWatchedLoading(true);
-    const movieData = {
-      watchedAt: watchedDate,
-      userId: user!.id,
-      createMovieDto: buildMoviePayload(),
-    };
+    if (!watchedDate) {
+      showToast("warn", "Informe a data em que você assistiu.");
+      return;
+    }
 
+    setWatchedLoading(true);
     setIsModalOpen(false);
-    const response = await sendWatchedRequest(movieData);
+
+    const result = await sendWatchedRequest({
+      watchedAt: new Date(watchedDate).toISOString(),
+      createMovieDto: buildMoviePayload(),
+    });
     setWatchedLoading(false);
 
-    if (response?.status === 201) {
+    if (result && !result.unmarked) {
       setIsWatched(true);
       showToast("success", "Filme marcado como assistido!");
     }
@@ -206,7 +224,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     buildMoviePayload,
     sendWatchedRequest,
     showToast,
-    user,
     validateUser,
     watchedDate,
   ]);
@@ -215,34 +232,31 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     if (!validateUser()) return;
 
     setIsWaitingLoading(true);
-    const movieData = {
-      userId: user!.id,
-      createMovieDto: buildMoviePayload(),
-    };
 
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(movieData),
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ createMovieDto: buildMoviePayload() }),
         },
       );
 
-      if (response.status === 200) setIsWaiting(false);
-      if (response.status === 201) setIsWaiting(true);
+      if (!response.ok) throw new Error("Requisição rejeitada");
+
+      const data = await response.json();
+      setIsWaiting(!data.unmarked);
     } catch (error) {
-      showToast("error", "Erro ao adicionar o filme na lista de espera.");
+      showToast("error", "Erro ao atualizar a lista de espera.");
     } finally {
       setIsWaitingLoading(false);
     }
-  }, [buildMoviePayload, showToast, user, validateUser]);
+  }, [buildMoviePayload, showToast, validateUser]);
 
   const handleRating = useCallback(
-    (newRating: number) => {
+    async (newRating: number) => {
       if (!validateUser()) return;
       if (!isWatched) {
         showToast(
@@ -252,26 +266,27 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         return;
       }
 
+      const previousRating = rating;
       setRating(newRating);
-      const movieData = {
-        userId: user!.id,
-        idTmdb: movie.id,
-        rating: newRating,
-      };
 
       try {
-        fetch(`${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/rate`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/rate`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idTmdb: movie.id, rating: newRating }),
           },
-          body: JSON.stringify(movieData),
-        });
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
       } catch {
+        setRating(previousRating);
         showToast("error", "Erro ao enviar a avaliação.");
       }
     },
-    [isWatched, movie.id, showToast, user, validateUser],
+    [isWatched, movie.id, rating, showToast, validateUser],
   );
 
   const formattedDate = useMemo(() => {
@@ -411,20 +426,27 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params!;
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_URL_API}/movie/${id}`,
-  );
-  const movie = await response.json();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_API}/movie/${id}`,
+    );
 
-  if (response.ok) {
+    if (!response.ok) {
+      return { notFound: true };
+    }
+
+    const movie = await response.json();
+
+    if (!movie?.id) {
+      return { notFound: true };
+    }
+
     setPublicCache(context.res, 3600, 86400);
-  }
 
-  return {
-    props: {
-      movie: movie,
-    },
-  };
+    return { props: { movie } };
+  } catch {
+    return { notFound: true };
+  }
 };
 
 export default Movie;

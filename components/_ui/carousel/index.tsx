@@ -4,7 +4,7 @@ import styles from "./styles.module.css";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 
 interface CarouselProps<T> {
-  data: T[];
+  data: Array<T & { id?: number | string }>;
   renderItem: (item: T, index: number) => React.ReactNode;
   settings?: any;
   slidesToShow: number;
@@ -46,7 +46,7 @@ const SampleNextArrow: React.FC<ArrowProps> = (props) => {
   );
 };
 
-const Carousel = <T,>({
+const CarouselComponent = <T,>({
   data = [],
   renderItem,
   settings,
@@ -66,6 +66,8 @@ const Carousel = <T,>({
     prevArrow: <SamplePrevArrow />,
     swipeToSlide: true,
     touchThreshold: 5,
+    lazyLoad: "ondemand" as const,
+    waitForAnimate: false,
     responsive: responsive || [
       {
         breakpoint: 1700,
@@ -106,7 +108,7 @@ const Carousel = <T,>({
     <Slider {...mergedSettings}>
       {data.length > 0 ? (
         data.map((item, index) => (
-          <div key={index} className={`mx-1 ${className}`}>
+          <div key={item?.id ?? index} className={`mx-1 ${className}`}>
             {renderItem(item, index)}
           </div>
         ))
@@ -118,5 +120,7 @@ const Carousel = <T,>({
     </Slider>
   );
 };
+
+const Carousel = React.memo(CarouselComponent) as typeof CarouselComponent;
 
 export default Carousel;

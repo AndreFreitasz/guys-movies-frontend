@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Header from "../components/_ui/header";
 import Title from "../components/_ui/title";
 import Image from "next/image";
@@ -44,76 +44,87 @@ const Home: React.FC<HomeProps> = ({
   initialPopularMoviesComedy,
   error,
 }) => {
-  const [providerData, setProviderData] = useState(initialProviderData);
+  const providerData = initialProviderData;
+  const popularMoviesHorror = initialPopularMoviesHorror;
+  const popularMoviesSciFi = initialPopularMoviesSciFi;
+  const popularMoviesFamily = initialPopularMoviesFamily;
+  const topRatedMovies = initialTopRatedMovies;
+  const popularMoviesDrama = initialPopularMoviesDrama;
+  const popularMoviesSciFiDrama = initialPopularMoviesSciFiDrama;
+  const popularMoviesComedy = initialPopularMoviesComedy;
+
   const [popularMovies, setPopularMovies] = useState(initialPopularMovies);
-  const [popularMoviesHorror, setPopularMoviesHorror] = useState(
-    initialPopularMoviesHorror,
-  );
-  const [popularMoviesSciFi, setPopularMoviesSciFi] = useState(
-    initialPopularMoviesSciFi,
-  );
-  const [popularMoviesFamily, setPopularMoviesFamily] = useState(
-    initialPopularMoviesFamily,
-  );
-  const [topRatedMovies, setTopRatedMovies] = useState(initialTopRatedMovies);
-  const [popularMoviesDrama, setPopularMoviesDrama] = useState(
-    initialPopularMoviesDrama,
-  );
-  const [popularMoviesSciFiDrama, setPopularMoviesSciFiDrama] = useState(
-    initialPopularMoviesSciFiDrama,
-  );
-  const [popularMoviesComedy, setPopularMoviesComedy] = useState(
-    initialPopularMoviesComedy,
-  );
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [loadMoreError, setLoadMoreError] = useState("");
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (error) {
-      setErrorMessage(error);
-      setShowError(true);
-    }
-  }, [error]);
+    setPopularMovies(initialPopularMovies);
+    setPage(1);
+  }, [initialPopularMovies]);
 
-  useEffect(() => {
+  const loadingRef = useRef(false);
+
+  const loadMoreMovies = useCallback(async () => {
+    if (loadingRef.current) return;
+
+    loadingRef.current = true;
     setLoading(true);
-    const handleScroll = async () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop <
-          document.documentElement.offsetHeight - 100 ||
-        loading
-      ) {
-        return;
-      }
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL_API}/movies/popular?page=${page + 1}`,
-        );
-        const data = await res.json();
-        setPopularMovies((prevMovies) => [...prevMovies, ...data]);
-        setPage((prevPage) => prevPage + 1);
-      } catch (err) {
-        setErrorMessage("Ocorreu um erro ao carregar mais filmes.");
-        setShowError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [loading, page]);
+    try {
+      const nextPage = page + 1;
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/movies/popular?page=${nextPage}`,
+      );
 
-  if (showError) {
+      if (!res.ok) throw new Error("Falha ao carregar mais filmes");
+
+      const data: Movie[] = await res.json();
+
+      if (data.length) {
+        setPopularMovies((prevMovies) => {
+          const seen = new Set(prevMovies.map((movie) => movie.id));
+          return [
+            ...prevMovies,
+            ...data.filter((movie) => !seen.has(movie.id)),
+          ];
+        });
+        setPage(nextPage);
+      }
+    } catch (err) {
+      setLoadMoreError("Ocorreu um erro ao carregar mais filmes.");
+    } finally {
+      loadingRef.current = false;
+      setLoading(false);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) loadMoreMovies();
+      },
+      { rootMargin: "600px" },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMoreMovies]);
+
+  if (error) {
     return (
       <>
+        <Head>
+          <title>GuysMovies - Erro</title>
+        </Head>
         <Header />
         <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
           <h1 className="text-2xl font-bold text-center mt-24 text-white">
-            {errorMessage}
+            {error}
           </h1>
         </div>
       </>
@@ -531,6 +542,15 @@ const Home: React.FC<HomeProps> = ({
               },
             ]}
           />
+          <div ref={sentinelRef} aria-hidden className="h-px w-full" />
+          {loading && (
+            <p className="py-8 text-center text-white/60">
+              Carregando mais filmes...
+            </p>
+          )}
+          {loadMoreError && (
+            <p className="py-8 text-center text-red-300">{loadMoreError}</p>
+          )}
         </div>
       )}
 

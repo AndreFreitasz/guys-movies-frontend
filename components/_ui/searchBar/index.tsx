@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { SearchResult } from "../../../interfaces/search/types";
 import SearchResultCard from "./searchResultCard";
+
+const DEBOUNCE_MS = 350;
+const MIN_QUERY_LENGTH = 2;
 
 interface SearchBarProps {
   onFocus: () => void;
@@ -27,43 +30,44 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    fetchSearchResults();
   };
 
-  const fetchSearchResults = useCallback(async () => {
-    if (searchQuery.trim() === "") {
+  useEffect(() => {
+    const trimmedQuery = searchQuery.trim();
+
+    if (trimmedQuery.length < MIN_QUERY_LENGTH) {
       setSearchResults([]);
       setIsLoading(false);
       return;
     }
 
+    const controller = new AbortController();
     setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/search?query=${encodeURIComponent(searchQuery)}`,
-      );
 
-      if (!response.ok) {
-        throw new Error("Falha ao buscar resultados");
+    const timeoutId = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/search?query=${encodeURIComponent(trimmedQuery)}`,
+          { signal: controller.signal },
+        );
+
+        if (!response.ok) throw new Error("Falha ao buscar resultados");
+
+        const data: SearchResult[] = await response.json();
+        setSearchResults(data);
+      } catch (error) {
+        if ((error as Error)?.name === "AbortError") return;
+        setSearchResults([]);
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
       }
+    }, DEBOUNCE_MS);
 
-      const data: SearchResult[] = await response.json();
-      setSearchResults(data);
-    } catch (error) {
-      console.error("Erro ao buscar resultados:", error);
-      setSearchResults([]);
-    } finally {
-      setIsLoading(false);
-    }
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [searchQuery]);
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchSearchResults();
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [fetchSearchResults]);
 
   return (
     <div className="relative w-full">
