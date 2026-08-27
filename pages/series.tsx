@@ -70,6 +70,26 @@ const Serie = ({ providerData, error }: SerieProps) => {
   );
 };
 
+const pickProviderSeries = (providers: any) =>
+  Array.isArray(providers)
+    ? providers.map((entry: any) => ({
+        provider: {
+          id: entry.provider?.id,
+          name: entry.provider?.name,
+          logoUrl: entry.provider?.logoUrl,
+        },
+        series: (Array.isArray(entry.series) ? entry.series : []).map(
+          (serie: any) => ({
+            id: serie.id,
+            name: serie.name,
+            poster_path: serie.poster_path,
+            overview: serie.overview,
+            vote_average: serie.vote_average,
+          }),
+        ),
+      }))
+    : [];
+
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   try {
     const [providerRes] = await Promise.all([
@@ -88,7 +108,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
     return {
       props: {
-        providerData,
+        providerData: pickProviderSeries(providerData),
         error: null,
       },
     };

@@ -154,14 +154,21 @@ const Header = () => {
                     >
                       <ul className="divide-y divide-white/30">
                         <li className="hover:cursor-pointer">
-                          <a className="block px-4 py-2 hover:bg-white/10 transition-colors duration-200">
+                          <Link
+                            href="/assistidos"
+                            onClick={() => setIsDropdownOpen(false)}
+                            className="block px-4 py-2 hover:bg-white/10 transition-colors duration-200"
+                          >
                             Assistidos
-                          </a>
+                          </Link>
                         </li>
-                        <li className="hover:cursor-pointer">
-                          <a className="block px-4 py-2 hover:bg-white/10 transition-colors duration-200">
+                        <li>
+                          <span className="flex items-center justify-center gap-2 px-4 py-2 text-white/40">
                             Watchlist
-                          </a>
+                            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.6rem] uppercase tracking-wider">
+                              em breve
+                            </span>
+                          </span>
                         </li>
                         <li>
                           <button
@@ -219,10 +226,21 @@ const Header = () => {
               {isAuthenticated ? (
                 <>
                   <li className="text-lg font-semibold text-white w-full">
-                    <a className="block py-2">Assistidos</a>
+                    <Link
+                      href="/assistidos"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block py-2"
+                    >
+                      Assistidos
+                    </Link>
                   </li>
-                  <li className="text-lg font-semibold text-white w-full">
-                    <a className="block py-2">Watchlist</a>
+                  <li className="w-full text-lg font-semibold text-white/40">
+                    <span className="flex items-center justify-center gap-2 py-2">
+                      Watchlist
+                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.6rem] uppercase tracking-wider">
+                        em breve
+                      </span>
+                    </span>
                   </li>
                   <Button
                     label="Sair"

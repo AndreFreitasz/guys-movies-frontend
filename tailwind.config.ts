@@ -15,7 +15,13 @@ const config: Config = {
         defaultBackgroundSecond: "#1a1f2e",
       },
       fontFamily: {
-        sans: ["var(--font-raleway)", "Raleway", "sans-serif"],
+        sans: [
+          "var(--font-figtree)",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "sans-serif",
+        ],
       },
       maxHeight: {
         "screen-60": "60vh",

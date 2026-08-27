@@ -559,6 +559,47 @@ const Home: React.FC<HomeProps> = ({
   );
 };
 
+const OVERVIEW_MAX_LENGTH = 200;
+
+const truncateOverview = (overview: unknown): string => {
+  if (typeof overview !== "string") return "";
+  return overview.length > OVERVIEW_MAX_LENGTH
+    ? `${overview.slice(0, OVERVIEW_MAX_LENGTH).trimEnd()}...`
+    : overview;
+};
+
+const pickMovieFields = (movie: any): Movie => ({
+  id: movie.id,
+  title: movie.title,
+  poster_path: movie.poster_path,
+  overview: truncateOverview(movie.overview),
+  vote_average: movie.vote_average,
+});
+
+const pickMovies = (movies: any): Movie[] =>
+  Array.isArray(movies) ? movies.map(pickMovieFields) : [];
+
+const PROVIDER_MOVIES_SHOWN = 5;
+
+const pickProviderData = (providers: any) =>
+  Array.isArray(providers)
+    ? providers.map((entry: any) => ({
+        provider: {
+          id: entry.provider?.id,
+          name: entry.provider?.name,
+          logoUrl: entry.provider?.logoUrl,
+        },
+        movies: (Array.isArray(entry.movies) ? entry.movies : [])
+          .slice(0, PROVIDER_MOVIES_SHOWN)
+          .map((movie: any) => ({
+            id: movie.id,
+            title: movie.title,
+            poster_path: movie.poster_path,
+            overview: truncateOverview(movie.overview),
+          })),
+      }))
+    : [];
+
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   try {
     const [
@@ -627,15 +668,15 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
     return {
       props: {
-        initialProviderData: providerData,
-        initialPopularMovies: popularMovies,
-        initialPopularMoviesHorror: popularMoviesHorror,
-        initialPopularMoviesSciFi: popularMoviesSciFi,
-        initialPopularMoviesFamily: popularMoviesFamily,
-        initialTopRatedMovies: topRatedMovies,
-        initialPopularMoviesDrama: popularMoviesDrama,
-        initialPopularMoviesSciFiDrama: popularMoviesSciFiDrama,
-        initialPopularMoviesComedy: popularMoviesComedy,
+        initialProviderData: pickProviderData(providerData),
+        initialPopularMovies: pickMovies(popularMovies),
+        initialPopularMoviesHorror: pickMovies(popularMoviesHorror),
+        initialPopularMoviesSciFi: pickMovies(popularMoviesSciFi),
+        initialPopularMoviesFamily: pickMovies(popularMoviesFamily),
+        initialTopRatedMovies: pickMovies(topRatedMovies),
+        initialPopularMoviesDrama: pickMovies(popularMoviesDrama),
+        initialPopularMoviesSciFiDrama: pickMovies(popularMoviesSciFiDrama),
+        initialPopularMoviesComedy: pickMovies(popularMoviesComedy),
         error: null,
       },
     };

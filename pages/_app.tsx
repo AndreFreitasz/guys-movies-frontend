@@ -4,7 +4,8 @@ import "slick-carousel/slick/slick-theme.css";
 import "react-circular-progressbar/dist/styles.css";
 import type { AppProps } from "next/app";
 import dynamic from "next/dynamic";
-import { Raleway } from "next/font/google";
+import { Figtree } from "next/font/google";
+import { MotionConfig } from "framer-motion";
 import { AuthProvider } from "../hooks/authContext";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -14,10 +15,10 @@ const ToastContainer = dynamic(
   { ssr: false },
 );
 
-const raleway = Raleway({
+const figtree = Figtree({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-raleway",
+  variable: "--font-figtree",
 });
 
 const ROUTE_CHANGE_DELAY = 250;
@@ -65,12 +66,21 @@ function RouteProgressBar() {
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <div className={`${raleway.variable} bg-defaultBackground min-h-screen`}>
-      <AuthProvider>
-        <RouteProgressBar />
-        <Component {...pageProps} />
-        <ToastContainer position="bottom-right" />
-      </AuthProvider>
+    <div
+      className={`${figtree.variable} bg-defaultBackground min-h-screen font-sans`}
+    >
+      <style jsx global>{`
+        :root {
+          --font-figtree: ${figtree.style.fontFamily};
+        }
+      `}</style>
+      <MotionConfig reducedMotion="user">
+        <AuthProvider>
+          <RouteProgressBar />
+          <Component {...pageProps} />
+          <ToastContainer position="bottom-right" />
+        </AuthProvider>
+      </MotionConfig>
     </div>
   );
 }
