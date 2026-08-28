@@ -28,7 +28,7 @@ const schema = yup.object({
   username: yup.string().required("O nome de usuário é obrigatório."),
   password: yup
     .string()
-    .min(6, "A senha deve conter no mínimo 6 caracteres.")
+    .min(8, "A senha deve conter no mínimo 8 caracteres.")
     .required("A senha é obrigatória."),
   confirmPassword: yup
     .string()
@@ -50,12 +50,13 @@ const FormRegister = ({ onClose }: FormRegisterComponentProps) => {
   const onSubmit = async (data: FormRegisterProps) => {
     setIsLoading(true);
     try {
+      const { confirmPassword, ...payload } = data;
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         const errorData = await response.json();
