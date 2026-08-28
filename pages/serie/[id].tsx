@@ -8,6 +8,7 @@ import Header from "../../components/_ui/header";
 import LoadingSpinner from "../../components/_ui/loadingSpinner";
 import BodyModalForm from "../../components/movie/bodyModalForm";
 import Modal from "../../components/_ui/modal";
+import { authFetch } from "../../utils/authFetch";
 import {
   MediaCastSection,
   MediaDetailLayout,
@@ -97,11 +98,10 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const sendWatchedRequest = useCallback(
     async (serieData: unknown) => {
       try {
-        const response = await fetch(
+        const response = await authFetch(
           `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie`,
           {
             method: "POST",
-            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(serieData),
           },
@@ -120,9 +120,8 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
 
   const getRating = useCallback(async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/getRate?idTmdb=${serie.id}`,
-        { credentials: "include" },
       );
       if (response.ok) {
         const data = await response.json();
@@ -136,9 +135,8 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
 
   const checkIsWaiting = useCallback(async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/waitingSerie/isWaiting?idTmdb=${serie.id}`,
-        { credentials: "include" },
       );
       if (!response.ok) return;
       const data = await response.json();
@@ -150,9 +148,8 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
 
   const checkIsWatched = useCallback(async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/isWatched?idTmdb=${serie.id}`,
-        { credentials: "include" },
       );
       if (!response.ok) return;
       const data = await response.json();
@@ -242,11 +239,10 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     setIsWaitingLoading(true);
 
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/waitingSerie`,
         {
           method: "POST",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ createSerieDto: buildSeriePayload() }),
         },
@@ -285,11 +281,10 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       setRating(newRating);
 
       try {
-        const response = await fetch(
+        const response = await authFetch(
           `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/rate`,
           {
             method: "POST",
-            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idTmdb: serie.id, rating: newRating }),
           },

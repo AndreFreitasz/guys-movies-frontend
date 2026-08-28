@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import { authFetch, clearAccessToken, setAccessToken } from "../utils/authFetch";
 
 interface UserData {
   username: string;
@@ -47,6 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const clearSession = useCallback(() => {
     setUser(null);
+    clearAccessToken();
     try {
       window.localStorage.removeItem(STORAGE_KEY);
     } catch {
@@ -66,9 +68,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const dataUser = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/auth/profile`,
-        { method: "GET", credentials: "include" },
+        { method: "GET" },
       );
 
       if (!response.ok) {
@@ -110,10 +112,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       );
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
         throw new Error(data.message || "Erro ao realizar login.");
       }
+
+      if (data.accessToken) setAccessToken(data.accessToken);
 
       await dataUser();
     },
@@ -122,9 +127,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback(async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_URL_API}/auth/logout`, {
+      await authFetch(`${process.env.NEXT_PUBLIC_URL_API}/auth/logout`, {
         method: "POST",
-        credentials: "include",
       });
     } catch {
       return;

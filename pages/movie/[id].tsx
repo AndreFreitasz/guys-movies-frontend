@@ -8,6 +8,7 @@ import Header from "../../components/_ui/header";
 import LoadingSpinner from "../../components/_ui/loadingSpinner";
 import BodyModalForm from "../../components/movie/bodyModalForm";
 import Modal from "../../components/_ui/modal";
+import { authFetch } from "../../utils/authFetch";
 import {
   MediaCastSection,
   MediaDetailLayout,
@@ -93,11 +94,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const sendWatchedRequest = useCallback(
     async (movieData: unknown) => {
       try {
-        const response = await fetch(
+        const response = await authFetch(
           `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie`,
           {
             method: "POST",
-            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(movieData),
           },
@@ -116,9 +116,8 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
 
   const getRating = useCallback(async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/getRate?idTmdb=${movie.id}`,
-        { credentials: "include" },
       );
       if (response.ok) {
         const data = await response.json();
@@ -131,9 +130,8 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
 
   const checkIsWaiting = useCallback(async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie/isWaiting?idTmdb=${movie.id}`,
-        { credentials: "include" },
       );
       if (!response.ok) return;
       const data = await response.json();
@@ -145,9 +143,8 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
 
   const checkIsWatched = useCallback(async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/isWatched?idTmdb=${movie.id}`,
-        { credentials: "include" },
       );
       if (!response.ok) return;
       const data = await response.json();
@@ -234,11 +231,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     setIsWaitingLoading(true);
 
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/waitingMovie`,
         {
           method: "POST",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ createMovieDto: buildMoviePayload() }),
         },
@@ -270,11 +266,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       setRating(newRating);
 
       try {
-        const response = await fetch(
+        const response = await authFetch(
           `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/rate`,
           {
             method: "POST",
-            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idTmdb: movie.id, rating: newRating }),
           },

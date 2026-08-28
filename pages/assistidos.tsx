@@ -10,6 +10,7 @@ import WatchedTile from "../components/watched/watchedTile";
 import WatchedToolbar from "../components/watched/watchedToolbar";
 import WatchedDetailSheet from "../components/watched/watchedDetailSheet";
 import { useAuth } from "../hooks/authContext";
+import { authFetch } from "../utils/authFetch";
 import {
   WatchedMovieItem,
   WatchedMovieList,
@@ -75,9 +76,8 @@ const WatchedPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/list`,
-        { credentials: "include" },
       );
 
       if (!response.ok) throw new Error("Falha ao carregar a lista");
