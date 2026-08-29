@@ -53,7 +53,7 @@ const PageShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       <title>GuysMovies - Assistidos</title>
     </Head>
     <Header />
-    <main className="mx-auto w-full max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-10">
+    <main className="relative mx-auto w-full max-w-[1600px] px-4 pb-16 pt-8 sm:px-6 lg:px-10 xl:px-14">
       {children}
     </main>
     <Footer />
@@ -157,7 +157,7 @@ const WatchedPage = () => {
           </p>
           <Link
             href="/"
-            className="mt-7 inline-flex rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
+            className="mt-7 inline-flex rounded-2xl px-6 py-3 text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96]"
           >
             Voltar para a home
           </Link>
@@ -174,11 +174,11 @@ const WatchedPage = () => {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="mb-8"
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-300">
+        <p className="text-[0.65rem] font-bold uppercase tracking-[0.28em] text-indigo-300">
           Sua coleção
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          Filmes assistidos
+        <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
+          Filmes <span className="brand-text">assistidos</span>
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">
           Tudo o que você marcou como assistido fica aqui. Use a busca e os
@@ -247,7 +247,7 @@ const WatchedPage = () => {
       )}
 
       {isLoading && (
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 xl:grid-cols-6">
           {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
             <div
               key={index}
@@ -290,7 +290,7 @@ const WatchedPage = () => {
           </p>
           <Link
             href="/"
-            className="mt-7 inline-flex rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
+            className="mt-7 inline-flex rounded-2xl px-6 py-3 text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96]"
           >
             Descobrir filmes
           </Link>
@@ -321,7 +321,7 @@ const WatchedPage = () => {
       {!isLoading && !error && visibleMovies.length > 0 && (
         <motion.div
           layout
-          className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5"
+          className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 xl:grid-cols-6"
         >
           <AnimatePresence mode="popLayout">
             {visibleMovies.map((movie, index) => (

@@ -22,7 +22,7 @@ const BodyModalForm: React.FC<BodyModalFormProps> = ({
       }}
       className="flex flex-col gap-5"
     >
-      <p className="text-sm text-white/70">
+      <p className="text-sm leading-relaxed text-white/45">
         Conte pra gente quando você assistiu a este filme para manter seu
         histórico sempre em ordem.
       </p>
@@ -31,11 +31,11 @@ const BodyModalForm: React.FC<BodyModalFormProps> = ({
         label="Quando você assistiu?"
         value={watchedDate}
         onChange={(e) => setWatchedDate(e.target.value)}
-        className="mt-2 font-mono focus:ring-2 focus:ring-indigo-400/60"
+        className="font-medium"
       />
       <button
         type="submit"
-        className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-5 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex h-12 items-center justify-center rounded-2xl text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-50"
         disabled={loading}
       >
         {loading ? "Salvando..." : "Salvar momento"}

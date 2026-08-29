@@ -76,9 +76,9 @@ const WatchedDetailSheet: React.FC<WatchedDetailSheetProps> = ({
             animate={{ y: 0 }}
             exit={{ y: 40, opacity: 0 }}
             transition={{ type: "spring", damping: 32, stiffness: 320 }}
-            className="relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-[2rem] border border-white/10 bg-[#0b1020]/95 shadow-2xl backdrop-blur-2xl sm:rounded-[2rem]"
+            className="relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-[2rem] border border-white/10 bg-[#0a0a16]/95 shadow-lift backdrop-blur-2xl sm:rounded-[2rem]"
           >
-            <div className="sticky top-0 z-10 flex justify-center bg-gradient-to-b from-[#0b1020] to-transparent pb-4 pt-3 sm:hidden">
+            <div className="sticky top-0 z-10 flex justify-center bg-gradient-to-b from-[#0a0a16] to-transparent pb-4 pt-3 sm:hidden">
               <span className="h-1.5 w-12 rounded-full bg-white/25" />
             </div>
 
@@ -158,7 +158,7 @@ const WatchedDetailSheet: React.FC<WatchedDetailSheetProps> = ({
 
                 <Link
                   href={`/movie/${movie.idTmdb}`}
-                  className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
+                  className="group mt-6 inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96]"
                 >
                   Abrir página do filme
                   <svg viewBox="0 0 20 20" className="h-4 w-4">

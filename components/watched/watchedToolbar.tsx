@@ -45,15 +45,15 @@ const WatchedToolbar: React.FC<WatchedToolbarProps> = ({
         onChange={(event) => onQueryChange(event.target.value)}
         placeholder="Buscar nos assistidos..."
         aria-label="Buscar nos filmes assistidos"
-        className="w-full rounded-2xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/60 focus:outline-none"
+        className="w-full rounded-2xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 transition-all duration-300 ease-ios focus:border-indigo-400/60 focus:bg-black/40 focus:outline-none"
       />
     </div>
 
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="hide-scrollbar -mx-1 flex items-center gap-3 overflow-x-auto px-1 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
       <div
         role="tablist"
         aria-label="Ordenar filmes"
-        className="flex rounded-2xl border border-white/10 bg-black/25 p-1"
+        className="flex shrink-0 rounded-2xl border border-white/10 bg-black/25 p-1"
       >
         {SORT_OPTIONS.map((option) => (
           <button
@@ -87,7 +87,7 @@ const WatchedToolbar: React.FC<WatchedToolbarProps> = ({
         type="button"
         onClick={() => onOnlyRatedChange(!onlyRated)}
         aria-pressed={onlyRated}
-        className={`rounded-2xl border px-3.5 py-2 text-xs font-semibold transition ${
+        className={`shrink-0 rounded-2xl border px-3.5 py-2 text-xs font-semibold transition ${
           onlyRated
             ? "border-amber-400/50 bg-amber-400/15 text-amber-200"
             : "border-white/10 bg-black/25 text-white/50 hover:text-white/80"
@@ -96,7 +96,7 @@ const WatchedToolbar: React.FC<WatchedToolbarProps> = ({
         Só avaliados
       </button>
 
-      <span className="text-xs font-medium tabular-nums text-white/40">
+      <span className="shrink-0 whitespace-nowrap text-xs font-medium tabular-nums text-white/40">
         {resultCount} {resultCount === 1 ? "filme" : "filmes"}
       </span>
     </div>

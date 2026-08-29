@@ -1,11 +1,13 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { FaEnvelope, FaLock, FaUser, FaAt } from "react-icons/fa";
 import Input from "../../form/input";
 import ButtonCancel from "../../form/buttonCancel";
 import ButtonSubmit from "../../form/buttonSubmit";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { useAuth } from "../../../../hooks/authContext";
 
 interface FormRegisterProps {
   name: string;
@@ -38,6 +40,7 @@ const schema = yup.object({
 
 const FormRegister = ({ onClose }: FormRegisterComponentProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
@@ -53,17 +56,25 @@ const FormRegister = ({ onClose }: FormRegisterComponentProps) => {
       const { confirmPassword, ...payload } = data;
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/users`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
       if (!response.ok) {
         const errorData = await response.json();
         toast.error(errorData.message || "Erro ao cadastrar um novo usuário.");
         return;
       }
-      toast.success("Cadastro realizado com sucesso!");
+
+      try {
+        await login(data.email, data.password);
+        toast.success(`Bem-vindo, ${data.name.split(" ")[0]}!`);
+      } catch {
+        toast.success(
+          "Cadastro realizado! Entre com seu e-mail e senha para continuar.",
+        );
+      }
+
       reset();
       onClose();
     } catch {
@@ -74,57 +85,57 @@ const FormRegister = ({ onClose }: FormRegisterComponentProps) => {
   };
 
   return (
-    <div>
-      <form
-        className="flex flex-col space-y-6"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <Input
-          type="text"
-          placeholder="Nome Completo"
-          label="Nome Completo"
-          className="bg-gray-800 text-white"
-          {...register("name")}
-          error={errors.name?.message}
-        />
-        <Input
-          type="email"
-          placeholder="E-mail"
-          label="E-mail"
-          className="bg-gray-800 text-white"
-          {...register("email")}
-          error={errors.email?.message}
-        />
-        <Input
-          type="text"
-          placeholder="Nome de usuário"
-          label="Nome de usuário"
-          className="bg-gray-800 text-white"
-          {...register("username")}
-          error={errors.username?.message}
-        />
-        <Input
-          type="password"
-          placeholder="Senha"
-          label="Senha"
-          className="bg-gray-800 text-white"
-          {...register("password")}
-          error={errors.password?.message}
-        />
-        <Input
-          type="password"
-          placeholder="Confirmar senha"
-          label="Confirmar senha"
-          className="bg-gray-800 text-white"
-          {...register("confirmPassword")}
-          error={errors.confirmPassword?.message}
-        />
-        <div className="flex justify-end">
-          <ButtonCancel label="Cancelar" onClick={onClose} className="mr-4" />
-          <ButtonSubmit label="Cadastrar" isLoading={isLoading} />
-        </div>
-      </form>
-    </div>
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <Input
+        type="text"
+        placeholder="Como podemos te chamar"
+        label="Nome completo"
+        autoComplete="name"
+        icon={<FaUser size={14} />}
+        {...register("name")}
+        error={errors.name?.message}
+      />
+      <Input
+        type="email"
+        placeholder="voce@email.com"
+        label="E-mail"
+        autoComplete="email"
+        icon={<FaEnvelope size={14} />}
+        {...register("email")}
+        error={errors.email?.message}
+      />
+      <Input
+        type="text"
+        placeholder="seuusuario"
+        label="Nome de usuário"
+        autoComplete="username"
+        icon={<FaAt size={14} />}
+        {...register("username")}
+        error={errors.username?.message}
+      />
+      <Input
+        type="password"
+        placeholder="Mínimo de 8 caracteres"
+        label="Senha"
+        autoComplete="new-password"
+        icon={<FaLock size={14} />}
+        {...register("password")}
+        error={errors.password?.message}
+      />
+      <Input
+        type="password"
+        placeholder="Repita a senha"
+        label="Confirmar senha"
+        autoComplete="new-password"
+        icon={<FaLock size={14} />}
+        {...register("confirmPassword")}
+        error={errors.confirmPassword?.message}
+      />
+      <div className="flex gap-3 pt-2">
+        <ButtonCancel label="Cancelar" onClick={onClose} />
+        <ButtonSubmit label="Criar conta" isLoading={isLoading} />
+      </div>
+    </form>
   );
 };
 

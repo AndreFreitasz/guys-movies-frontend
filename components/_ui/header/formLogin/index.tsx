@@ -1,4 +1,4 @@
-import { FaLock, FaUser } from "react-icons/fa";
+import { FaLock, FaEnvelope } from "react-icons/fa";
 import Input from "../../form/input";
 import ButtonCancel from "../../form/buttonCancel";
 import ButtonSubmit from "../../form/buttonSubmit";
@@ -45,44 +45,40 @@ const FormLogin = ({ onClose }: FormLoginComponentProps) => {
       toast.success("Login realizado com sucesso!");
       reset();
       onClose();
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.message || "Erro ao realizar login.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao realizar login.",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div>
-      <form
-        className="flex flex-col space-y-6"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <Input
-          type="email"
-          placeholder="E-mail"
-          label="E-mail"
-          icon={<FaUser className="text-gray-400" />}
-          className="bg-gray-800 text-white"
-          {...register("email")}
-          error={errors.email?.message}
-        />
-        <Input
-          type="password"
-          placeholder="Senha"
-          label="Senha"
-          icon={<FaLock className="text-gray-400" />}
-          className="bg-gray-800 text-white"
-          {...register("password")}
-          error={errors.password?.message}
-        />
-        <div className="flex justify-end">
-          <ButtonCancel label="Cancelar" onClick={onClose} className="mr-4" />
-          <ButtonSubmit label="Enviar" isLoading={isLoading} />
-        </div>
-      </form>
-    </div>
+    <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
+      <Input
+        type="email"
+        placeholder="voce@email.com"
+        label="E-mail"
+        autoComplete="email"
+        icon={<FaEnvelope size={14} />}
+        {...register("email")}
+        error={errors.email?.message}
+      />
+      <Input
+        type="password"
+        placeholder="Sua senha"
+        label="Senha"
+        autoComplete="current-password"
+        icon={<FaLock size={14} />}
+        {...register("password")}
+        error={errors.password?.message}
+      />
+      <div className="flex gap-3 pt-2">
+        <ButtonCancel label="Cancelar" onClick={onClose} />
+        <ButtonSubmit label="Entrar" isLoading={isLoading} />
+      </div>
+    </form>
   );
 };
 

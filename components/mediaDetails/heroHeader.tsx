@@ -14,10 +14,10 @@ const MediaHeroHeader = memo(
       <header className="space-y-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-indigo-200">
+            <p className="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-indigo-300">
               {badgeLabel}
             </p>
-            <h1 className="text-3xl font-black sm:text-5xl md:text-6xl">
+            <h1 className="text-3xl font-black leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
               {title}
             </h1>
           </div>
@@ -29,7 +29,7 @@ const MediaHeroHeader = memo(
             </div>
           </div>
         </div>
-        <p className="max-w-3xl text-lg leading-relaxed text-white/75">
+        <p className="max-w-3xl text-sm leading-relaxed text-white/60 sm:text-base lg:text-lg">
           {overview}
         </p>
       </header>

@@ -1,4 +1,5 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type InputProps = {
   type: string;
@@ -11,31 +12,72 @@ type InputProps = {
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ type, placeholder, label, icon, className, error, ...rest }, ref) => {
-    const inputPadding = icon ? "pl-10" : "pl-3";
+    const [isFocused, setIsFocused] = useState(false);
+    const [isRevealed, setIsRevealed] = useState(false);
+
+    const isPassword = type === "password";
+    const resolvedType = isPassword && isRevealed ? "text" : type;
 
     return (
-      <div className="relative mb-4">
-        <label className="block text-white mb-1 font-bold text-lg">
+      <div className="w-full">
+        <label className="mb-2 block text-[0.7rem] font-bold uppercase tracking-[0.15em] text-white/45">
           {label}
         </label>
-        <div className="relative">
+        <div
+          className={`flex items-center gap-3 rounded-2xl border bg-white/[0.04] px-4 transition-all duration-300 ease-ios ${
+            error
+              ? "border-red-400/50 bg-red-500/[0.04]"
+              : isFocused
+                ? "border-indigo-400/60 bg-white/[0.07] shadow-glow-sm"
+                : "border-white/10"
+          }`}
+        >
           {icon && (
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <span
+              className={`shrink-0 transition-colors duration-300 ${
+                isFocused ? "text-indigo-300" : "text-white/35"
+              }`}
+            >
               {icon}
-            </div>
+            </span>
           )}
           <input
             ref={ref}
-            type={type}
+            type={resolvedType}
             placeholder={placeholder}
-            className={`${inputPadding} p-3 rounded-md bg-gray-800 text-white w-full focus:outline-none ${className}`}
+            className={`w-full bg-transparent py-3.5 text-sm font-medium text-white placeholder:text-white/25 focus:outline-none ${className ?? ""}`}
             {...rest}
+            onFocus={(event) => {
+              setIsFocused(true);
+              rest.onFocus?.(event);
+            }}
+            onBlur={(event) => {
+              setIsFocused(false);
+              rest.onBlur?.(event);
+            }}
           />
+          {isPassword && (
+            <button
+              type="button"
+              onClick={() => setIsRevealed((previous) => !previous)}
+              aria-label={isRevealed ? "Ocultar senha" : "Mostrar senha"}
+              className="shrink-0 text-white/35 transition-colors duration-200 hover:text-white/70"
+            >
+              {isRevealed ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+            </button>
+          )}
         </div>
-        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        {error && (
+          <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-red-300">
+            <span className="h-1 w-1 rounded-full bg-red-400" />
+            {error}
+          </p>
+        )}
       </div>
     );
   },
 );
+
+Input.displayName = "Input";
 
 export default Input;

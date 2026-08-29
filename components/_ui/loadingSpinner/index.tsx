@@ -1,4 +1,3 @@
-// components/_ui/LoadingSpinner.tsx
 import React from "react";
 
 interface LoadingSpinnerProps {
@@ -6,34 +5,25 @@ interface LoadingSpinnerProps {
 }
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ small }) => {
+  if (small) {
+    return (
+      <span className="inline-flex h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-white/20 border-t-indigo-400" />
+    );
+  }
+
   return (
-    <div
-      className={
-        small
-          ? "flex justify-center items-center"
-          : "flex justify-center items-center h-screen"
-      }
-    >
-      <svg
-        className={`animate-spin ${small ? "h-6 w-6" : "h-10 w-10"} text-indigo-600`}
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        ></circle>
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8v8H4z"
-        ></path>
-      </svg>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-5">
+      <div className="relative h-14 w-14">
+        <span className="absolute inset-0 animate-glow-pulse rounded-full bg-white/25 blur-xl" />
+        <span className="absolute inset-0 animate-spin rounded-full border-2 border-white/10 border-t-white" />
+        <span
+          className="absolute inset-2 animate-spin rounded-full border-2 border-white/5 border-b-white/50"
+          style={{ animationDirection: "reverse", animationDuration: "1.4s" }}
+        />
+      </div>
+      <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/35">
+        Carregando
+      </p>
     </div>
   );
 };

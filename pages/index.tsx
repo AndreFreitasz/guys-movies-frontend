@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Head from "next/head";
+import { GetServerSideProps } from "next";
+import { motion } from "framer-motion";
+
 import Header from "../components/_ui/header";
-import Title from "../components/_ui/title";
-import Image from "next/image";
-import Carousel from "../components/_ui/carousel";
+import Footer from "../components/_ui/footer";
+import Hero from "../components/home/hero";
+import SectionRow from "../components/home/sectionRow";
 import MoviesProvider from "../components/home/moviesProvider";
 import MovieCard from "../components/home/movieCard";
-import Footer from "../components/_ui/footer";
-import { GetServerSideProps } from "next";
 import LoadingSpinner from "../components/_ui/loadingSpinner";
-import Head from "next/head";
 import { setPublicCache } from "../utils/httpCache";
 
 interface Movie {
@@ -17,6 +18,8 @@ interface Movie {
   poster_path: string;
   overview: string;
   vote_average: number;
+  backdrop_path?: string | null;
+  release_date?: string | null;
 }
 
 interface HomeProps {
@@ -32,6 +35,12 @@ interface HomeProps {
   error: string | null;
 }
 
+const providerResponsive = [
+  { breakpoint: 1536, settings: { slidesToShow: 3, slidesToScroll: 1 } },
+  { breakpoint: 1280, settings: { slidesToShow: 2, slidesToScroll: 1 } },
+  { breakpoint: 900, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+];
+
 const Home: React.FC<HomeProps> = ({
   initialProviderData,
   initialPopularMovies,
@@ -44,59 +53,46 @@ const Home: React.FC<HomeProps> = ({
   initialPopularMoviesComedy,
   error,
 }) => {
-  const providerData = initialProviderData;
-  const popularMoviesHorror = initialPopularMoviesHorror;
-  const popularMoviesSciFi = initialPopularMoviesSciFi;
-  const popularMoviesFamily = initialPopularMoviesFamily;
-  const topRatedMovies = initialTopRatedMovies;
-  const popularMoviesDrama = initialPopularMoviesDrama;
-  const popularMoviesSciFiDrama = initialPopularMoviesSciFiDrama;
-  const popularMoviesComedy = initialPopularMoviesComedy;
-
   const [popularMovies, setPopularMovies] = useState(initialPopularMovies);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState("");
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(false);
 
   useEffect(() => {
     setPopularMovies(initialPopularMovies);
     setPage(1);
   }, [initialPopularMovies]);
 
-  const loadingRef = useRef(false);
-
   const loadMoreMovies = useCallback(async () => {
     if (loadingRef.current) return;
 
     loadingRef.current = true;
-    setLoading(true);
+    setIsLoadingMore(true);
 
     try {
       const nextPage = page + 1;
-      const res = await fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL_API}/movies/popular?page=${nextPage}`,
       );
 
-      if (!res.ok) throw new Error("Falha ao carregar mais filmes");
+      if (!response.ok) throw new Error("Falha ao carregar mais filmes");
 
-      const data: Movie[] = await res.json();
+      const data: Movie[] = await response.json();
 
       if (data.length) {
-        setPopularMovies((prevMovies) => {
-          const seen = new Set(prevMovies.map((movie) => movie.id));
-          return [
-            ...prevMovies,
-            ...data.filter((movie) => !seen.has(movie.id)),
-          ];
+        setPopularMovies((previous) => {
+          const seen = new Set(previous.map((movie) => movie.id));
+          return [...previous, ...data.filter((movie) => !seen.has(movie.id))];
         });
         setPage(nextPage);
       }
-    } catch (err) {
+    } catch {
       setLoadMoreError("Ocorreu um erro ao carregar mais filmes.");
     } finally {
       loadingRef.current = false;
-      setLoading(false);
+      setIsLoadingMore(false);
     }
   }, [page]);
 
@@ -122,436 +118,159 @@ const Home: React.FC<HomeProps> = ({
           <title>GuysMovies - Erro</title>
         </Head>
         <Header />
-        <div className="flex flex-col px-4 sm:px-6 md:px-8 lg:px-40 w-full mt-14">
-          <h1 className="text-2xl font-bold text-center mt-24 text-white">
-            {error}
+        <div className="mx-auto flex min-h-[60vh] w-full max-w-lg flex-col items-center justify-center px-4 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/15 text-2xl">
+            ⚠️
+          </span>
+          <h1 className="mt-5 text-2xl font-black text-white">
+            Não conseguimos carregar o catálogo
           </h1>
+          <p className="mt-3 text-sm leading-relaxed text-white/45">{error}</p>
         </div>
+        <Footer />
       </>
     );
   }
+
+  const renderMovieCard = (movie: Movie) => (
+    <MovieCard key={movie.id} {...movie} />
+  );
 
   return (
     <>
       <Head>
         <title>GuysMovies - Filmes</title>
+        <meta
+          name="description"
+          content="Descubra filmes populares, aclamados pela crítica e disponíveis nos principais streamings."
+        />
       </Head>
       <Header />
+
       {!initialProviderData.length ? (
         <LoadingSpinner />
       ) : (
-        <div className="flex flex-col px-4 md:px-8 lg:px-20 xl:px-40 w-full mt-14 overflow-x-hidden">
-          <div className="flex items-center mb-4">
-            <Image
-              src="/icons/home/popular.png"
-              alt="Ícone de uma estrela"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
+        <main className="relative overflow-x-hidden">
+          <Hero movies={popularMovies} />
+
+          <div
+            id="catalogo"
+            className="relative mx-auto w-full max-w-[1600px] px-4 pb-16 sm:px-6 lg:px-10 xl:px-14"
+          >
+            <div className="aurora" />
+
+            <SectionRow
+              iconSrc="/icons/home/popular.png"
+              iconAlt="Ícone de uma estrela"
+              eyebrow="Por plataforma"
+              title="Populares nos streamings"
+              data={initialProviderData}
+              slidesToShow={4}
+              infinite={false}
+              responsive={providerResponsive}
+              skeletonVariant="panel"
+              renderItem={(providerData: any) => (
+                <MoviesProvider
+                  providerData={providerData}
+                  key={providerData.provider.id}
+                />
+              )}
             />
-            <Title
-              title="Filmes Populares Por Streamings"
-              className="ml-2 text-left"
+
+            <SectionRow
+              iconSrc="/icons/home/cinema.png"
+              iconAlt="Ícone de um cinema"
+              eyebrow="Todo mundo assistindo"
+              title="Filmes populares"
+              data={popularMovies}
+              renderItem={renderMovieCard}
             />
-          </div>
-          <Carousel
-            data={providerData || []}
-            slidesToShow={3}
-            slidesToScroll={1}
-            renderItem={(providerData) => (
-              <MoviesProvider
-                providerData={providerData}
-                key={providerData.provider.id}
-              />
+
+            <SectionRow
+              iconSrc="/icons/home/horror.png"
+              iconAlt="Ícone de terror"
+              eyebrow="Para uma noite tensa"
+              title="Terror e suspense"
+              data={initialPopularMoviesHorror}
+              renderItem={renderMovieCard}
+            />
+
+            <SectionRow
+              iconSrc="/icons/home/scifi.png"
+              iconAlt="Ícone de tecnologia"
+              eyebrow="Mundos possíveis"
+              title="Ficção científica"
+              data={initialPopularMoviesSciFi}
+              renderItem={renderMovieCard}
+            />
+
+            <SectionRow
+              iconSrc="/icons/home/like.png"
+              iconAlt="Ícone de curtir"
+              eyebrow="Nota alta"
+              title="Aclamados pela crítica"
+              data={initialTopRatedMovies}
+              renderItem={renderMovieCard}
+            />
+
+            <SectionRow
+              iconSrc="/icons/home/family.png"
+              iconAlt="Ícone de uma família"
+              eyebrow="Para ver junto"
+              title="Família"
+              data={initialPopularMoviesFamily}
+              renderItem={renderMovieCard}
+            />
+
+            <SectionRow
+              iconSrc="/icons/home/drama.png"
+              iconAlt="Ícone de drama"
+              eyebrow="História que fica"
+              title="Drama"
+              data={initialPopularMoviesDrama}
+              renderItem={renderMovieCard}
+            />
+
+            <SectionRow
+              iconSrc="/icons/home/rocket.png"
+              iconAlt="Ícone de um foguete"
+              eyebrow="O melhor dos dois"
+              title="Sci-Fi dramático"
+              data={initialPopularMoviesSciFiDrama}
+              renderItem={renderMovieCard}
+            />
+
+            <SectionRow
+              iconSrc="/icons/home/comedy.png"
+              iconAlt="Ícone de comédia"
+              eyebrow="Para relaxar"
+              title="Comédia"
+              data={initialPopularMoviesComedy}
+              renderItem={renderMovieCard}
+            />
+
+            <div ref={sentinelRef} aria-hidden className="h-px w-full" />
+
+            {isLoadingMore && (
+              <div className="flex items-center justify-center gap-3 py-10">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/15 border-t-indigo-400" />
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">
+                  Carregando mais filmes
+                </p>
+              </div>
             )}
-            responsive={[
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 2,
-                  slidesToScroll: 1,
-                },
-              },
-              {
-                breakpoint: 600,
-                settings: {
-                  slidesToShow: 1,
-                  slidesToScroll: 1,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
 
-          <div className="flex items-center mt-12 mb-4">
-            <Image
-              src="/icons/home/cinema.png"
-              alt="Ícone de um cinema"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
-            />
-            <Title title="Filmes Populares" className="ml-2 text-left" />
+            {loadMoreError && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="py-10 text-center text-sm text-red-300"
+              >
+                {loadMoreError}
+              </motion.p>
+            )}
           </div>
-          <Carousel
-            slidesToShow={6}
-            infinite={true}
-            data={popularMovies || []}
-            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-            responsive={[
-              {
-                breakpoint: 1280,
-                settings: {
-                  slidesToShow: 5,
-                },
-              },
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 4,
-                },
-              },
-              {
-                breakpoint: 768,
-                settings: {
-                  slidesToShow: 3,
-                  arrows: false,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 2,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
-
-          <div className="flex items-center mt-24 mb-4">
-            <Image
-              src="/icons/home/horror.png"
-              alt="Ícone de Terror"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
-            />
-            <Title title="Terror E Suspense" className="ml-2 text-left" />
-          </div>
-          <Carousel
-            slidesToShow={6}
-            infinite={true}
-            data={popularMoviesHorror || []}
-            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-            responsive={[
-              {
-                breakpoint: 1280,
-                settings: {
-                  slidesToShow: 5,
-                },
-              },
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 4,
-                },
-              },
-              {
-                breakpoint: 768,
-                settings: {
-                  slidesToShow: 3,
-                  arrows: false,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 2,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
-
-          <div className="flex items-center mt-24 mb-4">
-            <Image
-              src="/icons/home/scifi.png"
-              alt="Ícone de tecnologia"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
-            />
-            <Title title="Ficção Científica" className="ml-2 text-left" />
-          </div>
-          <Carousel
-            slidesToShow={6}
-            infinite={true}
-            data={popularMoviesSciFi || []}
-            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-            responsive={[
-              {
-                breakpoint: 1280,
-                settings: {
-                  slidesToShow: 5,
-                },
-              },
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 4,
-                },
-              },
-              {
-                breakpoint: 768,
-                settings: {
-                  slidesToShow: 3,
-                  arrows: false,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 2,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
-
-          <div className="flex items-center mt-24 mb-4">
-            <Image
-              src="/icons/home/like.png"
-              alt="Ícone de um curtir"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
-            />
-            <Title title="Aclamados pela Crítica" className="ml-2 text-left" />
-          </div>
-          <Carousel
-            slidesToShow={6}
-            infinite={true}
-            data={topRatedMovies || []}
-            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-            responsive={[
-              {
-                breakpoint: 1280,
-                settings: {
-                  slidesToShow: 5,
-                },
-              },
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 4,
-                },
-              },
-              {
-                breakpoint: 768,
-                settings: {
-                  slidesToShow: 3,
-                  arrows: false,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 2,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
-
-          <div className="flex items-center mt-24 mb-4">
-            <Image
-              src="/icons/home/family.png"
-              alt="Ícone de uma família"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
-            />
-            <Title title="Família" className="ml-2 text-left" />
-          </div>
-          <Carousel
-            slidesToShow={6}
-            infinite={true}
-            data={popularMoviesFamily || []}
-            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-            responsive={[
-              {
-                breakpoint: 1280,
-                settings: {
-                  slidesToShow: 5,
-                },
-              },
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 4,
-                },
-              },
-              {
-                breakpoint: 768,
-                settings: {
-                  slidesToShow: 3,
-                  arrows: false,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 2,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
-
-          <div className="flex items-center mt-24 mb-4">
-            <Image
-              src="/icons/home/drama.png"
-              alt="Ícone de drama"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
-            />
-            <Title title="Drama" className="ml-2 text-left" />
-          </div>
-          <Carousel
-            slidesToShow={6}
-            infinite={true}
-            data={popularMoviesDrama || []}
-            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-            responsive={[
-              {
-                breakpoint: 1280,
-                settings: {
-                  slidesToShow: 5,
-                },
-              },
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 4,
-                },
-              },
-              {
-                breakpoint: 768,
-                settings: {
-                  slidesToShow: 3,
-                  arrows: false,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 2,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
-
-          <div className="flex items-center mt-24 mb-4">
-            <Image
-              src="/icons/home/rocket.png"
-              alt="Ícone de um foguete"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
-            />
-            <Title title="Sci-Fi Dramático" className="ml-2 text-left" />
-          </div>
-          <Carousel
-            slidesToShow={6}
-            infinite={true}
-            data={popularMoviesSciFiDrama || []}
-            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-            responsive={[
-              {
-                breakpoint: 1280,
-                settings: {
-                  slidesToShow: 5,
-                },
-              },
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 4,
-                },
-              },
-              {
-                breakpoint: 768,
-                settings: {
-                  slidesToShow: 3,
-                  arrows: false,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 2,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
-
-          <div className="flex items-center mt-24 mb-4">
-            <Image
-              src="/icons/home/comedy.png"
-              alt="Ícone de comédia"
-              className="mr-2 w-8 h-8"
-              width={64}
-              height={64}
-            />
-            <Title title="Comédia" className="ml-2 text-left" />
-          </div>
-          <Carousel
-            slidesToShow={6}
-            infinite={true}
-            data={popularMoviesComedy || []}
-            renderItem={(movie) => <MovieCard key={movie.id} {...movie} />}
-            responsive={[
-              {
-                breakpoint: 1280,
-                settings: {
-                  slidesToShow: 5,
-                },
-              },
-              {
-                breakpoint: 1024,
-                settings: {
-                  slidesToShow: 4,
-                },
-              },
-              {
-                breakpoint: 768,
-                settings: {
-                  slidesToShow: 3,
-                  arrows: false,
-                },
-              },
-              {
-                breakpoint: 640,
-                settings: {
-                  slidesToShow: 2,
-                  arrows: false,
-                },
-              },
-            ]}
-          />
-          <div ref={sentinelRef} aria-hidden className="h-px w-full" />
-          {loading && (
-            <p className="py-8 text-center text-white/60">
-              Carregando mais filmes...
-            </p>
-          )}
-          {loadMoreError && (
-            <p className="py-8 text-center text-red-300">{loadMoreError}</p>
-          )}
-        </div>
+        </main>
       )}
 
       <Footer />
@@ -568,16 +287,24 @@ const truncateOverview = (overview: unknown): string => {
     : overview;
 };
 
-const pickMovieFields = (movie: any): Movie => ({
+const pickMovieFields = (movie: any, withHeroFields: boolean): Movie => ({
   id: movie.id,
   title: movie.title,
   poster_path: movie.poster_path,
   overview: truncateOverview(movie.overview),
-  vote_average: movie.vote_average,
+  vote_average: movie.vote_average ?? 0,
+  ...(withHeroFields
+    ? {
+        backdrop_path: movie.backdrop_path ?? null,
+        release_date: movie.release_date ?? null,
+      }
+    : {}),
 });
 
-const pickMovies = (movies: any): Movie[] =>
-  Array.isArray(movies) ? movies.map(pickMovieFields) : [];
+const pickMovies = (movies: any, withHeroFields = false): Movie[] =>
+  Array.isArray(movies)
+    ? movies.map((movie) => pickMovieFields(movie, withHeroFields))
+    : [];
 
 const PROVIDER_MOVIES_SHOWN = 5;
 
@@ -669,7 +396,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     return {
       props: {
         initialProviderData: pickProviderData(providerData),
-        initialPopularMovies: pickMovies(popularMovies),
+        initialPopularMovies: pickMovies(popularMovies, true),
         initialPopularMoviesHorror: pickMovies(popularMoviesHorror),
         initialPopularMoviesSciFi: pickMovies(popularMoviesSciFi),
         initialPopularMoviesFamily: pickMovies(popularMoviesFamily),
