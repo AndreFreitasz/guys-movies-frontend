@@ -74,8 +74,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       watchedError: "Erro ao atualizar o filme como assistido.",
       missingDate: "Informe a data em que você assistiu.",
       waitingError: "Erro ao atualizar a lista de espera.",
-      ratingBlocked:
-        "Você precisa marcar o filme como assistido para avaliá-lo.",
+      ratingCreated: "Nota salva e filme marcado como assistido!",
       ratingError: "Erro ao enviar a avaliação.",
     },
   });

@@ -77,8 +77,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       waitingAdded: "Série adicionada à watchlist!",
       waitingRemoved: "Série removida da watchlist.",
       waitingError: "Erro ao atualizar a watchlist.",
-      ratingBlocked:
-        "Você precisa marcar a série como assistida para avaliá-la.",
+      ratingCreated: "Nota salva e série marcada como assistida!",
       ratingError: "Erro ao enviar a avaliação.",
     },
   });

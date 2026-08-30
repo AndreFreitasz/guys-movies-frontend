@@ -14,7 +14,7 @@ export interface WatchedMediaLabels {
   waitingAdded?: string;
   waitingRemoved?: string;
   waitingError: string;
-  ratingBlocked: string;
+  ratingCreated: string;
   ratingError: string;
 }
 
@@ -143,11 +143,6 @@ export const useWatchedMedia = ({
     async (newRating: number) => {
       if (!requireUser()) return;
 
-      if (!isWatched) {
-        toast.warn(labels.ratingBlocked);
-        return;
-      }
-
       const previousRating = rating;
       setRatingValue(newRating);
 
@@ -155,22 +150,34 @@ export const useWatchedMedia = ({
         const response = await authFetch(apiUrl(`${resource.watched}/rate`), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idTmdb, rating: newRating }),
+          body: JSON.stringify({
+            idTmdb,
+            rating: newRating,
+            [resource.payloadKey]: buildPayload(),
+          }),
         });
 
         if (!response.ok) throw new Error("Requisição rejeitada");
+
+        const data = (await response.json()) as { created?: boolean };
+
+        if (data.created) {
+          setIsWatched(true);
+          toast.success(labels.ratingCreated);
+        }
       } catch {
         setRatingValue(previousRating);
         toast.error(labels.ratingError);
       }
     },
     [
+      buildPayload,
       idTmdb,
-      isWatched,
-      labels.ratingBlocked,
+      labels.ratingCreated,
       labels.ratingError,
       rating,
       requireUser,
+      resource.payloadKey,
       resource.watched,
     ],
   );
