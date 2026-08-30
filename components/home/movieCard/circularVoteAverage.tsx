@@ -4,10 +4,12 @@ import styles from "./circularVoteAverage.module.css";
 
 interface CircularVoteAverageProps {
   vote_average: number;
+  compact?: boolean;
 }
 
 const CircularVoteAverage: React.FC<CircularVoteAverageProps> = ({
   vote_average,
+  compact = false,
 }) => {
   const getGradientId = (vote: number) => {
     if (vote >= 7) {
@@ -30,7 +32,13 @@ const CircularVoteAverage: React.FC<CircularVoteAverageProps> = ({
   };
 
   return (
-    <div className={styles.circularProgressbarContainer}>
+    <div
+      className={
+        compact
+          ? styles.circularProgressbarContainerCompact
+          : styles.circularProgressbarContainer
+      }
+    >
       <svg style={{ height: 2 }}>
         <defs>
           <linearGradient id="greenGradient" gradientTransform="rotate(90)">

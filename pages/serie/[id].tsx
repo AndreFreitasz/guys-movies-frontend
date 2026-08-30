@@ -17,6 +17,7 @@ import {
   MediaPosterCard,
   MediaProvidersSection,
   MediaQuickDetails,
+  MediaSynopsis,
   QuickDetailItem,
 } from "../../components/mediaDetails";
 import { useAuth } from "../../hooks/authContext";
@@ -353,34 +354,27 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
         <MediaDetailLayout
           backdropUrl={serie.wallpaper_path}
           backdropAlt={serie.name}
-          aside={
-            <>
-              <MediaPosterCard
-                posterUrl={serie.poster_path}
-                title={serie.name}
-                onWatchlistToggle={handleWaitingClick}
-                isInWatchlist={isWaiting}
-                isLoading={isWaitingLoading}
-                watchlistLabels={{
-                  active: "Na watchlist",
-                  inactive: "Watchlist",
-                }}
-              />
-              <MediaQuickDetails
-                title="Detalhes rápidos"
-                items={quickDetails}
-              />
-            </>
+          poster={
+            <MediaPosterCard
+              posterUrl={serie.poster_path}
+              title={serie.name}
+              onWatchlistToggle={handleWaitingClick}
+              isInWatchlist={isWaiting}
+              isLoading={isWaitingLoading}
+              watchlistLabels={{
+                active: "Na watchlist",
+                inactive: "Watchlist",
+              }}
+            />
           }
-        >
-          <MediaHeroHeader
-            badgeLabel="Série"
-            title={serie.name}
-            overview={serie.overview ?? ""}
-            voteAverage={serie.vote_average ?? 0}
-          />
-
-          <div className="flex flex-col gap-6 xl:gap-8">
+          header={
+            <MediaHeroHeader
+              badgeLabel="Série"
+              title={serie.name}
+              voteAverage={serie.vote_average ?? 0}
+            />
+          }
+          actions={
             <MediaExperiencePanel
               heading="Sua experiência"
               description="Gerencie o que você já assistiu, organize sua watchlist e registre sua avaliação personalizada."
@@ -411,14 +405,19 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
                 isClient,
               }}
             />
+          }
+          details={
+            <MediaQuickDetails title="Detalhes rápidos" items={quickDetails} />
+          }
+        >
+          <MediaSynopsis title="Sinopse" overview={serie.overview ?? ""} />
 
-            <MediaProvidersSection
-              title="Onde assistir"
-              providers={serie.providers}
-            />
+          <MediaProvidersSection
+            title="Onde assistir"
+            providers={serie.providers}
+          />
 
-            <MediaCastSection title="Elenco principal" cast={castMembers} />
-          </div>
+          <MediaCastSection title="Elenco principal" cast={castMembers} />
         </MediaDetailLayout>
       )}
       <Footer />

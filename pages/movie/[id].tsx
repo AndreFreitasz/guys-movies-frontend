@@ -17,6 +17,7 @@ import {
   MediaPosterCard,
   MediaProvidersSection,
   MediaQuickDetails,
+  MediaSynopsis,
   QuickDetailItem,
 } from "../../components/mediaDetails";
 import { useAuth } from "../../hooks/authContext";
@@ -332,35 +333,27 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         <MediaDetailLayout
           backdropUrl={movie.wallpaper_path}
           backdropAlt={movie.title}
-          aside={
-            <>
-              <MediaPosterCard
-                posterUrl={movie.poster_path}
-                title={movie.title}
-                onWatchlistToggle={handleWaitingClick}
-                isInWatchlist={isWaiting}
-                isLoading={isWaitingLoading}
-                watchlistLabels={{
-                  active: "Na watchlist",
-                  inactive: "Watchlist",
-                }}
-              />
-              <MediaQuickDetails
-                title="Detalhes rápidos"
-                items={quickDetails}
-                extra={adultBadge}
-              />
-            </>
+          poster={
+            <MediaPosterCard
+              posterUrl={movie.poster_path}
+              title={movie.title}
+              onWatchlistToggle={handleWaitingClick}
+              isInWatchlist={isWaiting}
+              isLoading={isWaitingLoading}
+              watchlistLabels={{
+                active: "Na watchlist",
+                inactive: "Watchlist",
+              }}
+            />
           }
-        >
-          <MediaHeroHeader
-            badgeLabel="Filme"
-            title={movie.title}
-            overview={movie.overview}
-            voteAverage={movie.vote_average}
-          />
-
-          <div className="flex flex-col gap-6 xl:gap-8">
+          header={
+            <MediaHeroHeader
+              badgeLabel="Filme"
+              title={movie.title}
+              voteAverage={movie.vote_average}
+            />
+          }
+          actions={
             <MediaExperiencePanel
               heading="Sua experiência"
               description="Gerencie rapidamente o que já assistiu, o que quer ver e registre sua nota personalizando suas recomendações."
@@ -391,14 +384,23 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                 isClient,
               }}
             />
-
-            <MediaProvidersSection
-              title="Onde assistir"
-              providers={movie.providers}
+          }
+          details={
+            <MediaQuickDetails
+              title="Detalhes rápidos"
+              items={quickDetails}
+              extra={adultBadge}
             />
+          }
+        >
+          <MediaSynopsis title="Sinopse" overview={movie.overview} />
 
-            <MediaCastSection title="Elenco principal" cast={castMembers} />
-          </div>
+          <MediaProvidersSection
+            title="Onde assistir"
+            providers={movie.providers}
+          />
+
+          <MediaCastSection title="Elenco principal" cast={castMembers} />
         </MediaDetailLayout>
       )}
       <Footer />

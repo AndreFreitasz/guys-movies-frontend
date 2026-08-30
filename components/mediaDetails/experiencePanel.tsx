@@ -58,7 +58,7 @@ const MediaExperiencePanel = memo(
           type="button"
           onClick={config.onClick}
           disabled={config.isLoading}
-          className={`group flex items-center gap-3 rounded-2xl border border-white/10 px-4 py-3 text-left transition ${
+          className={`group flex items-center gap-3 rounded-2xl border border-white/10 px-4 py-3.5 text-left transition sm:py-3 ${
             config.isLoading ? "opacity-70" : ""
           } ${baseClass}`}
         >
@@ -94,7 +94,9 @@ const MediaExperiencePanel = memo(
             <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
               {heading}
             </h2>
-            <p className="text-xs text-white/60 md:max-w-sm">{description}</p>
+            <p className="hidden text-xs text-white/60 md:block md:max-w-sm">
+              {description}
+            </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">

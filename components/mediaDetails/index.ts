@@ -1,6 +1,7 @@
 export { default as MediaDetailLayout } from "./detailLayout";
 export { default as MediaHeroHeader } from "./heroHeader";
 export { default as MediaPosterCard } from "./posterCard";
+export { default as MediaSynopsis } from "./synopsis";
 export { default as MediaQuickDetails } from "./quickDetails";
 export type { QuickDetailItem } from "./quickDetails";
 export { default as MediaExperiencePanel } from "./experiencePanel";

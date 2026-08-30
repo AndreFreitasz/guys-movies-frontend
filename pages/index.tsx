@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { GetServerSideProps } from "next";
-import { motion } from "framer-motion";
-
 import Header from "../components/_ui/header";
 import Footer from "../components/_ui/footer";
 import Hero from "../components/home/hero";
@@ -35,6 +33,8 @@ interface HomeProps {
   error: string | null;
 }
 
+const MAX_POPULAR_PAGES = 5;
+
 const providerResponsive = [
   { breakpoint: 1536, settings: { slidesToShow: 3, slidesToScroll: 1 } },
   { breakpoint: 1280, settings: { slidesToShow: 2, slidesToScroll: 1 } },
@@ -55,21 +55,24 @@ const Home: React.FC<HomeProps> = ({
 }) => {
   const [popularMovies, setPopularMovies] = useState(initialPopularMovies);
   const [page, setPage] = useState(1);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [loadMoreError, setLoadMoreError] = useState("");
+  const [hasMoreMovies, setHasMoreMovies] = useState(true);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
+  const seenIdsRef = useRef(
+    new Set(initialPopularMovies.map((movie) => movie.id)),
+  );
 
   useEffect(() => {
+    seenIdsRef.current = new Set(initialPopularMovies.map((movie) => movie.id));
     setPopularMovies(initialPopularMovies);
     setPage(1);
+    setHasMoreMovies(true);
   }, [initialPopularMovies]);
 
   const loadMoreMovies = useCallback(async () => {
     if (loadingRef.current) return;
 
     loadingRef.current = true;
-    setIsLoadingMore(true);
 
     try {
       const nextPage = page + 1;
@@ -80,25 +83,29 @@ const Home: React.FC<HomeProps> = ({
       if (!response.ok) throw new Error("Falha ao carregar mais filmes");
 
       const data: Movie[] = await response.json();
+      const newMovies = data.filter(
+        (movie) => !seenIdsRef.current.has(movie.id),
+      );
 
-      if (data.length) {
-        setPopularMovies((previous) => {
-          const seen = new Set(previous.map((movie) => movie.id));
-          return [...previous, ...data.filter((movie) => !seen.has(movie.id))];
-        });
-        setPage(nextPage);
+      if (!newMovies.length) {
+        setHasMoreMovies(false);
+        return;
       }
+
+      newMovies.forEach((movie) => seenIdsRef.current.add(movie.id));
+      setPopularMovies((previous) => [...previous, ...newMovies]);
+      setPage(nextPage);
+      setHasMoreMovies(nextPage < MAX_POPULAR_PAGES);
     } catch {
-      setLoadMoreError("Ocorreu um erro ao carregar mais filmes.");
+      setHasMoreMovies(false);
     } finally {
       loadingRef.current = false;
-      setIsLoadingMore(false);
     }
   }, [page]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel) return;
+    if (!sentinel || !hasMoreMovies) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -109,7 +116,7 @@ const Home: React.FC<HomeProps> = ({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMoreMovies]);
+  }, [hasMoreMovies, loadMoreMovies]);
 
   if (error) {
     return (
@@ -250,25 +257,6 @@ const Home: React.FC<HomeProps> = ({
             />
 
             <div ref={sentinelRef} aria-hidden className="h-px w-full" />
-
-            {isLoadingMore && (
-              <div className="flex items-center justify-center gap-3 py-10">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/15 border-t-indigo-400" />
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">
-                  Carregando mais filmes
-                </p>
-              </div>
-            )}
-
-            {loadMoreError && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="py-10 text-center text-sm text-red-300"
-              >
-                {loadMoreError}
-              </motion.p>
-            )}
           </div>
         </main>
       )}
