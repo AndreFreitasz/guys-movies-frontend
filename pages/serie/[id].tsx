@@ -63,6 +63,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     toggleWatched,
     setRating,
     toggleWaiting,
+    requireUser,
   } = useWatchedMedia({
     kind: "serie",
     idTmdb: serie.id,
@@ -90,21 +91,23 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   const handleWatchedClick = useCallback(() => {
+    if (!requireUser()) return;
     if (!isWatched) {
       openModal();
       return;
     }
     toggleWatched(new Date().toISOString());
-  }, [isWatched, openModal, toggleWatched]);
+  }, [isWatched, openModal, requireUser, toggleWatched]);
 
   const handleWatchedSubmit = useCallback(() => {
+    if (!requireUser()) return;
     if (!watchedDate) {
       toast.warn("Informe a data em que você assistiu.");
       return;
     }
     setIsModalOpen(false);
     toggleWatched(new Date(watchedDate).toISOString());
-  }, [toggleWatched, watchedDate]);
+  }, [requireUser, toggleWatched, watchedDate]);
 
   const formattedDate = useMemo(() => {
     if (!serie.first_air_date) {

@@ -224,5 +224,6 @@ export const useWatchedMedia = ({
     toggleWatched,
     setRating,
     toggleWaiting,
+    requireUser,
   };
 };

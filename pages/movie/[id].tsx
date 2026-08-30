@@ -63,6 +63,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     toggleWatched,
     setRating,
     toggleWaiting,
+    requireUser,
   } = useWatchedMedia({
     kind: "movie",
     idTmdb: movie.id,
@@ -87,21 +88,23 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   const handleWatchedClick = useCallback(() => {
+    if (!requireUser()) return;
     if (!isWatched) {
       openModal();
       return;
     }
     toggleWatched(new Date().toISOString());
-  }, [isWatched, openModal, toggleWatched]);
+  }, [isWatched, openModal, requireUser, toggleWatched]);
 
   const handleWatchedSubmit = useCallback(() => {
+    if (!requireUser()) return;
     if (!watchedDate) {
       toast.warn("Informe a data em que você assistiu.");
       return;
     }
     setIsModalOpen(false);
     toggleWatched(new Date(watchedDate).toISOString());
-  }, [toggleWatched, watchedDate]);
+  }, [requireUser, toggleWatched, watchedDate]);
 
   const formattedDate = useMemo(() => {
     const date = new Date(movie.release_date);
