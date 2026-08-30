@@ -271,6 +271,7 @@ export interface UseWatchedMediaResult {
   isWaiting: boolean;
   watchedLoading: boolean;
   isWaitingLoading: boolean;
+  requireUser: () => boolean;
   toggleWatched: (watchedAtIso: string) => Promise<void>;
   setRating: (newRating: number) => Promise<void>;
   toggleWaiting: () => Promise<void>;
@@ -551,22 +552,26 @@ Manter `buildMoviePayload` e acrescentar:
   });
 
   const handleWatchedClick = useCallback(() => {
+    if (!requireUser()) return;
     if (!isWatched) {
       openModal();
       return;
     }
     toggleWatched(new Date().toISOString());
-  }, [isWatched, openModal, toggleWatched]);
+  }, [isWatched, openModal, requireUser, toggleWatched]);
 
   const handleWatchedSubmit = useCallback(() => {
+    if (!requireUser()) return;
     if (!watchedDate) {
       toast.warn("Informe a data em que você assistiu.");
       return;
     }
     setIsModalOpen(false);
     toggleWatched(new Date(watchedDate).toISOString());
-  }, [toggleWatched, watchedDate]);
+  }, [requireUser, toggleWatched, watchedDate]);
 ```
+
+**A guarda `requireUser()` é a primeira instrução dos dois handlers, e tem de continuar sendo.** No código antigo o `validateUser()` rodava antes do ramo do modal: deslogado, clicar em "Marcar como assistido" avisava "Entre em uma conta…" e **não** abria o modal. Confiar só no `requireUser()` de dentro do `toggleWatched` chega tarde demais — o modal já abriu. Qualquer task posterior que mexa nesses handlers preserva a guarda no topo.
 
 `handleWaitingClick` some: passar `toggleWaiting` direto para `MediaPosterCard.onWatchlistToggle` e para `waitingConfig.onClick`. `handleRating` some: passar `setRating` direto para `ratingConfig.onChange`.
 
@@ -1587,7 +1592,7 @@ Em `pages/movie/[id].tsx` e `pages/serie/[id].tsx`:
 - Trocar o import de `BodyModalForm` por `import WatchedDateForm, { WatchedDateFormMode } from "../../components/watched/watchedDateForm";`.
 - Pegar `watchedAt` e `updateWatchedDate` do hook.
 - Acrescentar o estado `const [dateMode, setDateMode] = useState<WatchedDateFormMode>("create");`.
-- `handleWatchedClick` passa a `setDateMode("create")` antes de `openModal()`.
+- `handleWatchedClick` passa a `setDateMode("create")` antes de `openModal()`. A guarda `if (!requireUser()) return;` continua sendo a **primeira** instrução do handler — ver a nota na Task 2, Step 2.
 - Acrescentar `const openDateEditor = useCallback(() => { setDateMode("edit"); setIsModalOpen(true); }, []);`
 - Passar ao painel:
 
