@@ -1,12 +1,13 @@
 import Head from "next/head";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
 
 import Footer from "../../components/_ui/footer";
 import Header from "../../components/_ui/header";
 import LoadingSpinner from "../../components/_ui/loadingSpinner";
-import BodyModalForm from "../../components/movie/bodyModalForm";
+import WatchedDateForm, {
+  WatchedDateFormMode,
+} from "../../components/watched/watchedDateForm";
 import Modal from "../../components/_ui/modal";
 import {
   MediaCastSection,
@@ -31,7 +32,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [watchedDate, setWatchedDate] = useState("");
+  const [dateMode, setDateMode] = useState<WatchedDateFormMode>("create");
 
   const buildMoviePayload = useCallback(
     () => ({
@@ -57,11 +58,13 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const {
     isWatched,
     rating,
+    watchedAt,
     isWaiting,
     watchedLoading,
     isWaitingLoading,
     toggleWatched,
     setRating,
+    updateWatchedDate,
     toggleWaiting,
     requireUser,
   } = useWatchedMedia({
@@ -72,10 +75,11 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       authRequired: "Entre em uma conta para fazer atualizações no filme",
       watchedSuccess: "Filme marcado como assistido!",
       watchedError: "Erro ao atualizar o filme como assistido.",
-      missingDate: "Informe a data em que você assistiu.",
       waitingError: "Erro ao atualizar a lista de espera.",
       ratingCreated: "Nota salva e filme marcado como assistido!",
       ratingError: "Erro ao enviar a avaliação.",
+      dateUpdated: "Data atualizada!",
+      dateError: "Erro ao atualizar a data.",
     },
   });
 
@@ -89,21 +93,17 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   const handleWatchedClick = useCallback(() => {
     if (!requireUser()) return;
     if (!isWatched) {
+      setDateMode("create");
       openModal();
       return;
     }
     toggleWatched(new Date().toISOString());
   }, [isWatched, openModal, requireUser, toggleWatched]);
 
-  const handleWatchedSubmit = useCallback(() => {
-    if (!requireUser()) return;
-    if (!watchedDate) {
-      toast.warn("Informe a data em que você assistiu.");
-      return;
-    }
-    setIsModalOpen(false);
-    toggleWatched(new Date(watchedDate).toISOString());
-  }, [requireUser, toggleWatched, watchedDate]);
+  const openDateEditor = useCallback(() => {
+    setDateMode("edit");
+    setIsModalOpen(true);
+  }, []);
 
   const formattedDate = useMemo(() => {
     const date = new Date(movie.release_date);
@@ -203,6 +203,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                 onChange: setRating,
                 isClient,
               }}
+              watchedDateConfig={{ watchedAt, onEdit: openDateEditor }}
             />
           }
           details={
@@ -227,13 +228,24 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title="Quando você assistiu?"
+        title={dateMode === "edit" ? "Editar a data" : "Quando você assistiu?"}
       >
-        <BodyModalForm
-          watchedDate={watchedDate}
-          setWatchedDate={setWatchedDate}
-          onSubmit={handleWatchedSubmit}
+        <WatchedDateForm
+          initialDate={dateMode === "edit" ? watchedAt : null}
+          mode={dateMode}
           loading={watchedLoading}
+          onSubmit={(isoDate) => {
+            setIsModalOpen(false);
+            if (dateMode === "edit") {
+              updateWatchedDate(isoDate);
+              return;
+            }
+            toggleWatched(isoDate);
+          }}
+          onClear={() => {
+            setIsModalOpen(false);
+            updateWatchedDate(null);
+          }}
         />
       </Modal>
     </>

@@ -10,12 +10,13 @@ export interface WatchedMediaLabels {
   watchedSuccess: string;
   watchedRemoved?: string;
   watchedError: string;
-  missingDate: string;
   waitingAdded?: string;
   waitingRemoved?: string;
   waitingError: string;
   ratingCreated: string;
   ratingError: string;
+  dateUpdated: string;
+  dateError: string;
 }
 
 export interface UseWatchedMediaOptions {
@@ -51,6 +52,7 @@ export const useWatchedMedia = ({
 
   const [isWatched, setIsWatched] = useState(false);
   const [rating, setRatingValue] = useState(0);
+  const [watchedAt, setWatchedAt] = useState<string | null>(null);
   const [watchedLoading, setWatchedLoading] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
   const [isWaitingLoading, setIsWaitingLoading] = useState(false);
@@ -75,6 +77,7 @@ export const useWatchedMedia = ({
     if (watchedResponse.status === "fulfilled" && watchedResponse.value.ok) {
       const data = await watchedResponse.value.json();
       setIsWatched(Boolean(data.watched));
+      setWatchedAt(data.watchedAt ?? null);
     }
 
     if (waitingResponse.status === "fulfilled" && waitingResponse.value.ok) {
@@ -116,11 +119,13 @@ export const useWatchedMedia = ({
         if (data.unmarked) {
           setIsWatched(false);
           setRatingValue(0);
+          setWatchedAt(null);
           if (labels.watchedRemoved) toast.info(labels.watchedRemoved);
           return;
         }
 
         setIsWatched(true);
+        setWatchedAt(watchedAtIso);
         toast.success(labels.watchedSuccess);
       } catch {
         toast.error(labels.watchedError);
@@ -182,6 +187,43 @@ export const useWatchedMedia = ({
     ],
   );
 
+  const updateWatchedDate = useCallback(
+    async (value: string | null) => {
+      if (!requireUser()) return;
+
+      const previousWatchedAt = watchedAt;
+      setWatchedAt(value);
+
+      try {
+        const response = await authFetch(
+          apiUrl(`${resource.watched}/watchedAt`),
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idTmdb, watchedAt: value }),
+          },
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
+
+        const item = (await response.json()) as { watchedAt: string | null };
+        setWatchedAt(item.watchedAt);
+        toast.success(labels.dateUpdated);
+      } catch {
+        setWatchedAt(previousWatchedAt);
+        toast.error(labels.dateError);
+      }
+    },
+    [
+      idTmdb,
+      labels.dateError,
+      labels.dateUpdated,
+      requireUser,
+      resource.watched,
+      watchedAt,
+    ],
+  );
+
   const toggleWaiting = useCallback(async () => {
     if (!requireUser()) return;
 
@@ -225,11 +267,13 @@ export const useWatchedMedia = ({
   return {
     isWatched,
     rating,
+    watchedAt,
     isWaiting,
     watchedLoading,
     isWaitingLoading,
     toggleWatched,
     setRating,
+    updateWatchedDate,
     toggleWaiting,
     requireUser,
   };

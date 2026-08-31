@@ -1,12 +1,13 @@
 import Head from "next/head";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
 
 import Footer from "../../components/_ui/footer";
 import Header from "../../components/_ui/header";
 import LoadingSpinner from "../../components/_ui/loadingSpinner";
-import BodyModalForm from "../../components/movie/bodyModalForm";
+import WatchedDateForm, {
+  WatchedDateFormMode,
+} from "../../components/watched/watchedDateForm";
 import Modal from "../../components/_ui/modal";
 import {
   MediaCastSection,
@@ -31,7 +32,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [loading] = useState(false);
-  const [watchedDate, setWatchedDate] = useState("");
+  const [dateMode, setDateMode] = useState<WatchedDateFormMode>("create");
 
   const buildSeriePayload = useCallback(
     () => ({
@@ -57,11 +58,13 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const {
     isWatched,
     rating,
+    watchedAt,
     isWaiting,
     watchedLoading,
     isWaitingLoading,
     toggleWatched,
     setRating,
+    updateWatchedDate,
     toggleWaiting,
     requireUser,
   } = useWatchedMedia({
@@ -73,12 +76,13 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       watchedSuccess: "Série marcada como assistida!",
       watchedRemoved: "Série removida da lista de assistidos.",
       watchedError: "Erro ao atualizar a série como assistida.",
-      missingDate: "Informe a data em que você assistiu.",
       waitingAdded: "Série adicionada à watchlist!",
       waitingRemoved: "Série removida da watchlist.",
       waitingError: "Erro ao atualizar a watchlist.",
       ratingCreated: "Nota salva e série marcada como assistida!",
       ratingError: "Erro ao enviar a avaliação.",
+      dateUpdated: "Data atualizada!",
+      dateError: "Erro ao atualizar a data.",
     },
   });
 
@@ -92,21 +96,17 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const handleWatchedClick = useCallback(() => {
     if (!requireUser()) return;
     if (!isWatched) {
+      setDateMode("create");
       openModal();
       return;
     }
     toggleWatched(new Date().toISOString());
   }, [isWatched, openModal, requireUser, toggleWatched]);
 
-  const handleWatchedSubmit = useCallback(() => {
-    if (!requireUser()) return;
-    if (!watchedDate) {
-      toast.warn("Informe a data em que você assistiu.");
-      return;
-    }
-    setIsModalOpen(false);
-    toggleWatched(new Date(watchedDate).toISOString());
-  }, [requireUser, toggleWatched, watchedDate]);
+  const openDateEditor = useCallback(() => {
+    setDateMode("edit");
+    setIsModalOpen(true);
+  }, []);
 
   const formattedDate = useMemo(() => {
     if (!serie.first_air_date) {
@@ -212,6 +212,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
                 onChange: setRating,
                 isClient,
               }}
+              watchedDateConfig={{ watchedAt, onEdit: openDateEditor }}
             />
           }
           details={
@@ -232,13 +233,24 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title="Quando você assistiu?"
+        title={dateMode === "edit" ? "Editar a data" : "Quando você assistiu?"}
       >
-        <BodyModalForm
-          watchedDate={watchedDate}
-          setWatchedDate={setWatchedDate}
-          onSubmit={handleWatchedSubmit}
+        <WatchedDateForm
+          initialDate={dateMode === "edit" ? watchedAt : null}
+          mode={dateMode}
           loading={watchedLoading}
+          onSubmit={(isoDate) => {
+            setIsModalOpen(false);
+            if (dateMode === "edit") {
+              updateWatchedDate(isoDate);
+              return;
+            }
+            toggleWatched(isoDate);
+          }}
+          onClear={() => {
+            setIsModalOpen(false);
+            updateWatchedDate(null);
+          }}
         />
       </Modal>
     </>

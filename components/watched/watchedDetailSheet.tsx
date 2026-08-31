@@ -1,13 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { WatchedMovieItem } from "../../interfaces/watched/types";
 import RatingStars from "./ratingStars";
 import { formatWatchedDate } from "./watchedTile";
+import WatchedDateForm from "./watchedDateForm";
 
 interface WatchedDetailSheetProps {
   movie: WatchedMovieItem | null;
   onClose: () => void;
+  onWatchedAtChange: (
+    idTmdb: number,
+    watchedAt: string | null,
+  ) => Promise<void>;
 }
 
 const FALLBACK_POSTER = "/icons/home/cinema.png";
@@ -35,7 +40,14 @@ const DetailRow: React.FC<{ label: string; value: string }> = ({
 const WatchedDetailSheet: React.FC<WatchedDetailSheetProps> = ({
   movie,
   onClose,
+  onWatchedAtChange,
 }) => {
+  const [isEditingDate, setIsEditingDate] = useState(false);
+
+  useEffect(() => {
+    setIsEditingDate(false);
+  }, [movie?.idTmdb]);
+
   useEffect(() => {
     if (!movie) return;
 
@@ -134,10 +146,41 @@ const WatchedDetailSheet: React.FC<WatchedDetailSheetProps> = ({
                 )}
 
                 <div className="mt-5">
-                  <DetailRow
-                    label="Você assistiu em"
-                    value={formatWatchedDate(movie.watchedAt)}
-                  />
+                  {isEditingDate ? (
+                    <div className="border-b border-white/5 py-3">
+                      <WatchedDateForm
+                        key={movie.watchedAt ?? "empty"}
+                        initialDate={movie.watchedAt}
+                        mode="edit"
+                        onSubmit={(isoDate) => {
+                          setIsEditingDate(false);
+                          onWatchedAtChange(movie.idTmdb, isoDate);
+                        }}
+                        onClear={() => {
+                          setIsEditingDate(false);
+                          onWatchedAtChange(movie.idTmdb, null);
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-baseline justify-between gap-4 border-b border-white/5 py-3">
+                      <span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/40">
+                        Você assistiu em
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-right text-sm font-medium text-white/85">
+                          {formatWatchedDate(movie.watchedAt)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingDate(true)}
+                          className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/80 transition hover:bg-white/20"
+                        >
+                          Editar
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <DetailRow
                     label="Lançamento"
                     value={formatReleaseYear(movie.releaseDate)}
