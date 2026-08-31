@@ -29,6 +29,8 @@ interface CarouselProps<T> {
   header?: React.ReactNode;
 }
 
+const DESKTOP_QUERY = "(min-width: 1024px)";
+
 const skeletonStyles: Record<SkeletonVariant, string> = {
   poster:
     "auto-cols-[45%] sm:auto-cols-[31%] md:auto-cols-[23%] lg:auto-cols-[19%] xl:auto-cols-[16%] 2xl:auto-cols-[13.5%]",
@@ -77,8 +79,10 @@ const CarouselComponent = <T,>({
   header,
 }: CarouselProps<T>) => {
   const sliderRef = useRef<Slider>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
   const [visibleSlides, setVisibleSlides] = useState(slidesToShow);
 
   const activeResponsive = useMemo<ResponsiveEntry[]>(
@@ -116,7 +120,15 @@ const CarouselComponent = <T,>({
     [responsive, slidesToShow],
   );
 
-  useEffect(() => setIsMounted(true), []);
+  useEffect(() => {
+    const query = window.matchMedia(DESKTOP_QUERY);
+    const sync = () => setIsDesktop(query.matches);
+
+    sync();
+    setIsMounted(true);
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     const updateVisibleSlides = () =>
@@ -129,8 +141,50 @@ const CarouselComponent = <T,>({
     return () => window.removeEventListener("resize", updateVisibleSlides);
   }, [activeResponsive, slidesToShow]);
 
-  const goPrev = useCallback(() => sliderRef.current?.slickPrev(), []);
-  const goNext = useCallback(() => sliderRef.current?.slickNext(), []);
+  const scrollTrackBy = useCallback((direction: 1 | -1) => {
+    const track = trackRef.current;
+    if (!track) return false;
+
+    track.scrollBy({
+      left: direction * track.clientWidth * 0.9,
+      behavior: "smooth",
+    });
+    return true;
+  }, []);
+
+  const goPrev = useCallback(() => {
+    if (scrollTrackBy(-1)) return;
+    sliderRef.current?.slickPrev();
+  }, [scrollTrackBy]);
+
+  const goNext = useCallback(() => {
+    if (scrollTrackBy(1)) return;
+    sliderRef.current?.slickNext();
+  }, [scrollTrackBy]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const visible = new Set<number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const index = Number(
+            (entry.target as HTMLElement).dataset.slideIndex ?? 0,
+          );
+          if (entry.isIntersecting) visible.add(index);
+          else visible.delete(index);
+        });
+
+        if (visible.size) setCurrentSlide(Math.min(...Array.from(visible)));
+      },
+      { root: track, threshold: 0.6 },
+    );
+
+    Array.from(track.children).forEach((child) => observer.observe(child));
+    return () => observer.disconnect();
+  }, [isDesktop, isMounted, data.length]);
 
   const total = data.length;
   const hasOverflow = total > visibleSlides;
@@ -214,16 +268,34 @@ const CarouselComponent = <T,>({
       </div>
 
       <div className="relative">
-        <Slider ref={sliderRef} {...mergedSettings}>
-          {data.map((item, index) => (
-            <div
-              key={item?.id ?? index}
-              className={`px-1.5 ${className ?? ""}`}
-            >
-              {renderItem(item, index)}
-            </div>
-          ))}
-        </Slider>
+        {isDesktop ? (
+          <Slider ref={sliderRef} {...mergedSettings}>
+            {data.map((item, index) => (
+              <div
+                key={item?.id ?? index}
+                className={`px-1.5 ${className ?? ""}`}
+              >
+                {renderItem(item, index)}
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <div
+            ref={trackRef}
+            className="hide-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+          >
+            {data.map((item, index) => (
+              <div
+                key={item?.id ?? index}
+                data-slide-index={index}
+                style={{ width: `${100 / visibleSlides}%` }}
+                className={`shrink-0 snap-start px-1.5 ${className ?? ""}`}
+              >
+                {renderItem(item, index)}
+              </div>
+            ))}
+          </div>
+        )}
 
         {hasOverflow && (
           <>
