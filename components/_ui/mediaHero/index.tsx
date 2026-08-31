@@ -42,7 +42,9 @@ const MediaHero: React.FC<MediaHeroProps> = ({ items }) => {
 
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const isPaused = isHovered || isInteracting;
 
   const goTo = useCallback((index: number) => {
     const track = trackRef.current;
@@ -89,9 +91,11 @@ const MediaHero: React.FC<MediaHeroProps> = ({ items }) => {
   return (
     <section
       className="relative -mt-[4.25rem] mb-4 h-[78vh] min-h-[520px] w-full overflow-hidden lg:-mt-20 lg:h-[86vh] lg:min-h-[620px]"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onPointerDown={() => setIsPaused(true)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onPointerDown={() => setIsInteracting(true)}
+      onPointerUp={() => setIsInteracting(false)}
+      onPointerCancel={() => setIsInteracting(false)}
     >
       <div
         ref={trackRef}
@@ -103,7 +107,7 @@ const MediaHero: React.FC<MediaHeroProps> = ({ items }) => {
             data-slide-index={index}
             className="relative h-full w-full shrink-0 snap-center"
           >
-            <picture>
+            <picture className="block h-full w-full">
               {slide.backdropPath && (
                 <source
                   media="(min-width: 768px)"
