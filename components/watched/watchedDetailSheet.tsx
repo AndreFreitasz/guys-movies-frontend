@@ -136,9 +136,9 @@ const WatchedDetailSheet: React.FC<WatchedDetailSheetProps> = ({
                     const target = event.currentTarget;
                     if (target.src.endsWith(FALLBACK_POSTER)) return;
                     target.src = FALLBACK_POSTER;
-                    target.classList.add("opacity-40");
+                    target.classList.add("object-contain", "p-6", "opacity-40");
                   }}
-                  className="mx-auto w-40 rounded-2xl shadow-xl sm:mx-0 sm:w-52"
+                  className="mx-auto aspect-[2/3] w-40 self-start rounded-2xl object-cover shadow-xl sm:mx-0 sm:w-52"
                 />
 
                 <div className="flex-1">
