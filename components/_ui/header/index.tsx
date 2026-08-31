@@ -283,10 +283,17 @@ const Header = () => {
                 <button
                   type="button"
                   onClick={openLogin}
-                  className="flex h-10 items-center gap-2 rounded-full bg-white px-4 text-xs font-bold tracking-tight text-[#05050c] transition-all duration-300 ease-ios active:scale-[0.94] lg:hidden"
+                  className="flex h-10 shrink-0 items-center whitespace-nowrap rounded-full border border-white/12 bg-white/[0.06] px-3.5 text-xs font-bold tracking-tight text-white transition-all duration-300 ease-ios active:scale-[0.94] lg:hidden"
                 >
-                  <FaSignInAlt size={12} />
                   Entrar
+                </button>
+                <button
+                  type="button"
+                  onClick={openRegister}
+                  className="flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-3.5 text-xs font-bold tracking-tight text-[#05050c] transition-all duration-300 ease-ios active:scale-[0.94] lg:hidden"
+                >
+                  <FaUserPlus size={12} />
+                  Criar conta
                 </button>
               </>
             )}
