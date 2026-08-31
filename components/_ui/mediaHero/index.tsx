@@ -135,8 +135,8 @@ const MediaHero: React.FC<MediaHeroProps> = ({ items }) => {
         ))}
       </div>
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05050c] via-[#05050c]/55 to-[#05050c]/85" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#05050c] via-[#05050c]/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05050c] via-[#05050c]/35 to-[#05050c]/10" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#05050c]/85 via-[#05050c]/15 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#05050c] to-transparent" />
 
       <div className="pointer-events-none relative z-10 mx-auto flex h-full w-full max-w-[1600px] flex-col justify-end px-4 pb-10 pt-24 sm:px-6 lg:px-10 lg:pb-16 xl:px-14">

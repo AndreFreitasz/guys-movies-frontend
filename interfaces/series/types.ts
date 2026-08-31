@@ -27,7 +27,18 @@ export interface ProviderSeries {
   series: Serie[];
 }
 
+export interface HeroSerie {
+  id: number;
+  name: string;
+  overview: string;
+  vote_average: number;
+  backdrop_path: string | null;
+  poster_path: string | null;
+  first_air_date: string | null;
+}
+
 export interface SerieProps {
   providerData: ProviderSeries[];
+  popularSeries: HeroSerie[];
   error?: string;
 }
