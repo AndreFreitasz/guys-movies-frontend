@@ -31,7 +31,6 @@ const WatchedTile: React.FC<WatchedTileProps> = ({
 }) => (
   <motion.button
     type="button"
-    layoutId={`watched-${movie.idTmdb}`}
     onClick={() => onSelect(movie)}
     initial={{ opacity: 0, y: 24 }}
     animate={{ opacity: 1, y: 0 }}
@@ -45,8 +44,7 @@ const WatchedTile: React.FC<WatchedTileProps> = ({
     className="group relative flex w-full flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.03] text-left backdrop-blur-xl transition-colors duration-300 hover:border-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
   >
     <div className="relative aspect-[2/3] w-full overflow-hidden">
-      <motion.img
-        layoutId={`watched-poster-${movie.idTmdb}`}
+      <img
         src={movie.posterPath || FALLBACK_POSTER}
         alt={movie.title ?? "Pôster do filme"}
         loading="lazy"
