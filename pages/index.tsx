@@ -1,10 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import Header from "../components/_ui/header";
 import Footer from "../components/_ui/footer";
-import Hero from "../components/home/hero";
+import MediaHero, { HeroItem } from "../components/_ui/mediaHero";
 import SectionRow from "../components/home/sectionRow";
 import MoviesProvider from "../components/home/moviesProvider";
 import MovieCard from "../components/home/movieCard";
@@ -63,6 +69,22 @@ const Home: React.FC<HomeProps> = ({
     new Set(initialPopularMovies.map((movie) => movie.id)),
   );
   const router = useRouter();
+
+  const heroItems = useMemo<HeroItem[]>(
+    () =>
+      popularMovies.map((movie) => ({
+        id: movie.id,
+        href: `/movie/${movie.id}`,
+        title: movie.title,
+        overview: movie.overview,
+        voteAverage: movie.vote_average,
+        backdropPath: movie.backdrop_path ?? null,
+        posterPath: movie.poster_path ?? null,
+        date: movie.release_date ?? null,
+        badge: "Em alta",
+      })),
+    [popularMovies],
+  );
   const retry = useCallback(() => router.replace(router.asPath), [router]);
   const hasCatalog = initialProviderData.length > 0;
 
@@ -158,7 +180,7 @@ const Home: React.FC<HomeProps> = ({
       <Header />
 
       <main className="relative overflow-x-hidden">
-        <Hero movies={popularMovies} />
+        <MediaHero items={heroItems} />
 
         <div
           id="catalogo"
