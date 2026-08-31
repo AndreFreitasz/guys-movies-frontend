@@ -26,15 +26,15 @@ const MediaDetailLayout = memo(
           <img
             src={backdropUrl}
             alt={backdropAlt}
-            className="block h-[350px] w-full object-cover object-top opacity-40 sm:h-[500px] md:h-[600px] lg:h-[700px]"
+            className="block h-[350px] w-full object-cover object-top opacity-75 sm:h-[500px] md:h-[600px] lg:h-[700px]"
             style={{
               WebkitMaskImage:
                 "linear-gradient(to top, transparent 0%, black 100%)",
               maskImage: "linear-gradient(to top, transparent 0%, black 100%)",
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-[#05050c]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-[#05050c]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-[#05050c]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-[#05050c]" />
           <div className="absolute inset-0 backdrop-blur-[2px]" />
         </div>
 
