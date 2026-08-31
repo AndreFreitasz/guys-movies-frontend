@@ -4,8 +4,9 @@
 
 Step 10 (prova do escopo com duas contas via `curl`) foi **executado contra
 o stack real** depois que o Docker subiu — ver "Step 10 — execução contra o
-stack real" abaixo. Step 18 (verificação no navegador) continua pendente: a
-extensão do Chrome não está conectada nesta sessão.
+stack real" abaixo. Step 18 (verificação no navegador) também foi
+**executado**, com os seis cenários rodados no Chrome — ver "Step 18 —
+verificação no navegador".
 
 A migration de backfill herdada do CP3 também foi conferida e está aplicada.
 
@@ -175,6 +176,89 @@ completo; `null` → `200` e `{"watched":true,"watchedAt":null}`; futuro →
 **Veredito final do risco principal: IDOR ausente**, provado por leitura de
 código, por teste unitário e por requisição real contra o Postgres.
 
+## Step 18 — verificação no navegador
+
+Rodado no Chrome contra o stack local, logado como `idortest_a`. Os seis
+cenários do brief:
+
+**1. Painel com data e edição em `/movie/550`.** O painel exibe "VOCÊ
+ASSISTIU EM / Data não registrada" com botão "Editar" — e só quando o filme
+está marcado como assistido. "Editar" abre o modal com título "Editar a
+data", o texto do modo de edição, o campo vazio (a data estava `null`),
+"Salvar momento" desabilitado e "Limpar data" presente. Salvando
+`10/06/2023`: modal fecha, o painel passa a "10 de jun. de 2023" na hora e
+sai o toast "Data atualizada!". Reabrindo, o campo vem preenchido com
+`10/06/2023` — o `initialDate` reflete o valor novo.
+
+**2. Limpar data.** "Limpar data" devolve "Data não registrada" e o filme
+continua assistido ("Remover do assistido"), com toast de confirmação.
+
+**3. Data futura.** Lido do DOM: `input.max === "2026-08-31"`, igual a hoje.
+O seletor nativo não deixa escolher além disso. Com o campo vazio,
+`button.disabled === true`.
+
+**4. `/serie/70523`.** Painel idêntico. Salvando `22/03/2024`: atualiza para
+"22 de mar. de 2024" com toast, série segue assistida.
+
+**5. `/assistidos` — sheet e rollback.** Caminho feliz: o card abre o sheet,
+"Editar" troca a linha pelo formulário inline sem fechar o sheet, e salvar
+`05/01/2025` atualiza o sheet **e** o card da lista atrás, sem recarregar a
+página.
+
+Caminho de falha, que é o achado 1 desta auditoria: com
+`docker stop guys-movies-backend` e o sheet aberto, editar para `19/07/2022`
+e salvar produz o toast vermelho "Erro ao atualizar a data." e o sheet
+**volta a exibir "05 de jan. de 2025"** — o valor persistido. Antes da
+correção ele continuaria mostrando `19/07/2022`, uma data que nunca chegou
+ao banco. Confirmado no Postgres depois de religar a API:
+`550 | 2025-01-05`.
+
+**6. Filme criado por nota.** Em `/movie/27205` (A Origem), não assistido, o
+painel não mostra linha de data alguma. Clicar na 4ª estrela dispara o
+caminho do CP3: toast "Nota salva e filme marcado como assistido!", o botão
+vira "Remover do assistido" e a linha "Você assistiu em / Data não
+registrada" aparece. Em `/assistidos`, o registro criado por nota vem
+completo — pôster, sinopse, direção, nota TMDB — provando o vínculo
+`idMovie` do CP3. Datar pelo sheet com `14/02/2026` funciona normalmente.
+
+Estado final no banco, coerente com tudo que a tela mostrou:
+
+```
+ idTmdb |     title     | rating | watchedAt  | vinculado
+    550 | Clube da Luta |        | 2025-01-05 | t
+  27205 | A Origem      |      4 | 2026-02-14 | t
+
+ idTmdb | watchedAt      (watched_serie)
+  70523 | 2024-03-22
+```
+
+Nenhum desvio de fuso nas datas de assistido: o que foi digitado é o que
+aparece e o que persiste.
+
+### Achado colateral, fora do escopo do CP4
+
+As três páginas de detalhe visitadas quebram a hidratação com
+`Text content did not match`:
+
+| Página | Servidor | Cliente |
+|---|---|---|
+| `/movie/550` | `15/10/1999` | `14/10/1999` |
+| `/serie/70523` | `01/12/2017` | `30/11/2017` |
+| `/movie/27205` | `15/07/2010` | `14/07/2010` |
+
+A origem é o `formattedDate` das duas páginas —
+`new Date(release_date).toLocaleDateString("pt-BR")` — renderizado em UTC no
+container e em UTC-3 no navegador. O React descarta o HTML do servidor e
+re-renderiza a árvore inteira no cliente, o que na prática anula o SSR
+dessas rotas e deixa uma janela em que cliques não têm handler (o primeiro
+clique em "Editar" foi engolido por isso durante esta verificação).
+
+Não é regressão do CP4: o `formattedDate` está na lista de "permanece em
+cada página" da spec §3.1 e não foi tocado em nenhum commit desta leva.
+Registrado aqui por ter sido descoberto durante o Step 18. Correção natural
+seria formatar a data com fuso fixo (`timeZone: "UTC"`) em vez do fuso
+ambiente.
+
 ## Backfill do CP3 — conferido
 
 ```
@@ -305,17 +389,15 @@ $ npm run build   # depois da correção do achado 1
 
 ## Pendências deste checkpoint
 
-- **Step 18** — roteiro de verificação no navegador, seis cenários. Única
-  pendência restante: a extensão do Chrome não está conectada. As cinco
-  rotas respondem `200` em SSR (`/`, `/series`, `/assistidos`, `/movie/550`,
-  `/serie/70523`) e o Next compila sem erro, mas os cenários interativos
-  (modal, sheet, atualização otimista, rollback com backend derrubado)
-  exigem navegador.
+Nenhuma. Todos os 20 steps do brief foram executados: Step 10 contra o
+Postgres real, Step 18 no Chrome, e o backfill herdado do CP3 conferido.
 
-Step 10 e o backfill do CP3: **fechados**, com evidência nas seções acima.
+Fica registrado, **fora do escopo desta leva**, o mismatch de fuso na
+hidratação das páginas de detalhe (seção "Achado colateral" acima) e o aviso
+`A title element received an array with more than 1 element as children`,
+vindo de `<title>GuysMovie: {movie.title}</title>`
+(`pages/movie/[id].tsx:147` e `pages/serie/[id].tsx:156`) — linhas não
+tocadas pelo CP4.
 
-Observação fora de escopo: o container do frontend loga
-`Warning: A title element received an array with more than 1 element as
-children` nas duas páginas de detalhe. Vem de
-`<title>GuysMovie: {movie.title}</title>` (`pages/movie/[id].tsx:147` e
-`pages/serie/[id].tsx:156`), linhas não tocadas pelo CP4 — pré-existente.
+Dados de teste mantidos no banco por decisão do autor: usuários
+`idortest_a` (id 5) e `idortest_b` (id 6), com os registros listados acima.
