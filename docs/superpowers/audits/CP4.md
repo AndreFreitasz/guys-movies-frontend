@@ -2,12 +2,12 @@
 
 ## Contexto de execução
 
-Step 10 (prova do escopo com duas contas via `curl`) e Step 18 (verificação
-no navegador) não foram executados: o Docker Desktop está parado nesta
-máquina, sem Postgres e sem API no ar. A propriedade de segurança que o
-Step 10 existe para provar está coberta por teste unitário — ver "Risco
-principal" abaixo — mas a prova de ponta a ponta contra o banco real
-continua pendente.
+Step 10 (prova do escopo com duas contas via `curl`) foi **executado contra
+o stack real** depois que o Docker subiu — ver "Step 10 — execução contra o
+stack real" abaixo. Step 18 (verificação no navegador) continua pendente: a
+extensão do Chrome não está conectada nesta sessão.
+
+A migration de backfill herdada do CP3 também foi conferida e está aplicada.
 
 O `differential-review` foi conduzido sobre o commit `402a79c` do backend e
 sobre o diff de frontend deste checkpoint. Cada achado foi verificado
@@ -134,8 +134,61 @@ autenticado, nunca so pelo idTmdb" afirma o objeto de `findOne` inteiro, e
 "nao edita o registro de outro usuario" afirma que `save` não é chamado. Um
 refactor que tire o `idUser` do `WHERE` quebra a suíte.
 
-**Ainda pendente:** o Step 10 (duas contas reais contra o Postgres). Os
-testes provam a construção do `WHERE`, não o comportamento do driver.
+**Confirmado contra o stack real** — ver a seção seguinte.
+
+## Step 10 — execução contra o stack real
+
+Duas contas criadas via `POST /users`: `idortest_a` (id 5) e `idortest_b`
+(id 6). A marcou o filme 550 e a série 70523 como assistidos. Oito casos,
+todos com o resultado esperado:
+
+| # | Caso | Esperado | Obtido |
+|---|---|---|---|
+| 1 | B faz `PATCH` no registro de A | `404` | `404 "Filme assistido não encontrado"` |
+| 2 | Registro de A depois da tentativa de B | intacto | `{"watched":true,"watchedAt":"2024-05-01T00:00:00.000Z"}` |
+| 3 | A edita o próprio registro | `200` + item | `200`, `watchedAt` `2023-03-15`, item completo |
+| 4 | `watchedAt: null` | limpa a data, mantém assistido | `{"watched":true,"watchedAt":null}` |
+| 5 | Data futura (`2030-01-01`) | `400` | `400 "A data de assistido não pode estar no futuro"` |
+| 6 | Body com `idUser`/`userId` | `400` | `400 ["property idUser should not exist","property userId should not exist"]` |
+| 7 | Sem token | `401` | `401` |
+| 8 | `watchedAt: "nao-e-data"` | `400` | `400 ["watchedAt must be a valid ISO 8601 date string"]` |
+
+O caso 6 é a prova prática do `forbidNonWhitelisted`: a tentativa de
+injetar o usuário pelo corpo não é ignorada em silêncio, é rejeitada.
+
+Conferência no banco depois da bateria — só a linha de `idortest_a` mudou,
+e `idortest_b` não tem nenhuma linha em `watched_movie`:
+
+```
+ id | idUserId | idTmdb  | watchedAt  |   username
+ 10 |        1 | 1195506 | 2026-08-19 | qabot
+ ...
+ 20 |        3 |  969681 | 2026-08-20 | andrefreitas
+ 21 |        5 |     550 |            | idortest_a
+(10 rows)
+```
+
+Série, mesmos casos: B → `404`; A → `200` com o `WatchedSerieListItemDto`
+completo; `null` → `200` e `{"watched":true,"watchedAt":null}`; futuro →
+`400`.
+
+**Veredito final do risco principal: IDOR ausente**, provado por leitura de
+código, por teste unitário e por requisição real contra o Postgres.
+
+## Backfill do CP3 — conferido
+
+```
+$ docker exec guys-movies-db psql -U postgres -d postgres -c "SELECT name FROM migrations ORDER BY id;"
+ InitialSchema1787542371825
+ BackfillWatchedMediaLinks1790000000000
+
+$ ... COUNT(*) FROM watched_movie WHERE "idMovieId" IS NULL  -> 0
+$ ... COUNT(*) FROM watched_serie WHERE "serieId"   IS NULL  -> 0
+$ ... totais: watched_movie 9, watched_serie 0, movies 9, series 0
+```
+
+A migration foi aplicada no boot do container e os 9 registros de
+`watched_movie` estão todos vinculados. Pendência do CP3 fechada.
 
 ## Achados
 
@@ -252,10 +305,17 @@ $ npm run build   # depois da correção do achado 1
 
 ## Pendências deste checkpoint
 
-- **Step 10** — prova do escopo com duas contas reais (`curl` com o token de
-  B contra o registro de A esperando `404`; token de A esperando `200`).
-  Bloqueado por Docker parado.
-- **Step 18** — roteiro de verificação no navegador, seis cenários.
-  Bloqueado pelo mesmo motivo.
-- Herdada do CP3: a migration `BackfillWatchedMediaLinks1790000000000`
-  continua escrita e não executada.
+- **Step 18** — roteiro de verificação no navegador, seis cenários. Única
+  pendência restante: a extensão do Chrome não está conectada. As cinco
+  rotas respondem `200` em SSR (`/`, `/series`, `/assistidos`, `/movie/550`,
+  `/serie/70523`) e o Next compila sem erro, mas os cenários interativos
+  (modal, sheet, atualização otimista, rollback com backend derrubado)
+  exigem navegador.
+
+Step 10 e o backfill do CP3: **fechados**, com evidência nas seções acima.
+
+Observação fora de escopo: o container do frontend loga
+`Warning: A title element received an array with more than 1 element as
+children` nas duas páginas de detalhe. Vem de
+`<title>GuysMovie: {movie.title}</title>` (`pages/movie/[id].tsx:147` e
+`pages/serie/[id].tsx:156`), linhas não tocadas pelo CP4 — pré-existente.
