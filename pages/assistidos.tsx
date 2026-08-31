@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 import Header from "../components/_ui/header";
 import Footer from "../components/_ui/footer";
@@ -118,6 +119,68 @@ const WatchedPage = () => {
 
     return sortMovies(filtered, sortKey);
   }, [data, onlyRated, query, sortKey]);
+
+  const updateWatchedAt = useCallback(
+    async (idTmdb: number, watchedAt: string | null) => {
+      const previous = data;
+      const previousWatchedAt =
+        data?.items.find((item) => item.idTmdb === idTmdb)?.watchedAt ?? null;
+
+      setData((current) =>
+        current
+          ? {
+              ...current,
+              items: current.items.map((item) =>
+                item.idTmdb === idTmdb ? { ...item, watchedAt } : item,
+              ),
+            }
+          : current,
+      );
+      setSelected((current) =>
+        current && current.idTmdb === idTmdb
+          ? { ...current, watchedAt }
+          : current,
+      );
+
+      try {
+        const response = await authFetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/watchedAt`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idTmdb, watchedAt }),
+          },
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
+
+        const item = (await response.json()) as WatchedMovieItem;
+        setData((current) =>
+          current
+            ? {
+                ...current,
+                items: current.items.map((existing) =>
+                  existing.idTmdb === item.idTmdb ? item : existing,
+                ),
+              }
+            : current,
+        );
+        setSelected((current) =>
+          current && current.idTmdb === item.idTmdb ? item : current,
+        );
+      } catch {
+        setData(previous);
+        setSelected((current) =>
+          current && current.idTmdb === idTmdb
+            ? { ...current, watchedAt: previousWatchedAt }
+            : current,
+        );
+        toast.error("Erro ao atualizar a data.");
+        fetchWatched();
+      }
+    },
+    [data, fetchWatched],
+  );
 
   const closeSheet = useCallback(() => setSelected(null), []);
 
@@ -336,7 +399,11 @@ const WatchedPage = () => {
         </motion.div>
       )}
 
-      <WatchedDetailSheet movie={selected} onClose={closeSheet} />
+      <WatchedDetailSheet
+        movie={selected}
+        onClose={closeSheet}
+        onWatchedAtChange={updateWatchedAt}
+      />
     </PageShell>
   );
 };

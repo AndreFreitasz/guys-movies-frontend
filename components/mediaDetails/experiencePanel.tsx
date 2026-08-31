@@ -2,6 +2,7 @@ import { memo } from "react";
 import LoadingSpinner from "../_ui/loadingSpinner";
 import { FaClock, FaEye } from "react-icons/fa";
 import ReactStars from "react-stars";
+import { formatWatchedDate } from "../watched/watchedTile";
 
 interface ExperienceActionConfig {
   isActive: boolean;
@@ -21,12 +22,18 @@ interface RatingConfig {
   isClient: boolean;
 }
 
+interface WatchedDateConfig {
+  watchedAt: string | null;
+  onEdit: () => void;
+}
+
 interface MediaExperiencePanelProps {
   heading: string;
   description: string;
   watchedConfig: ExperienceActionConfig;
   waitingConfig: ExperienceActionConfig;
   ratingConfig: RatingConfig;
+  watchedDateConfig?: WatchedDateConfig;
 }
 
 const iconMap = {
@@ -41,6 +48,7 @@ const MediaExperiencePanel = memo(
     watchedConfig,
     waitingConfig,
     ratingConfig,
+    watchedDateConfig,
   }: MediaExperiencePanelProps) => {
     const renderButton = (config: ExperienceActionConfig) => {
       const IconComponent = iconMap[config.icon];
@@ -103,6 +111,26 @@ const MediaExperiencePanel = memo(
             {renderButton(watchedConfig)}
             {renderButton(waitingConfig)}
           </div>
+
+          {watchedConfig.isActive && watchedDateConfig && (
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-black/30 px-4 py-3">
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-white/60">
+                  Você assistiu em
+                </p>
+                <p className="text-sm font-semibold text-white">
+                  {formatWatchedDate(watchedDateConfig.watchedAt)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={watchedDateConfig.onEdit}
+                className="rounded-xl bg-white/10 px-4 py-2 text-xs font-semibold text-white/80 transition hover:bg-white/20"
+              >
+                Editar
+              </button>
+            </div>
+          )}
 
           <div className="rounded-2xl border border-white/5 bg-black/30 p-4 md:p-5 backdrop-blur">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

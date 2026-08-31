@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import Header from "../components/_ui/header";
 import Footer from "../components/_ui/footer";
 import Hero from "../components/home/hero";
 import SectionRow from "../components/home/sectionRow";
 import MoviesProvider from "../components/home/moviesProvider";
 import MovieCard from "../components/home/movieCard";
-import LoadingSpinner from "../components/_ui/loadingSpinner";
+import CatalogErrorState from "../components/_ui/catalogErrorState";
 import { setPublicCache } from "../utils/httpCache";
 
 interface Movie {
@@ -61,6 +62,9 @@ const Home: React.FC<HomeProps> = ({
   const seenIdsRef = useRef(
     new Set(initialPopularMovies.map((movie) => movie.id)),
   );
+  const router = useRouter();
+  const retry = useCallback(() => router.replace(router.asPath), [router]);
+  const hasCatalog = initialProviderData.length > 0;
 
   useEffect(() => {
     seenIdsRef.current = new Set(initialPopularMovies.map((movie) => movie.id));
@@ -118,22 +122,21 @@ const Home: React.FC<HomeProps> = ({
     return () => observer.disconnect();
   }, [hasMoreMovies, loadMoreMovies]);
 
-  if (error) {
+  if (error || !hasCatalog) {
     return (
       <>
         <Head>
           <title>GuysMovies - Erro</title>
         </Head>
         <Header />
-        <div className="mx-auto flex min-h-[60vh] w-full max-w-lg flex-col items-center justify-center px-4 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/15 text-2xl">
-            ⚠️
-          </span>
-          <h1 className="mt-5 text-2xl font-black text-white">
-            Não conseguimos carregar o catálogo
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-white/45">{error}</p>
-        </div>
+        <CatalogErrorState
+          title="Não conseguimos carregar o catálogo"
+          message={
+            error ??
+            "O catálogo voltou vazio desta vez. Tente de novo em alguns instantes."
+          }
+          onRetry={retry}
+        />
         <Footer />
       </>
     );
@@ -154,112 +157,108 @@ const Home: React.FC<HomeProps> = ({
       </Head>
       <Header />
 
-      {!initialProviderData.length ? (
-        <LoadingSpinner />
-      ) : (
-        <main className="relative overflow-x-hidden">
-          <Hero movies={popularMovies} />
+      <main className="relative overflow-x-hidden">
+        <Hero movies={popularMovies} />
 
-          <div
-            id="catalogo"
-            className="relative mx-auto w-full max-w-[1600px] px-4 pb-16 sm:px-6 lg:px-10 xl:px-14"
-          >
-            <div className="aurora" />
+        <div
+          id="catalogo"
+          className="relative mx-auto w-full max-w-[1600px] px-4 pb-16 sm:px-6 lg:px-10 xl:px-14"
+        >
+          <div className="aurora" />
 
-            <SectionRow
-              iconSrc="/icons/home/popular.png"
-              iconAlt="Ícone de uma estrela"
-              eyebrow="Por plataforma"
-              title="Populares nos streamings"
-              data={initialProviderData}
-              slidesToShow={4}
-              infinite={false}
-              responsive={providerResponsive}
-              skeletonVariant="panel"
-              renderItem={(providerData: any) => (
-                <MoviesProvider
-                  providerData={providerData}
-                  key={providerData.provider.id}
-                />
-              )}
-            />
+          <SectionRow
+            iconSrc="/icons/home/popular.png"
+            iconAlt="Ícone de uma estrela"
+            eyebrow="Por plataforma"
+            title="Populares nos streamings"
+            data={initialProviderData}
+            slidesToShow={4}
+            infinite={false}
+            responsive={providerResponsive}
+            skeletonVariant="panel"
+            renderItem={(providerData: any) => (
+              <MoviesProvider
+                providerData={providerData}
+                key={providerData.provider.id}
+              />
+            )}
+          />
 
-            <SectionRow
-              iconSrc="/icons/home/cinema.png"
-              iconAlt="Ícone de um cinema"
-              eyebrow="Todo mundo assistindo"
-              title="Filmes populares"
-              data={popularMovies}
-              renderItem={renderMovieCard}
-            />
+          <SectionRow
+            iconSrc="/icons/home/cinema.png"
+            iconAlt="Ícone de um cinema"
+            eyebrow="Todo mundo assistindo"
+            title="Filmes populares"
+            data={popularMovies}
+            renderItem={renderMovieCard}
+          />
 
-            <SectionRow
-              iconSrc="/icons/home/horror.png"
-              iconAlt="Ícone de terror"
-              eyebrow="Para uma noite tensa"
-              title="Terror e suspense"
-              data={initialPopularMoviesHorror}
-              renderItem={renderMovieCard}
-            />
+          <SectionRow
+            iconSrc="/icons/home/horror.png"
+            iconAlt="Ícone de terror"
+            eyebrow="Para uma noite tensa"
+            title="Terror e suspense"
+            data={initialPopularMoviesHorror}
+            renderItem={renderMovieCard}
+          />
 
-            <SectionRow
-              iconSrc="/icons/home/scifi.png"
-              iconAlt="Ícone de tecnologia"
-              eyebrow="Mundos possíveis"
-              title="Ficção científica"
-              data={initialPopularMoviesSciFi}
-              renderItem={renderMovieCard}
-            />
+          <SectionRow
+            iconSrc="/icons/home/scifi.png"
+            iconAlt="Ícone de tecnologia"
+            eyebrow="Mundos possíveis"
+            title="Ficção científica"
+            data={initialPopularMoviesSciFi}
+            renderItem={renderMovieCard}
+          />
 
-            <SectionRow
-              iconSrc="/icons/home/like.png"
-              iconAlt="Ícone de curtir"
-              eyebrow="Nota alta"
-              title="Aclamados pela crítica"
-              data={initialTopRatedMovies}
-              renderItem={renderMovieCard}
-            />
+          <SectionRow
+            iconSrc="/icons/home/like.png"
+            iconAlt="Ícone de curtir"
+            eyebrow="Nota alta"
+            title="Aclamados pela crítica"
+            data={initialTopRatedMovies}
+            renderItem={renderMovieCard}
+          />
 
-            <SectionRow
-              iconSrc="/icons/home/family.png"
-              iconAlt="Ícone de uma família"
-              eyebrow="Para ver junto"
-              title="Família"
-              data={initialPopularMoviesFamily}
-              renderItem={renderMovieCard}
-            />
+          <SectionRow
+            iconSrc="/icons/home/family.png"
+            iconAlt="Ícone de uma família"
+            eyebrow="Para ver junto"
+            title="Família"
+            data={initialPopularMoviesFamily}
+            renderItem={renderMovieCard}
+          />
 
-            <SectionRow
-              iconSrc="/icons/home/drama.png"
-              iconAlt="Ícone de drama"
-              eyebrow="História que fica"
-              title="Drama"
-              data={initialPopularMoviesDrama}
-              renderItem={renderMovieCard}
-            />
+          <SectionRow
+            iconSrc="/icons/home/drama.png"
+            iconAlt="Ícone de drama"
+            eyebrow="História que fica"
+            title="Drama"
+            data={initialPopularMoviesDrama}
+            renderItem={renderMovieCard}
+          />
 
-            <SectionRow
-              iconSrc="/icons/home/rocket.png"
-              iconAlt="Ícone de um foguete"
-              eyebrow="O melhor dos dois"
-              title="Sci-Fi dramático"
-              data={initialPopularMoviesSciFiDrama}
-              renderItem={renderMovieCard}
-            />
+          <SectionRow
+            iconSrc="/icons/home/rocket.png"
+            iconAlt="Ícone de um foguete"
+            eyebrow="O melhor dos dois"
+            title="Sci-Fi dramático"
+            data={initialPopularMoviesSciFiDrama}
+            renderItem={renderMovieCard}
+          />
 
-            <SectionRow
-              iconSrc="/icons/home/comedy.png"
-              iconAlt="Ícone de comédia"
-              eyebrow="Para relaxar"
-              title="Comédia"
-              data={initialPopularMoviesComedy}
-              renderItem={renderMovieCard}
-            />
+          <SectionRow
+            iconSrc="/icons/home/comedy.png"
+            iconAlt="Ícone de comédia"
+            eyebrow="Para relaxar"
+            title="Comédia"
+            data={initialPopularMoviesComedy}
+            renderItem={renderMovieCard}
+          />
 
-            <div ref={sentinelRef} aria-hidden className="h-px w-full" />
-          </div>
-        </main>
-      )}
+          <div ref={sentinelRef} aria-hidden className="h-px w-full" />
+        </div>
+      </main>
 
       <Footer />
     </>

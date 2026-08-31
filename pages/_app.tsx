@@ -90,12 +90,11 @@ function MyApp({ Component, pageProps, router }: AppProps) {
       <MotionConfig reducedMotion="user">
         <AuthProvider>
           <RouteProgressBar />
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence initial={false}>
             <motion.div
               key={router.asPath}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
               transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
             >
               <Component {...pageProps} />
