@@ -20,7 +20,11 @@ import {
   MediaSynopsis,
   QuickDetailItem,
 } from "../../components/mediaDetails";
+import SeasonChecklist, {
+  SeasonOption,
+} from "../../components/series/seasonChecklist";
 import { useWatchedMedia } from "../../hooks/useWatchedMedia";
+import { useWatchedSeasons } from "../../hooks/useWatchedSeasons";
 import { SerieResponse } from "../../interfaces/series/types";
 import { setPublicCache } from "../../utils/httpCache";
 
@@ -42,13 +46,11 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       idTmdb: serie.id,
       posterPath: serie.poster_path,
       voteAverage: serie.vote_average,
-      numberOfSeasons: serie.number_of_seasons,
     }),
     [
       serie.first_air_date,
       serie.id,
       serie.name,
-      serie.number_of_seasons,
       serie.overview,
       serie.poster_path,
       serie.vote_average,
@@ -85,6 +87,26 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
       dateError: "Erro ao atualizar a data.",
     },
   });
+
+  const seasonOptions = useMemo<SeasonOption[]>(
+    () =>
+      (serie.seasons ?? []).map((season) => ({
+        seasonNumber: season.season_number,
+        name: season.name,
+        episodeCount: season.episode_count,
+        airDate: season.air_date,
+        posterPath: season.poster_path,
+      })),
+    [serie.seasons],
+  );
+
+  const {
+    watchedSeasons,
+    completedAt,
+    isBusy: isSeasonBusy,
+    toggleSeason,
+    completeAll,
+  } = useWatchedSeasons({ idTmdb: serie.id, buildPayload: buildSeriePayload });
 
   useEffect(() => {
     setIsClient(true);
@@ -219,6 +241,22 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
             <MediaQuickDetails title="Detalhes rápidos" items={quickDetails} />
           }
         >
+          <SeasonChecklist
+            seasons={seasonOptions}
+            watchedSeasons={watchedSeasons}
+            isBusy={isSeasonBusy}
+            completedAt={completedAt}
+            onToggle={toggleSeason}
+            onCompleteAll={() =>
+              completeAll(
+                seasonOptions.map((season) => ({
+                  seasonNumber: season.seasonNumber,
+                  episodeCount: season.episodeCount,
+                })),
+              )
+            }
+          />
+
           <MediaSynopsis title="Sinopse" overview={serie.overview ?? ""} />
 
           <MediaProvidersSection

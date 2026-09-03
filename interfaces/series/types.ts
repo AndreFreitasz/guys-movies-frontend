@@ -9,6 +9,14 @@ export interface Serie {
 
 import { CastMember, Providers } from "../movie/types";
 
+export interface SerieSeason {
+  season_number: number;
+  name: string;
+  episode_count: number;
+  air_date: string | null;
+  poster_path: string | null;
+}
+
 export interface SerieResponse extends Serie {
   wallpaper_path: string;
   genres: string[];
@@ -16,6 +24,7 @@ export interface SerieResponse extends Serie {
   created_by: { name: string }[];
   providers: Providers;
   cast?: CastMember[];
+  seasons?: SerieSeason[];
 }
 
 export interface ProviderSeries {

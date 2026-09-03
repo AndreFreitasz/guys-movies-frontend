@@ -7,6 +7,7 @@ interface StatCardProps {
   hint: string;
   suffix?: string;
   decimals?: number;
+  formatValue?: (value: number) => string;
   accent: "indigo" | "amber" | "emerald";
   delay?: number;
 }
@@ -23,6 +24,7 @@ const StatCard: React.FC<StatCardProps> = ({
   hint,
   suffix = "",
   decimals = 0,
+  formatValue,
   accent,
   delay = 0,
 }) => {
@@ -30,18 +32,19 @@ const StatCard: React.FC<StatCardProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const animatedRef = useRef(false);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
+  const format = formatValue ?? ((raw: number) => raw.toFixed(decimals));
 
   useEffect(() => {
     const node = valueRef.current;
     if (!node || value === null) return;
 
     if (!isInView) {
-      node.textContent = (0).toFixed(decimals);
+      node.textContent = format(0);
       return;
     }
 
     if (animatedRef.current) {
-      node.textContent = value.toFixed(decimals);
+      node.textContent = format(value);
       return;
     }
 
@@ -52,15 +55,15 @@ const StatCard: React.FC<StatCardProps> = ({
       delay,
       ease: [0.16, 1, 0.3, 1],
       onUpdate: (latest) => {
-        node.textContent = latest.toFixed(decimals);
+        node.textContent = format(latest);
       },
       onComplete: () => {
-        node.textContent = value.toFixed(decimals);
+        node.textContent = format(value);
       },
     });
 
     return () => controls.stop();
-  }, [decimals, delay, isInView, value]);
+  }, [decimals, delay, format, isInView, value]);
 
   return (
     <motion.div
