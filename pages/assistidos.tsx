@@ -248,6 +248,11 @@ const WatchedPage = () => {
     return sortSeries(filtered, serieSortKey);
   }, [serieData, serieOnlyRated, serieQuery, serieSortKey]);
 
+  const showSerieRuntimeCard = !serieData || serieData.stats.runtimeMinutes > 0;
+  const serieStatsGridClass = showSerieRuntimeCard
+    ? "mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+    : "mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3";
+
   const updateWatchedAt = useCallback(
     async (idTmdb: number, watchedAt: string | null) => {
       const previous = data;
@@ -604,7 +609,7 @@ const WatchedPage = () => {
 
       {activeTab === "series" && (
         <>
-          <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <section className={serieStatsGridClass}>
             <StatCard
               label="Séries"
               value={serieData?.stats.total ?? null}
@@ -623,14 +628,16 @@ const WatchedPage = () => {
               accent="emerald"
               delay={0.1}
             />
-            <StatCard
-              label="Tempo assistido"
-              value={serieData?.stats.runtimeMinutes ?? null}
-              formatValue={formatRuntime}
-              hint="Estimativa a partir da duração média dos episódios"
-              accent="indigo"
-              delay={0.15}
-            />
+            {showSerieRuntimeCard && (
+              <StatCard
+                label="Tempo assistido"
+                value={serieData?.stats.runtimeMinutes ?? null}
+                formatValue={formatRuntime}
+                hint="Estimativa a partir da duração média dos episódios"
+                accent="indigo"
+                delay={0.15}
+              />
+            )}
             <StatCard
               label="Nota média"
               value={serieData?.stats.averageRating ?? null}
@@ -638,7 +645,7 @@ const WatchedPage = () => {
               suffix=" / 5"
               decimals={1}
               accent="amber"
-              delay={0.2}
+              delay={showSerieRuntimeCard ? 0.2 : 0.15}
             />
           </section>
 
