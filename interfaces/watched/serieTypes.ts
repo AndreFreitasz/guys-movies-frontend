@@ -29,6 +29,7 @@ export interface WatchedSerieStats {
 export interface WatchedSerieList {
   items: WatchedSerieItem[];
   stats: WatchedSerieStats;
+  availabilityFailed: boolean;
 }
 
 export type WatchedSerieSortKey = "recent" | "rating" | "title" | "progress";

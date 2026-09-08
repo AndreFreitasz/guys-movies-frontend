@@ -21,6 +21,7 @@ export interface WatchedMovieStats {
 export interface WatchedMovieList {
   items: WatchedMovieItem[];
   stats: WatchedMovieStats;
+  availabilityFailed: boolean;
 }
 
 export type WatchedSortKey = "recent" | "rating" | "title" | "release";
