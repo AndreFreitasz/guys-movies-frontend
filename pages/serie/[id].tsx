@@ -202,6 +202,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
               badgeLabel="Série"
               title={serie.name}
               voteAverage={serie.vote_average ?? 0}
+              mediaId={serie.id}
             />
           }
           actions={

@@ -171,6 +171,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
               badgeLabel="Filme"
               title={movie.title}
               voteAverage={movie.vote_average}
+              mediaId={movie.id}
             />
           }
           actions={
