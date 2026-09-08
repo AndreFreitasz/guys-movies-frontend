@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -15,7 +21,10 @@ import WatchedToolbar, {
 } from "../components/watched/watchedToolbar";
 import WatchedDetailSheet from "../components/watched/watchedDetailSheet";
 import WatchedSerieSheet from "../components/watched/watchedSerieSheet";
+import FilterChips from "../components/watched/filterChips";
+import FilterDrawer from "../components/watched/filterDrawer";
 import { useAuth } from "../hooks/authContext";
+import { useWatchedFilters } from "../hooks/useWatchedFilters";
 import { authFetch } from "../utils/authFetch";
 import {
   WatchedMovieItem,
@@ -148,6 +157,28 @@ const WatchedPage = () => {
     null,
   );
 
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const openFilterDrawer = useCallback(() => setIsFilterDrawerOpen(true), []);
+  const closeFilterDrawer = useCallback(() => setIsFilterDrawerOpen(false), []);
+
+  const {
+    ratings,
+    directors,
+    providers,
+    setRatings,
+    setDirectors,
+    setProviders,
+    activeCount,
+    clearAll,
+    isReady: filtersReady,
+  } = useWatchedFilters();
+
+  const providerQuery = providers.length
+    ? `?providers=${providers.join(",")}`
+    : "";
+
+  const fetchedSerieProviderQueryRef = useRef<string | null>(null);
+
   const switchTab = useCallback(
     (tab: WatchedTab) => {
       router.push({ query: { tab } }, undefined, { shallow: true });
@@ -161,7 +192,7 @@ const WatchedPage = () => {
 
     try {
       const response = await authFetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/list`,
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/list${providerQuery}`,
       );
 
       if (!response.ok) throw new Error("Falha ao carregar a lista");
@@ -172,7 +203,7 @@ const WatchedPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [providerQuery]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -191,7 +222,7 @@ const WatchedPage = () => {
 
     try {
       const response = await authFetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/list`,
+        `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/list${providerQuery}`,
       );
       if (!response.ok) throw new Error("Falha ao carregar a lista");
       setSerieData((await response.json()) as WatchedSerieList);
@@ -200,27 +231,40 @@ const WatchedPage = () => {
     } finally {
       setIsSerieLoading(false);
     }
-  }, []);
+  }, [providerQuery]);
 
   useEffect(() => {
     if (authLoading || !user) return;
-    if (activeTab !== "series" || serieData || isSerieLoading) return;
+    if (activeTab !== "series" || isSerieLoading) return;
+    if (serieData && fetchedSerieProviderQueryRef.current === providerQuery)
+      return;
+
+    fetchedSerieProviderQueryRef.current = providerQuery;
     fetchWatchedSeries();
   }, [
     activeTab,
     authLoading,
     fetchWatchedSeries,
     isSerieLoading,
+    providerQuery,
     serieData,
     user,
   ]);
+
+  const directorOptions = useMemo(() => {
+    const names = new Set<string>();
+    (data?.items ?? []).forEach((item) => {
+      if (item.director) names.add(item.director);
+    });
+    return Array.from(names).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [data]);
 
   const visibleMovies = useMemo(() => {
     if (!data) return [];
 
     const normalizedQuery = query.trim().toLowerCase();
 
-    const filtered = data.items.filter((movie) => {
+    let filtered = data.items.filter((movie) => {
       if (onlyRated && movie.rating === null) return false;
       if (!normalizedQuery) return true;
 
@@ -230,23 +274,43 @@ const WatchedPage = () => {
       );
     });
 
+    if (ratings.length > 0) {
+      filtered = filtered.filter(
+        (item) =>
+          item.rating != null && ratings.includes(Math.round(item.rating)),
+      );
+    }
+
+    if (directors.length > 0) {
+      filtered = filtered.filter(
+        (item) => item.director != null && directors.includes(item.director),
+      );
+    }
+
     return sortMovies(filtered, sortKey);
-  }, [data, onlyRated, query, sortKey]);
+  }, [data, directors, onlyRated, query, ratings, sortKey]);
 
   const visibleSeries = useMemo(() => {
     if (!serieData) return [];
 
     const normalizedQuery = serieQuery.trim().toLowerCase();
 
-    const filtered = serieData.items.filter((serie) => {
+    let filtered = serieData.items.filter((serie) => {
       if (serieOnlyRated && serie.rating === null) return false;
       if (!normalizedQuery) return true;
 
       return serie.name?.toLowerCase().includes(normalizedQuery);
     });
 
+    if (ratings.length > 0) {
+      filtered = filtered.filter(
+        (item) =>
+          item.rating != null && ratings.includes(Math.round(item.rating)),
+      );
+    }
+
     return sortSeries(filtered, serieSortKey);
-  }, [serieData, serieOnlyRated, serieQuery, serieSortKey]);
+  }, [ratings, serieData, serieOnlyRated, serieQuery, serieSortKey]);
 
   const showSerieRuntimeCard = !serieData || serieData.stats.runtimeMinutes > 0;
   const serieStatsGridClass = showSerieRuntimeCard
@@ -495,8 +559,15 @@ const WatchedPage = () => {
             </div>
           )}
 
+          {data?.availabilityFailed && (
+            <p className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+              Não foi possível consultar a disponibilidade de alguns títulos. A
+              lista pode estar incompleta.
+            </p>
+          )}
+
           {!error && data && data.items.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-8 space-y-4">
               <WatchedToolbar
                 query={query}
                 onQueryChange={setQuery}
@@ -512,6 +583,38 @@ const WatchedPage = () => {
                 resultLabelSingular="filme"
                 resultLabelPlural="filmes"
               />
+
+              <div
+                aria-hidden={!filtersReady}
+                className={`flex flex-wrap items-center justify-between gap-3 ${
+                  filtersReady ? "" : "invisible pointer-events-none"
+                }`}
+              >
+                <FilterChips
+                  ratings={ratings}
+                  directors={directors}
+                  providers={providers}
+                  directorOptions={directorOptions}
+                  showDirectors
+                  onRatingsChange={setRatings}
+                  onDirectorsChange={setDirectors}
+                  onProvidersChange={setProviders}
+                  className="hidden lg:flex"
+                />
+                <button
+                  type="button"
+                  tabIndex={filtersReady ? 0 : -1}
+                  onClick={openFilterDrawer}
+                  className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 text-sm text-white/70 transition hover:text-white lg:hidden"
+                >
+                  Filtros
+                  {activeCount > 0 && (
+                    <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
+                      {activeCount}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           )}
 
@@ -579,6 +682,7 @@ const WatchedPage = () => {
                 onClick={() => {
                   setQuery("");
                   setOnlyRated(false);
+                  clearAll();
                 }}
                 className="mt-4 rounded-xl bg-white/10 px-4 py-2 text-xs font-semibold text-white/80 transition hover:bg-white/20"
               >
@@ -662,8 +766,15 @@ const WatchedPage = () => {
             </div>
           )}
 
+          {serieData?.availabilityFailed && (
+            <p className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+              Não foi possível consultar a disponibilidade de alguns títulos. A
+              lista pode estar incompleta.
+            </p>
+          )}
+
           {!serieError && serieData && serieData.items.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-8 space-y-4">
               <WatchedToolbar
                 query={serieQuery}
                 onQueryChange={setSerieQuery}
@@ -679,6 +790,38 @@ const WatchedPage = () => {
                 resultLabelSingular="série"
                 resultLabelPlural="séries"
               />
+
+              <div
+                aria-hidden={!filtersReady}
+                className={`flex flex-wrap items-center justify-between gap-3 ${
+                  filtersReady ? "" : "invisible pointer-events-none"
+                }`}
+              >
+                <FilterChips
+                  ratings={ratings}
+                  directors={directors}
+                  providers={providers}
+                  directorOptions={[]}
+                  showDirectors={false}
+                  onRatingsChange={setRatings}
+                  onDirectorsChange={setDirectors}
+                  onProvidersChange={setProviders}
+                  className="hidden lg:flex"
+                />
+                <button
+                  type="button"
+                  tabIndex={filtersReady ? 0 : -1}
+                  onClick={openFilterDrawer}
+                  className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 text-sm text-white/70 transition hover:text-white lg:hidden"
+                >
+                  Filtros
+                  {activeCount > 0 && (
+                    <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
+                      {activeCount}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           )}
 
@@ -745,6 +888,7 @@ const WatchedPage = () => {
                 onClick={() => {
                   setSerieQuery("");
                   setSerieOnlyRated(false);
+                  clearAll();
                 }}
                 className="mt-4 rounded-xl bg-white/10 px-4 py-2 text-xs font-semibold text-white/80 transition hover:bg-white/20"
               >
@@ -783,6 +927,21 @@ const WatchedPage = () => {
         serie={selectedSerie}
         onClose={closeSerieSheet}
         onProgressChange={handleSerieProgressChange}
+      />
+
+      <FilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={closeFilterDrawer}
+        ratings={ratings}
+        directors={directors}
+        providers={providers}
+        directorOptions={activeTab === "movies" ? directorOptions : []}
+        showDirectors={activeTab === "movies"}
+        onRatingsChange={setRatings}
+        onDirectorsChange={setDirectors}
+        onProvidersChange={setProviders}
+        activeCount={activeCount}
+        onClearAll={clearAll}
       />
     </PageShell>
   );
