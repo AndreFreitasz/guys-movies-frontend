@@ -172,7 +172,6 @@ const WatchedPage = () => {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<WatchedSortKey>("recent");
-  const [onlyRated, setOnlyRated] = useState(false);
   const [selected, setSelected] = useState<WatchedMovieItem | null>(null);
 
   const [serieData, setSerieData] = useState<WatchedSerieList | null>(null);
@@ -181,7 +180,6 @@ const WatchedPage = () => {
   const [serieQuery, setSerieQuery] = useState("");
   const [serieSortKey, setSerieSortKey] =
     useState<WatchedSerieSortKey>("recent");
-  const [serieOnlyRated, setSerieOnlyRated] = useState(false);
   const [selectedSerie, setSelectedSerie] = useState<WatchedSerieItem | null>(
     null,
   );
@@ -207,6 +205,7 @@ const WatchedPage = () => {
   const activeCount =
     activeTab === "movies" ? rawActiveCount : rawActiveCount - directors.length;
 
+  const hasProviderFilter = providers.length > 0;
   const providerQuery = providers.length
     ? `?providers=${providers.join(",")}`
     : "";
@@ -309,7 +308,6 @@ const WatchedPage = () => {
     const normalizedQuery = query.trim().toLowerCase();
 
     let filtered = data.items.filter((movie) => {
-      if (onlyRated && movie.rating === null) return false;
       if (!normalizedQuery) return true;
 
       return (
@@ -333,7 +331,7 @@ const WatchedPage = () => {
     }
 
     return sortMovies(filtered, sortKey);
-  }, [data, decade, directors, onlyRated, query, rating, sortKey]);
+  }, [data, decade, directors, query, rating, sortKey]);
 
   const visibleSeries = useMemo(() => {
     if (!serieData) return [];
@@ -341,7 +339,6 @@ const WatchedPage = () => {
     const normalizedQuery = serieQuery.trim().toLowerCase();
 
     let filtered = serieData.items.filter((serie) => {
-      if (serieOnlyRated && serie.rating === null) return false;
       if (!normalizedQuery) return true;
 
       return serie.name?.toLowerCase().includes(normalizedQuery);
@@ -356,7 +353,7 @@ const WatchedPage = () => {
     }
 
     return sortSeries(filtered, serieSortKey);
-  }, [decade, rating, serieData, serieOnlyRated, serieQuery, serieSortKey]);
+  }, [decade, rating, serieData, serieQuery, serieSortKey]);
 
   const showSerieRuntimeCard = !serieData || serieData.stats.runtimeMinutes > 0;
   const serieStatsGridClass = showSerieRuntimeCard
@@ -612,7 +609,7 @@ const WatchedPage = () => {
             </p>
           )}
 
-          {!error && data && data.items.length > 0 && (
+          {!error && data && (data.items.length > 0 || hasProviderFilter) && (
             <div className="mb-8 space-y-4">
               <WatchedToolbar
                 query={query}
@@ -623,8 +620,6 @@ const WatchedPage = () => {
                 onSortChange={setSortKey}
                 sortOptions={MOVIE_SORT_OPTIONS}
                 sortAriaLabel="Ordenar filmes"
-                onlyRated={onlyRated}
-                onOnlyRatedChange={setOnlyRated}
                 resultCount={visibleMovies.length}
                 resultLabelSingular="filme"
                 resultLabelPlural="filmes"
@@ -684,44 +679,47 @@ const WatchedPage = () => {
             </div>
           )}
 
-          {!isLoading && !error && data?.items.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="mx-auto mt-6 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl"
-            >
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/40">
-                <svg viewBox="0 0 20 20" className="h-7 w-7">
-                  <path
-                    fill="currentColor"
-                    d="M3 4h14a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm1.5 2.5v7h11v-7h-11z"
-                  />
-                </svg>
-              </div>
-              <h2 className="mt-5 text-xl font-bold text-white">
-                Nenhum filme por aqui ainda
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-white/55">
-                Abra a página de um filme e toque em{" "}
-                <span className="font-semibold text-white/80">
-                  Marcar como assistido
-                </span>
-                . Ele aparece aqui na hora, junto com a nota que você der.
-              </p>
-              <Link
-                href="/"
-                className="mt-7 inline-flex rounded-2xl px-6 py-3 text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96]"
+          {!isLoading &&
+            !error &&
+            data?.items.length === 0 &&
+            !hasProviderFilter && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="mx-auto mt-6 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl"
               >
-                Descobrir filmes
-              </Link>
-            </motion.div>
-          )}
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/40">
+                  <svg viewBox="0 0 20 20" className="h-7 w-7">
+                    <path
+                      fill="currentColor"
+                      d="M3 4h14a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm1.5 2.5v7h11v-7h-11z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="mt-5 text-xl font-bold text-white">
+                  Nenhum filme por aqui ainda
+                </h2>
+                <p className="mt-3 text-sm leading-relaxed text-white/55">
+                  Abra a página de um filme e toque em{" "}
+                  <span className="font-semibold text-white/80">
+                    Marcar como assistido
+                  </span>
+                  . Ele aparece aqui na hora, junto com a nota que você der.
+                </p>
+                <Link
+                  href="/"
+                  className="mt-7 inline-flex rounded-2xl px-6 py-3 text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96]"
+                >
+                  Descobrir filmes
+                </Link>
+              </motion.div>
+            )}
 
           {!isLoading &&
           !error &&
           visibleMovies.length === 0 &&
-          data?.items.length ? (
+          (data?.items.length || (data && hasProviderFilter)) ? (
             <div className="rounded-3xl border border-white/10 bg-white/[0.02] py-16 text-center">
               <p className="text-sm text-white/50">
                 Nenhum filme corresponde à sua busca.
@@ -730,7 +728,6 @@ const WatchedPage = () => {
                 type="button"
                 onClick={() => {
                   setQuery("");
-                  setOnlyRated(false);
                   clearAll();
                 }}
                 className="mt-4 rounded-xl bg-white/10 px-4 py-2 text-xs font-semibold text-white/80 transition hover:bg-white/20"
@@ -822,60 +819,60 @@ const WatchedPage = () => {
             </p>
           )}
 
-          {!serieError && serieData && serieData.items.length > 0 && (
-            <div className="mb-8 space-y-4">
-              <WatchedToolbar
-                query={serieQuery}
-                onQueryChange={setSerieQuery}
-                searchPlaceholder="Buscar nas séries assistidas..."
-                searchAriaLabel="Buscar nas séries assistidas"
-                sortKey={serieSortKey}
-                onSortChange={setSerieSortKey}
-                sortOptions={SERIE_SORT_OPTIONS}
-                sortAriaLabel="Ordenar séries"
-                onlyRated={serieOnlyRated}
-                onOnlyRatedChange={setSerieOnlyRated}
-                resultCount={visibleSeries.length}
-                resultLabelSingular="série"
-                resultLabelPlural="séries"
-              />
-
-              <div
-                aria-hidden={!filtersReady}
-                className={`flex flex-wrap items-center justify-between gap-3 ${
-                  filtersReady ? "" : "invisible pointer-events-none"
-                }`}
-              >
-                <FilterBar
-                  rating={rating}
-                  decade={decade}
-                  directors={directors}
-                  providers={providers}
-                  decadeOptions={serieDecadeOptions}
-                  directorOptions={[]}
-                  showDirectors={false}
-                  onRatingChange={setRating}
-                  onDecadeChange={setDecade}
-                  onDirectorsChange={setDirectors}
-                  onProvidersChange={setProviders}
-                  className="hidden lg:flex"
+          {!serieError &&
+            serieData &&
+            (serieData.items.length > 0 || hasProviderFilter) && (
+              <div className="mb-8 space-y-4">
+                <WatchedToolbar
+                  query={serieQuery}
+                  onQueryChange={setSerieQuery}
+                  searchPlaceholder="Buscar nas séries assistidas..."
+                  searchAriaLabel="Buscar nas séries assistidas"
+                  sortKey={serieSortKey}
+                  onSortChange={setSerieSortKey}
+                  sortOptions={SERIE_SORT_OPTIONS}
+                  sortAriaLabel="Ordenar séries"
+                  resultCount={visibleSeries.length}
+                  resultLabelSingular="série"
+                  resultLabelPlural="séries"
                 />
-                <button
-                  type="button"
-                  tabIndex={filtersReady ? 0 : -1}
-                  onClick={openFilterDrawer}
-                  className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 text-sm text-white/70 transition hover:text-white lg:hidden"
+
+                <div
+                  aria-hidden={!filtersReady}
+                  className={`flex flex-wrap items-center justify-between gap-3 ${
+                    filtersReady ? "" : "invisible pointer-events-none"
+                  }`}
                 >
-                  Filtros
-                  {activeCount > 0 && (
-                    <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
-                      {activeCount}
-                    </span>
-                  )}
-                </button>
+                  <FilterBar
+                    rating={rating}
+                    decade={decade}
+                    directors={directors}
+                    providers={providers}
+                    decadeOptions={serieDecadeOptions}
+                    directorOptions={[]}
+                    showDirectors={false}
+                    onRatingChange={setRating}
+                    onDecadeChange={setDecade}
+                    onDirectorsChange={setDirectors}
+                    onProvidersChange={setProviders}
+                    className="hidden lg:flex"
+                  />
+                  <button
+                    type="button"
+                    tabIndex={filtersReady ? 0 : -1}
+                    onClick={openFilterDrawer}
+                    className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 text-sm text-white/70 transition hover:text-white lg:hidden"
+                  >
+                    Filtros
+                    {activeCount > 0 && (
+                      <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
+                        {activeCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {isSerieLoading && (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 xl:grid-cols-6">
@@ -894,43 +891,46 @@ const WatchedPage = () => {
             </div>
           )}
 
-          {!isSerieLoading && !serieError && serieData?.items.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="mx-auto mt-6 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl"
-            >
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/40">
-                <svg viewBox="0 0 20 20" className="h-7 w-7">
-                  <path
-                    fill="currentColor"
-                    d="M3 4h14a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm1.5 2.5v7h11v-7h-11z"
-                  />
-                </svg>
-              </div>
-              <h2 className="mt-5 text-xl font-bold text-white">
-                Nenhuma série por aqui ainda
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-white/55">
-                Abra a página de uma série e marque uma{" "}
-                <span className="font-semibold text-white/80">temporada</span>{" "}
-                como assistida. Ela aparece aqui na hora, com o progresso de
-                cada temporada.
-              </p>
-              <Link
-                href="/series"
-                className="mt-7 inline-flex rounded-2xl px-6 py-3 text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96]"
+          {!isSerieLoading &&
+            !serieError &&
+            serieData?.items.length === 0 &&
+            !hasProviderFilter && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="mx-auto mt-6 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl"
               >
-                Descobrir séries
-              </Link>
-            </motion.div>
-          )}
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/40">
+                  <svg viewBox="0 0 20 20" className="h-7 w-7">
+                    <path
+                      fill="currentColor"
+                      d="M3 4h14a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm1.5 2.5v7h11v-7h-11z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="mt-5 text-xl font-bold text-white">
+                  Nenhuma série por aqui ainda
+                </h2>
+                <p className="mt-3 text-sm leading-relaxed text-white/55">
+                  Abra a página de uma série e marque uma{" "}
+                  <span className="font-semibold text-white/80">temporada</span>{" "}
+                  como assistida. Ela aparece aqui na hora, com o progresso de
+                  cada temporada.
+                </p>
+                <Link
+                  href="/series"
+                  className="mt-7 inline-flex rounded-2xl px-6 py-3 text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96]"
+                >
+                  Descobrir séries
+                </Link>
+              </motion.div>
+            )}
 
           {!isSerieLoading &&
           !serieError &&
           visibleSeries.length === 0 &&
-          serieData?.items.length ? (
+          (serieData?.items.length || (serieData && hasProviderFilter)) ? (
             <div className="rounded-3xl border border-white/10 bg-white/[0.02] py-16 text-center">
               <p className="text-sm text-white/50">
                 Nenhuma série corresponde à sua busca.
@@ -939,7 +939,6 @@ const WatchedPage = () => {
                 type="button"
                 onClick={() => {
                   setSerieQuery("");
-                  setSerieOnlyRated(false);
                   clearAll();
                 }}
                 className="mt-4 rounded-xl bg-white/10 px-4 py-2 text-xs font-semibold text-white/80 transition hover:bg-white/20"
