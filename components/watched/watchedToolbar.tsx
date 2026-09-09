@@ -15,8 +15,6 @@ interface WatchedToolbarProps<T extends string> {
   onSortChange: (value: T) => void;
   sortOptions: WatchedSortOption<T>[];
   sortAriaLabel: string;
-  onlyRated: boolean;
-  onOnlyRatedChange: (value: boolean) => void;
   resultCount: number;
   resultLabelSingular: string;
   resultLabelPlural: string;
@@ -31,8 +29,6 @@ const WatchedToolbar = <T extends string>({
   onSortChange,
   sortOptions,
   sortAriaLabel,
-  onlyRated,
-  onOnlyRatedChange,
   resultCount,
   resultLabelSingular,
   resultLabelPlural,
@@ -91,19 +87,6 @@ const WatchedToolbar = <T extends string>({
           </button>
         ))}
       </div>
-
-      <button
-        type="button"
-        onClick={() => onOnlyRatedChange(!onlyRated)}
-        aria-pressed={onlyRated}
-        className={`shrink-0 rounded-2xl border px-3.5 py-2 text-xs font-semibold transition ${
-          onlyRated
-            ? "border-amber-400/50 bg-amber-400/15 text-amber-200"
-            : "border-white/10 bg-black/25 text-white/50 hover:text-white/80"
-        }`}
-      >
-        Só avaliados
-      </button>
 
       <span className="shrink-0 whitespace-nowrap text-xs font-medium tabular-nums text-white/40">
         {resultCount}{" "}

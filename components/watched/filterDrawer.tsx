@@ -1,16 +1,20 @@
 import React, { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import FilterChips from "./filterChips";
+import { RatingRangeFilter } from "../../hooks/useWatchedFilters";
+import FilterBar from "./filterBar";
 
 interface FilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  ratings: number[];
+  rating: RatingRangeFilter;
+  decade: number | null;
   directors: string[];
   providers: number[];
+  decadeOptions: number[];
   directorOptions: string[];
   showDirectors: boolean;
-  onRatingsChange: (value: number[]) => void;
+  onRatingChange: (value: RatingRangeFilter) => void;
+  onDecadeChange: (value: number | null) => void;
   onDirectorsChange: (value: string[]) => void;
   onProvidersChange: (value: number[]) => void;
   activeCount: number;
@@ -20,12 +24,15 @@ interface FilterDrawerProps {
 const FilterDrawer: React.FC<FilterDrawerProps> = ({
   isOpen,
   onClose,
-  ratings,
+  rating,
+  decade,
   directors,
   providers,
+  decadeOptions,
   directorOptions,
   showDirectors,
-  onRatingsChange,
+  onRatingChange,
+  onDecadeChange,
   onDirectorsChange,
   onProvidersChange,
   activeCount,
@@ -116,13 +123,16 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
                   </button>
                 </div>
 
-                <FilterChips
-                  ratings={ratings}
+                <FilterBar
+                  rating={rating}
+                  decade={decade}
                   directors={directors}
                   providers={providers}
+                  decadeOptions={decadeOptions}
                   directorOptions={directorOptions}
                   showDirectors={showDirectors}
-                  onRatingsChange={onRatingsChange}
+                  onRatingChange={onRatingChange}
+                  onDecadeChange={onDecadeChange}
                   onDirectorsChange={onDirectorsChange}
                   onProvidersChange={onProvidersChange}
                   className="mt-5"

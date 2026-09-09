@@ -2,6 +2,16 @@ import { useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/router";
 import type { ParsedUrlQuery } from "querystring";
 
+export type RatingRangeFilter = { min: number; max: number } | "none" | null;
+
+const RATING_MIN = 0.5;
+const RATING_MAX = 5;
+const RATING_STEP = 0.5;
+
+const isHalfStepValue = (value: number): boolean =>
+  Number.isFinite(value) &&
+  Math.abs(value / RATING_STEP - Math.round(value / RATING_STEP)) < 1e-9;
+
 const parseNumbers = (value: string | string[] | undefined): number[] => {
   if (typeof value !== "string" || value.length === 0) return [];
   return value
@@ -15,13 +25,49 @@ const parseStrings = (value: string | string[] | undefined): string[] => {
   return value.split(",").filter((item) => item.length > 0);
 };
 
+const parseRating = (
+  value: string | string[] | undefined,
+): RatingRangeFilter => {
+  if (typeof value !== "string" || value.length === 0) return null;
+  if (value === "none") return "none";
+
+  const match = /^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/.exec(value);
+  if (!match) return null;
+
+  const min = Number.parseFloat(match[1]);
+  const max = Number.parseFloat(match[2]);
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return null;
+  if (min > max) return null;
+  if (min < RATING_MIN || max > RATING_MAX) return null;
+  if (!isHalfStepValue(min) || !isHalfStepValue(max)) return null;
+
+  return { min, max };
+};
+
+const formatRating = (value: RatingRangeFilter): string | undefined => {
+  if (value === null) return undefined;
+  if (value === "none") return "none";
+  return `${value.min}-${value.max}`;
+};
+
+const parseDecade = (value: string | string[] | undefined): number | null => {
+  if (typeof value !== "string" || value.length === 0) return null;
+  const decade = Number.parseInt(value, 10);
+  if (!Number.isInteger(decade) || decade % 10 !== 0) return null;
+  return decade;
+};
+
 export const useWatchedFilters = () => {
   const router = useRouter();
   const pendingQueryRef = useRef<ParsedUrlQuery | null>(null);
 
-  const ratings = useMemo(
-    () => parseNumbers(router.query.ratings),
-    [router.query.ratings],
+  const rating = useMemo(
+    () => parseRating(router.query.rating),
+    [router.query.rating],
+  );
+  const decade = useMemo(
+    () => parseDecade(router.query.decade),
+    [router.query.decade],
   );
   const directors = useMemo(
     () => parseStrings(router.query.directors),
@@ -52,10 +98,19 @@ export const useWatchedFilters = () => {
     [router],
   );
 
-  const activeCount = ratings.length + directors.length + providers.length;
+  const activeCount =
+    (rating !== null ? 1 : 0) +
+    (decade !== null ? 1 : 0) +
+    directors.length +
+    providers.length;
 
-  const setRatings = useCallback(
-    (value: number[]) => replaceQuery({ ratings: value.join(",") }),
+  const setRating = useCallback(
+    (value: RatingRangeFilter) => replaceQuery({ rating: formatRating(value) }),
+    [replaceQuery],
+  );
+  const setDecade = useCallback(
+    (value: number | null) =>
+      replaceQuery({ decade: value === null ? undefined : String(value) }),
     [replaceQuery],
   );
   const setDirectors = useCallback(
@@ -69,18 +124,22 @@ export const useWatchedFilters = () => {
   const clearAll = useCallback(
     () =>
       replaceQuery({
-        ratings: undefined,
+        rating: undefined,
+        decade: undefined,
         directors: undefined,
         providers: undefined,
+        ratings: undefined,
       }),
     [replaceQuery],
   );
 
   return {
-    ratings,
+    rating,
+    decade,
     directors,
     providers,
-    setRatings,
+    setRating,
+    setDecade,
     setDirectors,
     setProviders,
     activeCount,
