@@ -31,7 +31,9 @@ function RouteProgressBar() {
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
 
-    const handleStart = () => {
+    const handleStart = (_url: string, options?: { shallow?: boolean }) => {
+      clearTimeout(timeoutId);
+      if (options?.shallow) return;
       timeoutId = setTimeout(() => setIsNavigating(true), ROUTE_CHANGE_DELAY);
     };
 
