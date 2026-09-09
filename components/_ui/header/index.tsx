@@ -33,7 +33,6 @@ const Header = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,17 +64,16 @@ const Header = () => {
   }, [isDropdownOpen]);
 
   useEffect(() => {
-    const shouldLock = isMenuOpen || isMobileSearchOpen;
+    const shouldLock = isMenuOpen;
     document.body.style.overflow = shouldLock ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isMenuOpen, isMobileSearchOpen]);
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const closeOverlays = () => {
       setIsMenuOpen(false);
-      setIsMobileSearchOpen(false);
       setIsDropdownOpen(false);
     };
 
@@ -87,7 +85,6 @@ const Header = () => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       setIsMenuOpen(false);
-      setIsMobileSearchOpen(false);
       setIsDropdownOpen(false);
     };
 
@@ -113,9 +110,9 @@ const Header = () => {
     setIsLogoutModalOpen(true);
   }, []);
 
-  const toggleMobileSearch = () => {
+  const goToMobileSearch = () => {
     setIsMenuOpen(false);
-    setIsMobileSearchOpen((previous) => !previous);
+    router.push("/busca");
   };
 
   const handleLogoutConfirm = () => {
@@ -126,7 +123,6 @@ const Header = () => {
   const handleMobileAccountClick = () => {
     if (isAuthenticated) {
       setIsMenuOpen((previous) => !previous);
-      setIsMobileSearchOpen(false);
       return;
     }
     openLogin();
@@ -139,7 +135,7 @@ const Header = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-ios ${
-          isScrolled || isMenuOpen || isMobileSearchOpen
+          isScrolled || isMenuOpen
             ? "border-b border-white/[0.07] bg-[#05050c]/80 backdrop-blur-2xl backdrop-saturate-150"
             : "border-b border-transparent bg-gradient-to-b from-[#05050c]/90 to-transparent"
         }`}
@@ -168,15 +164,17 @@ const Header = () => {
             </ul>
           </nav>
 
-          <div className="ml-auto hidden min-w-0 flex-1 justify-end lg:flex">
-            <div className="w-full max-w-md">
-              <SearchBar
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-                isExpanded={isSearchFocused}
-              />
+          {router.pathname !== "/busca" && (
+            <div className="ml-auto hidden min-w-0 flex-1 justify-end lg:flex">
+              <div className="w-full max-w-md">
+                <SearchBar
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
+                  isExpanded={isSearchFocused}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
             {authLoading ? (
@@ -299,26 +297,6 @@ const Header = () => {
             )}
           </div>
         </div>
-
-        <AnimatePresence>
-          {isMobileSearchOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-              className="border-t border-white/[0.06] bg-[#05050c]/95 px-4 pb-4 pt-3 backdrop-blur-2xl lg:hidden"
-            >
-              <SearchBar
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-                isExpanded
-                isMobile
-                autoFocus
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.header>
 
       <AnimatePresence>
@@ -346,9 +324,9 @@ const Header = () => {
 
       <MobileTabBar
         isAuthenticated={isAuthenticated}
-        onSearchClick={toggleMobileSearch}
+        onSearchClick={goToMobileSearch}
         onAccountClick={handleMobileAccountClick}
-        isSearchOpen={isMobileSearchOpen}
+        isSearchOpen={router.pathname === "/busca"}
         isMenuOpen={isMenuOpen}
       />
 
