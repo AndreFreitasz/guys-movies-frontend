@@ -6,9 +6,11 @@ import { FaStar, FaPlay } from "react-icons/fa";
 interface MovieCardProps {
   id: number;
   title: string;
-  poster_path: string;
+  poster_path?: string;
+  posterUrl?: string;
   overview: string;
   vote_average: number;
+  href?: string;
 }
 
 const POSTER_BASE_URL = "https://image.tmdb.org/t/p/w342";
@@ -24,15 +26,17 @@ const MovieCard: React.FC<MovieCardProps> = ({
   id,
   title,
   poster_path,
+  posterUrl: posterUrlProp,
   overview,
   vote_average,
+  href,
 }) => {
-  const posterUrl = poster_path
-    ? `${POSTER_BASE_URL}${poster_path}`
-    : FALLBACK_POSTER;
+  const posterUrl =
+    posterUrlProp ??
+    (poster_path ? `${POSTER_BASE_URL}${poster_path}` : FALLBACK_POSTER);
 
   return (
-    <Link href={`/movie/${id}`} prefetch={false} className="block">
+    <Link href={href ?? `/movie/${id}`} prefetch={false} className="block">
       <motion.article
         whileHover={{ y: -8, scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
