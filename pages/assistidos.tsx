@@ -169,6 +169,8 @@ const WatchedPage = () => {
 
   const [data, setData] = useState<WatchedMovieList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const hasMovieDataRef = useRef(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<WatchedSortKey>("recent");
@@ -176,6 +178,8 @@ const WatchedPage = () => {
 
   const [serieData, setSerieData] = useState<WatchedSerieList | null>(null);
   const [isSerieLoading, setIsSerieLoading] = useState(false);
+  const [isSerieRefreshing, setIsSerieRefreshing] = useState(false);
+  const hasSerieDataRef = useRef(false);
   const [serieError, setSerieError] = useState("");
   const [serieQuery, setSerieQuery] = useState("");
   const [serieSortKey, setSerieSortKey] =
@@ -220,7 +224,8 @@ const WatchedPage = () => {
   );
 
   const fetchWatched = useCallback(async () => {
-    setIsLoading(true);
+    if (hasMovieDataRef.current) setIsRefreshing(true);
+    else setIsLoading(true);
     setError("");
 
     try {
@@ -231,10 +236,12 @@ const WatchedPage = () => {
       if (!response.ok) throw new Error("Falha ao carregar a lista");
 
       setData((await response.json()) as WatchedMovieList);
+      hasMovieDataRef.current = true;
     } catch {
       setError("Não foi possível carregar seus filmes assistidos.");
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   }, [providerQuery]);
 
@@ -250,7 +257,8 @@ const WatchedPage = () => {
   }, [authLoading, fetchWatched, user]);
 
   const fetchWatchedSeries = useCallback(async () => {
-    setIsSerieLoading(true);
+    if (hasSerieDataRef.current) setIsSerieRefreshing(true);
+    else setIsSerieLoading(true);
     setSerieError("");
 
     try {
@@ -259,10 +267,12 @@ const WatchedPage = () => {
       );
       if (!response.ok) throw new Error("Falha ao carregar a lista");
       setSerieData((await response.json()) as WatchedSerieList);
+      hasSerieDataRef.current = true;
     } catch {
       setSerieError("Não foi possível carregar suas séries assistidas.");
     } finally {
       setIsSerieLoading(false);
+      setIsSerieRefreshing(false);
     }
   }, [providerQuery]);
 
@@ -740,7 +750,10 @@ const WatchedPage = () => {
           {!isLoading && !error && visibleMovies.length > 0 && (
             <motion.div
               layout
-              className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 xl:grid-cols-6"
+              aria-busy={isRefreshing}
+              className={`grid grid-cols-2 gap-4 transition-opacity duration-200 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 xl:grid-cols-6 ${
+                isRefreshing ? "opacity-50" : "opacity-100"
+              }`}
             >
               <AnimatePresence mode="popLayout">
                 {visibleMovies.map((movie, index) => (
@@ -951,7 +964,10 @@ const WatchedPage = () => {
           {!isSerieLoading && !serieError && visibleSeries.length > 0 && (
             <motion.div
               layout
-              className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 xl:grid-cols-6"
+              aria-busy={isSerieRefreshing}
+              className={`grid grid-cols-2 gap-4 transition-opacity duration-200 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 xl:grid-cols-6 ${
+                isSerieRefreshing ? "opacity-50" : "opacity-100"
+              }`}
             >
               <AnimatePresence mode="popLayout">
                 {visibleSeries.map((serie, index) => (

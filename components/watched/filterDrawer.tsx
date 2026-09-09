@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { RatingRangeFilter } from "../../hooks/useWatchedFilters";
-import FilterBar from "./filterBar";
+import FilterSheet from "./filterSheet";
 
 interface FilterDrawerProps {
   isOpen: boolean;
@@ -123,20 +123,21 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
                   </button>
                 </div>
 
-                <FilterBar
-                  rating={rating}
-                  decade={decade}
-                  directors={directors}
-                  providers={providers}
-                  decadeOptions={decadeOptions}
-                  directorOptions={directorOptions}
-                  showDirectors={showDirectors}
-                  onRatingChange={onRatingChange}
-                  onDecadeChange={onDecadeChange}
-                  onDirectorsChange={onDirectorsChange}
-                  onProvidersChange={onProvidersChange}
-                  className="mt-5"
-                />
+                <div className="mt-5">
+                  <FilterSheet
+                    rating={rating}
+                    decade={decade}
+                    directors={directors}
+                    providers={providers}
+                    decadeOptions={decadeOptions}
+                    directorOptions={directorOptions}
+                    showDirectors={showDirectors}
+                    onRatingChange={onRatingChange}
+                    onDecadeChange={onDecadeChange}
+                    onDirectorsChange={onDirectorsChange}
+                    onProvidersChange={onProvidersChange}
+                  />
+                </div>
 
                 <div className="mt-6 flex items-center justify-between gap-3">
                   <button
@@ -152,7 +153,7 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
                     onClick={onClose}
                     className="rounded-2xl px-6 py-2.5 text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 active:translate-y-0 active:scale-[0.96]"
                   >
-                    Aplicar
+                    Ver resultados
                   </button>
                 </div>
               </div>
