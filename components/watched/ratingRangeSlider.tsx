@@ -7,6 +7,7 @@ export interface RatingRange {
 }
 
 interface RatingRangeSliderProps {
+  starClass?: string;
   value: RatingRange | null;
   onChange: (value: RatingRange) => void;
 }
@@ -30,6 +31,7 @@ const valueFromClientX = (clientX: number, rect: DOMRect): number => {
 const RatingRangeSlider: React.FC<RatingRangeSliderProps> = ({
   value,
   onChange,
+  starClass = "h-7 w-7",
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const anchorRef = useRef<number | null>(null);
@@ -184,13 +186,13 @@ const RatingRangeSlider: React.FC<RatingRangeSliderProps> = ({
       onKeyDown={handleKeyDown}
       className="relative inline-block w-max cursor-pointer touch-none select-none leading-none outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a16]"
     >
-      <StarRow dimension="h-7 w-7" tone="text-white/15" />
+      <StarRow dimension={starClass} tone="text-white/15" />
       {displayValue && (
         <span
           className="absolute inset-0"
           style={{ clipPath: `inset(0 ${rightInset}% 0 ${leftInset}%)` }}
         >
-          <StarRow dimension="h-7 w-7" tone="text-amber-400" />
+          <StarRow dimension={starClass} tone="text-amber-400" />
         </span>
       )}
     </div>
