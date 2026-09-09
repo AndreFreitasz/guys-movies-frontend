@@ -3,10 +3,15 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { authFetch } from "../../utils/authFetch";
+import { useAuth } from "../../hooks/authContext";
 import { useWatchedSeasons } from "../../hooks/useWatchedSeasons";
 import SeasonChecklist, { SeasonOption } from "../series/seasonChecklist";
 import { WatchedSerieItem } from "../../interfaces/watched/serieTypes";
 import { SerieSeason } from "../../interfaces/series/types";
+import {
+  WatchProviderOption,
+  WatchSourceValue,
+} from "../../constants/watchProviders";
 import RatingStars from "./ratingStars";
 import WatchedDateForm from "./watchedDateForm";
 
@@ -45,12 +50,16 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
   serie,
   onProgressChange,
 }) => {
+  const { user, authLoading } = useAuth();
   const [isEditingDate, setIsEditingDate] = useState(false);
   const [isUpdatingDate, setIsUpdatingDate] = useState(false);
   const [seasonOptions, setSeasonOptions] = useState<SeasonOption[]>([]);
   const [seasonsStatus, setSeasonsStatus] = useState<
     "loading" | "error" | "ready"
   >("loading");
+  const [flatrateProviders, setFlatrateProviders] = useState<
+    WatchProviderOption[]
+  >([]);
   const [reloadSeasonsToken, setReloadSeasonsToken] = useState(0);
   const isFirstProgressRef = useRef(true);
 
@@ -93,6 +102,14 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
             airDate: season.air_date,
             posterPath: season.poster_path,
           })),
+        );
+        setFlatrateProviders(
+          (data.providers?.flatrate ?? []).map(
+            (provider: { id_provider: number; provider_name: string }) => ({
+              id: provider.id_provider,
+              name: provider.provider_name,
+            }),
+          ),
         );
         setSeasonsStatus("ready");
       })
@@ -151,6 +168,43 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
     [buildPayload, reload, serie.idTmdb],
   );
 
+  const requireUser = useCallback(() => {
+    if (authLoading) return false;
+    if (!user) {
+      toast.warn("Entre em uma conta para declarar onde você assistiu.");
+      return false;
+    }
+    return true;
+  }, [authLoading, user]);
+
+  const saveWatchSource = useCallback(
+    async (watchSource: WatchSourceValue | null, providerId: number | null) => {
+      if (!requireUser()) return;
+
+      try {
+        const response = await authFetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/watchSource/${serie.idTmdb}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(
+              watchSource === "streaming"
+                ? { watchSource, providerId }
+                : { watchSource },
+            ),
+          },
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
+
+        toast.success("Atualizamos onde você assistiu.");
+      } catch {
+        toast.error("Erro ao salvar onde você assistiu.");
+      }
+    },
+    [requireUser, serie.idTmdb],
+  );
+
   return (
     <div className="flex-1">
       <p className="text-xs font-semibold uppercase tracking-[0.28em] text-indigo-300">
@@ -182,8 +236,16 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
               key={completedAt ?? "empty"}
               initialDate={completedAt}
               mode="edit"
+              availableProviders={flatrateProviders}
+              initialWatchSource={serie.watchSource}
+              initialProviderId={serie.providerId}
               loading={isUpdatingDate}
-              onSubmit={handleCompletedAtSubmit}
+              onSubmit={(isoDate, watchSource, providerId) => {
+                handleCompletedAtSubmit(isoDate);
+                if (watchSource !== undefined) {
+                  saveWatchSource(watchSource, providerId);
+                }
+              }}
             />
           </div>
         ) : (

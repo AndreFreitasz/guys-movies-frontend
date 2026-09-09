@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 import Footer from "../../components/_ui/footer";
 import Header from "../../components/_ui/header";
@@ -26,6 +27,11 @@ import SeasonChecklist, {
 import { useWatchedMedia } from "../../hooks/useWatchedMedia";
 import { useWatchedSeasons } from "../../hooks/useWatchedSeasons";
 import { SerieResponse } from "../../interfaces/series/types";
+import {
+  WatchProviderOption,
+  WatchSourceValue,
+} from "../../constants/watchProviders";
+import { authFetch } from "../../utils/authFetch";
 import { setPublicCache } from "../../utils/httpCache";
 
 interface SerieProps {
@@ -129,6 +135,43 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     setDateMode("edit");
     setIsModalOpen(true);
   }, []);
+
+  const availableProviders = useMemo<WatchProviderOption[]>(
+    () =>
+      (serie.providers?.flatrate ?? []).map((provider) => ({
+        id: provider.id_provider,
+        name: provider.provider_name,
+      })),
+    [serie.providers?.flatrate],
+  );
+
+  const saveWatchSource = useCallback(
+    async (watchSource: WatchSourceValue | null, providerId: number | null) => {
+      if (!requireUser()) return;
+
+      try {
+        const response = await authFetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/watchedSerie/watchSource/${serie.id}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(
+              watchSource === "streaming"
+                ? { watchSource, providerId }
+                : { watchSource },
+            ),
+          },
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
+
+        toast.success("Atualizamos onde você assistiu.");
+      } catch {
+        toast.error("Erro ao salvar onde você assistiu.");
+      }
+    },
+    [requireUser, serie.id],
+  );
 
   const formattedDate = useMemo(() => {
     if (!serie.first_air_date) {
@@ -277,14 +320,18 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
         <WatchedDateForm
           initialDate={dateMode === "edit" ? watchedAt : null}
           mode={dateMode}
+          availableProviders={availableProviders}
           loading={watchedLoading}
-          onSubmit={(isoDate) => {
+          onSubmit={async (isoDate, watchSource, providerId) => {
             setIsModalOpen(false);
             if (dateMode === "edit") {
-              updateWatchedDate(isoDate);
-              return;
+              await updateWatchedDate(isoDate);
+            } else {
+              await toggleWatched(isoDate);
             }
-            toggleWatched(isoDate);
+            if (watchSource !== undefined) {
+              saveWatchSource(watchSource, providerId);
+            }
           }}
           onClear={() => {
             setIsModalOpen(false);
