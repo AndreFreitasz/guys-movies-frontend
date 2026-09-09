@@ -5,11 +5,15 @@ import Header from "../components/_ui/header";
 import Footer from "../components/_ui/footer";
 import CatalogErrorState from "../components/_ui/catalogErrorState";
 import MovieCard from "../components/home/movieCard";
-import SearchResultGrid from "../components/search/searchResultGrid";
+import SearchResultGrid, {
+  getLibraryBadgeKind,
+  LibraryBadge,
+} from "../components/search/searchResultGrid";
 import SearchTypeFilter, {
   SearchTypeFilterValue,
 } from "../components/search/searchTypeFilter";
 import { useSearch } from "../hooks/useSearch";
+import { useUserLibrary } from "../hooks/useUserLibrary";
 
 interface PopularMovie {
   id: number;
@@ -43,6 +47,8 @@ const Busca: React.FC = () => {
   const [popularReloadToken, setPopularReloadToken] = useState(0);
 
   const { results, isSearching, error, retry } = useSearch(term);
+  const { watchedMovies, watchedSeries, watchlistMovies, watchlistSeries } =
+    useUserLibrary();
 
   useEffect(() => {
     if (!router.isReady || isReady) return;
@@ -190,7 +196,17 @@ const Busca: React.FC = () => {
             ) : (
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
                 {popularMovies.map((movie) => (
-                  <MovieCard key={movie.id} {...movie} />
+                  <div key={movie.id} className="relative isolate">
+                    <LibraryBadge
+                      kind={getLibraryBadgeKind(movie.id, "movie", {
+                        watchedMovies,
+                        watchedSeries,
+                        watchlistMovies,
+                        watchlistSeries,
+                      })}
+                    />
+                    <MovieCard {...movie} />
+                  </div>
                 ))}
               </div>
             )}
@@ -204,7 +220,13 @@ const Busca: React.FC = () => {
             outro termo ou confira a grafia.
           </p>
         ) : (
-          <SearchResultGrid results={visible} />
+          <SearchResultGrid
+            results={visible}
+            watchedMovies={watchedMovies}
+            watchedSeries={watchedSeries}
+            watchlistMovies={watchlistMovies}
+            watchlistSeries={watchlistSeries}
+          />
         )}
       </main>
 
