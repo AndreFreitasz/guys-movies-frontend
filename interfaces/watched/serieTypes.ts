@@ -1,3 +1,5 @@
+import { WatchSourceValue } from "../../constants/watchProviders";
+
 export interface WatchedSerieItem {
   idTmdb: number;
   name: string | null;
@@ -13,6 +15,8 @@ export interface WatchedSerieItem {
   watchedSeasons: number;
   watchedEpisodes: number;
   episodeRunTime: number | null;
+  providerId: number | null;
+  watchSource: WatchSourceValue | null;
 }
 
 export interface WatchedSerieStats {
@@ -29,6 +33,7 @@ export interface WatchedSerieStats {
 export interface WatchedSerieList {
   items: WatchedSerieItem[];
   stats: WatchedSerieStats;
+  availabilityFailed: boolean;
 }
 
 export type WatchedSerieSortKey = "recent" | "rating" | "title" | "progress";

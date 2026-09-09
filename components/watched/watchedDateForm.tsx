@@ -1,13 +1,25 @@
 import React, { useState } from "react";
 import Input from "../_ui/form/input";
+import WatchSourceSelect, { WatchSourceValueState } from "./watchSourceSelect";
+import {
+  WatchProviderOption,
+  WatchSourceValue,
+} from "../../constants/watchProviders";
 
 export type WatchedDateFormMode = "create" | "edit";
 
 interface WatchedDateFormProps {
   initialDate: string | null;
   mode: WatchedDateFormMode;
+  availableProviders: WatchProviderOption[];
+  initialWatchSource?: WatchSourceValue | null;
+  initialProviderId?: number | null;
   loading?: boolean;
-  onSubmit: (isoDate: string) => void;
+  onSubmit: (
+    isoDate: string,
+    watchSource: WatchSourceValue | null | undefined,
+    providerId: number | null,
+  ) => void;
   onClear?: () => void;
 }
 
@@ -21,18 +33,31 @@ const toInputValue = (value: string | null): string => {
 const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
   initialDate,
   mode,
+  availableProviders,
+  initialWatchSource,
+  initialProviderId,
   loading,
   onSubmit,
   onClear,
 }) => {
   const [date, setDate] = useState(() => toInputValue(initialDate));
+  const [watchSourceValue, setWatchSourceValue] =
+    useState<WatchSourceValueState>({
+      watchSource: initialWatchSource ?? null,
+      providerId: initialProviderId ?? null,
+    });
+  const [watchSourceTouched, setWatchSourceTouched] = useState(false);
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
         if (!date) return;
-        onSubmit(new Date(`${date}T00:00:00`).toISOString());
+        onSubmit(
+          new Date(`${date}T00:00:00`).toISOString(),
+          watchSourceTouched ? watchSourceValue.watchSource : undefined,
+          watchSourceTouched ? watchSourceValue.providerId : null,
+        );
       }}
       className="flex flex-col gap-5"
     >
@@ -49,6 +74,15 @@ const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
         max={new Date().toISOString().slice(0, 10)}
         onChange={(event) => setDate(event.target.value)}
         className="font-medium"
+      />
+
+      <WatchSourceSelect
+        availableProviders={availableProviders}
+        value={watchSourceValue}
+        onChange={(value) => {
+          setWatchSourceTouched(true);
+          setWatchSourceValue(value);
+        }}
       />
 
       <button

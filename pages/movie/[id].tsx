@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 import Footer from "../../components/_ui/footer";
 import Header from "../../components/_ui/header";
@@ -22,6 +23,11 @@ import {
 } from "../../components/mediaDetails";
 import { useWatchedMedia } from "../../hooks/useWatchedMedia";
 import { MovieResponse } from "../../interfaces/movie/types";
+import {
+  WatchProviderOption,
+  WatchSourceValue,
+} from "../../constants/watchProviders";
+import { authFetch } from "../../utils/authFetch";
 import { setPublicCache } from "../../utils/httpCache";
 
 interface MovieProps {
@@ -105,6 +111,43 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     setIsModalOpen(true);
   }, []);
 
+  const availableProviders = useMemo<WatchProviderOption[]>(
+    () =>
+      (movie.providers?.flatrate ?? []).map((provider) => ({
+        id: provider.id_provider,
+        name: provider.provider_name,
+      })),
+    [movie.providers?.flatrate],
+  );
+
+  const saveWatchSource = useCallback(
+    async (watchSource: WatchSourceValue | null, providerId: number | null) => {
+      if (!requireUser()) return;
+
+      try {
+        const response = await authFetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/watchedMovie/watchSource/${movie.id}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(
+              watchSource === "streaming"
+                ? { watchSource, providerId }
+                : { watchSource },
+            ),
+          },
+        );
+
+        if (!response.ok) throw new Error("Requisição rejeitada");
+
+        toast.success("Atualizamos onde você assistiu.");
+      } catch {
+        toast.error("Erro ao salvar onde você assistiu.");
+      }
+    },
+    [movie.id, requireUser],
+  );
+
   const formattedDate = useMemo(() => {
     const date = new Date(movie.release_date);
     if (Number.isNaN(date.getTime())) {
@@ -171,6 +214,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
               badgeLabel="Filme"
               title={movie.title}
               voteAverage={movie.vote_average}
+              mediaId={movie.id}
             />
           }
           actions={
@@ -233,14 +277,18 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
         <WatchedDateForm
           initialDate={dateMode === "edit" ? watchedAt : null}
           mode={dateMode}
+          availableProviders={availableProviders}
           loading={watchedLoading}
-          onSubmit={(isoDate) => {
+          onSubmit={async (isoDate, watchSource, providerId) => {
             setIsModalOpen(false);
             if (dateMode === "edit") {
-              updateWatchedDate(isoDate);
-              return;
+              await updateWatchedDate(isoDate);
+              if (watchSource !== undefined) {
+                saveWatchSource(watchSource, providerId);
+              }
+            } else {
+              await toggleWatched(isoDate, watchSource, providerId);
             }
-            toggleWatched(isoDate);
           }}
           onClear={() => {
             setIsModalOpen(false);
