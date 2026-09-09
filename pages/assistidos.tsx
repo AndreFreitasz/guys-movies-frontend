@@ -21,10 +21,13 @@ import WatchedToolbar, {
 } from "../components/watched/watchedToolbar";
 import WatchedDetailSheet from "../components/watched/watchedDetailSheet";
 import WatchedSerieSheet from "../components/watched/watchedSerieSheet";
-import FilterChips from "../components/watched/filterChips";
+import FilterBar from "../components/watched/filterBar";
 import FilterDrawer from "../components/watched/filterDrawer";
 import { useAuth } from "../hooks/authContext";
-import { useWatchedFilters } from "../hooks/useWatchedFilters";
+import {
+  RatingRangeFilter,
+  useWatchedFilters,
+} from "../hooks/useWatchedFilters";
 import { authFetch } from "../utils/authFetch";
 import {
   WatchedMovieItem,
@@ -111,6 +114,32 @@ const sortSeries = (
   }
 };
 
+const getDecadeFromDate = (dateStr: string | null): number | null => {
+  if (!dateStr) return null;
+  const year = new Date(dateStr).getFullYear();
+  if (!Number.isFinite(year)) return null;
+  return Math.floor(year / 10) * 10;
+};
+
+const matchesRating = (
+  itemRating: number | null,
+  filter: RatingRangeFilter,
+): boolean => {
+  if (filter === null) return true;
+  if (filter === "none") return itemRating === null;
+  if (itemRating === null) return false;
+  return itemRating >= filter.min && itemRating <= filter.max;
+};
+
+const collectDecades = (dates: (string | null)[]): number[] => {
+  const decades = new Set<number>();
+  dates.forEach((date) => {
+    const decade = getDecadeFromDate(date);
+    if (decade !== null) decades.add(decade);
+  });
+  return Array.from(decades).sort((a, b) => b - a);
+};
+
 const formatRuntime = (minutes: number): string => {
   if (!minutes) return "—";
   const days = Math.floor(minutes / 1440);
@@ -162,10 +191,12 @@ const WatchedPage = () => {
   const closeFilterDrawer = useCallback(() => setIsFilterDrawerOpen(false), []);
 
   const {
-    ratings,
+    rating,
+    decade,
     directors,
     providers,
-    setRatings,
+    setRating,
+    setDecade,
     setDirectors,
     setProviders,
     activeCount: rawActiveCount,
@@ -262,6 +293,16 @@ const WatchedPage = () => {
     return Array.from(names).sort((a, b) => a.localeCompare(b, "pt-BR"));
   }, [data]);
 
+  const movieDecadeOptions = useMemo(
+    () => collectDecades((data?.items ?? []).map((item) => item.releaseDate)),
+    [data],
+  );
+  const serieDecadeOptions = useMemo(
+    () =>
+      collectDecades((serieData?.items ?? []).map((item) => item.firstAirDate)),
+    [serieData],
+  );
+
   const visibleMovies = useMemo(() => {
     if (!data) return [];
 
@@ -277,10 +318,11 @@ const WatchedPage = () => {
       );
     });
 
-    if (ratings.length > 0) {
+    filtered = filtered.filter((item) => matchesRating(item.rating, rating));
+
+    if (decade !== null) {
       filtered = filtered.filter(
-        (item) =>
-          item.rating != null && ratings.includes(Math.floor(item.rating)),
+        (item) => getDecadeFromDate(item.releaseDate) === decade,
       );
     }
 
@@ -291,7 +333,7 @@ const WatchedPage = () => {
     }
 
     return sortMovies(filtered, sortKey);
-  }, [data, directors, onlyRated, query, ratings, sortKey]);
+  }, [data, decade, directors, onlyRated, query, rating, sortKey]);
 
   const visibleSeries = useMemo(() => {
     if (!serieData) return [];
@@ -305,15 +347,16 @@ const WatchedPage = () => {
       return serie.name?.toLowerCase().includes(normalizedQuery);
     });
 
-    if (ratings.length > 0) {
+    filtered = filtered.filter((item) => matchesRating(item.rating, rating));
+
+    if (decade !== null) {
       filtered = filtered.filter(
-        (item) =>
-          item.rating != null && ratings.includes(Math.floor(item.rating)),
+        (item) => getDecadeFromDate(item.firstAirDate) === decade,
       );
     }
 
     return sortSeries(filtered, serieSortKey);
-  }, [ratings, serieData, serieOnlyRated, serieQuery, serieSortKey]);
+  }, [decade, rating, serieData, serieOnlyRated, serieQuery, serieSortKey]);
 
   const showSerieRuntimeCard = !serieData || serieData.stats.runtimeMinutes > 0;
   const serieStatsGridClass = showSerieRuntimeCard
@@ -593,13 +636,16 @@ const WatchedPage = () => {
                   filtersReady ? "" : "invisible pointer-events-none"
                 }`}
               >
-                <FilterChips
-                  ratings={ratings}
+                <FilterBar
+                  rating={rating}
+                  decade={decade}
                   directors={directors}
                   providers={providers}
+                  decadeOptions={movieDecadeOptions}
                   directorOptions={directorOptions}
                   showDirectors
-                  onRatingsChange={setRatings}
+                  onRatingChange={setRating}
+                  onDecadeChange={setDecade}
                   onDirectorsChange={setDirectors}
                   onProvidersChange={setProviders}
                   className="hidden lg:flex"
@@ -800,13 +846,16 @@ const WatchedPage = () => {
                   filtersReady ? "" : "invisible pointer-events-none"
                 }`}
               >
-                <FilterChips
-                  ratings={ratings}
+                <FilterBar
+                  rating={rating}
+                  decade={decade}
                   directors={directors}
                   providers={providers}
+                  decadeOptions={serieDecadeOptions}
                   directorOptions={[]}
                   showDirectors={false}
-                  onRatingsChange={setRatings}
+                  onRatingChange={setRating}
+                  onDecadeChange={setDecade}
                   onDirectorsChange={setDirectors}
                   onProvidersChange={setProviders}
                   className="hidden lg:flex"
@@ -935,12 +984,17 @@ const WatchedPage = () => {
       <FilterDrawer
         isOpen={isFilterDrawerOpen}
         onClose={closeFilterDrawer}
-        ratings={ratings}
+        rating={rating}
+        decade={decade}
         directors={directors}
         providers={providers}
+        decadeOptions={
+          activeTab === "movies" ? movieDecadeOptions : serieDecadeOptions
+        }
         directorOptions={activeTab === "movies" ? directorOptions : []}
         showDirectors={activeTab === "movies"}
-        onRatingsChange={setRatings}
+        onRatingChange={setRating}
+        onDecadeChange={setDecade}
         onDirectorsChange={setDirectors}
         onProvidersChange={setProviders}
         activeCount={activeCount}

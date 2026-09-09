@@ -5,11 +5,11 @@ interface RatingStarsProps {
   size?: "sm" | "md";
 }
 
-const TOTAL_STARS = 5;
-const STAR_PATH =
+export const TOTAL_STARS = 5;
+export const STAR_PATH =
   "M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L1.5 7.7l5.9-.9z";
 
-const StarRow: React.FC<{ dimension: string; tone: string }> = ({
+export const StarRow: React.FC<{ dimension: string; tone: string }> = ({
   dimension,
   tone,
 }) => (
