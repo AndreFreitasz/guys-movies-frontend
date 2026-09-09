@@ -164,15 +164,17 @@ const Header = () => {
             </ul>
           </nav>
 
-          <div className="ml-auto hidden min-w-0 flex-1 justify-end lg:flex">
-            <div className="w-full max-w-md">
-              <SearchBar
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-                isExpanded={isSearchFocused}
-              />
+          {router.pathname !== "/busca" && (
+            <div className="ml-auto hidden min-w-0 flex-1 justify-end lg:flex">
+              <div className="w-full max-w-md">
+                <SearchBar
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
+                  isExpanded={isSearchFocused}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
             {authLoading ? (

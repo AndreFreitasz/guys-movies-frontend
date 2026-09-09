@@ -62,6 +62,15 @@ const Busca: React.FC = () => {
   }, [router.isReady, router.query.q, isReady]);
 
   useEffect(() => {
+    if (!isReady) return;
+
+    const queryValue = router.query.q;
+    const urlTerm = typeof queryValue === "string" ? queryValue : "";
+
+    setTerm((currentTerm) => (currentTerm === urlTerm ? currentTerm : urlTerm));
+  }, [isReady, router.query.q]);
+
+  useEffect(() => {
     if (isReady && autoFocusEnabled) inputRef.current?.focus();
   }, [isReady, autoFocusEnabled]);
 
