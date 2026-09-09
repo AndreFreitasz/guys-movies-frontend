@@ -38,13 +38,13 @@ const CircularVoteAverage: React.FC<CircularVoteAverageProps> = ({
 
   return (
     <div
-      className={
+      className={`relative shrink-0 [&_.CircularProgressbar]:h-full [&_.CircularProgressbar]:w-full ${
         compact
-          ? styles.circularProgressbarContainerCompact
-          : styles.circularProgressbarContainer
-      }
+          ? `h-11 w-11 sm:h-[3.75rem] sm:w-[3.75rem] ${styles.circularProgressbarContainerCompact}`
+          : `h-[3.75rem] w-[3.75rem] ${styles.circularProgressbarContainer}`
+      }`}
     >
-      <svg style={{ height: 2 }}>
+      <svg aria-hidden style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
           <linearGradient id={greenId} gradientTransform="rotate(90)">
             <stop offset="0%" stopColor="#3f6212" />
