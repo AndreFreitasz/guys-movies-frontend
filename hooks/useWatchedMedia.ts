@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { authFetch } from "../utils/authFetch";
 import { useAuth } from "./authContext";
+import { WatchSourceValue } from "../constants/watchProviders";
 
 export type WatchedMediaKind = "movie" | "serie";
 
@@ -97,18 +98,31 @@ export const useWatchedMedia = ({
   }, [authLoading, loadState, user]);
 
   const toggleWatched = useCallback(
-    async (watchedAtIso: string) => {
+    async (
+      watchedAtIso: string,
+      watchSource?: WatchSourceValue | null,
+      providerId?: number | null,
+    ) => {
       if (!requireUser()) return;
 
       setWatchedLoading(true);
 
       try {
+        const basePayload = buildPayload() as Record<string, unknown>;
+        const createPayload = watchSource
+          ? {
+              ...basePayload,
+              watchSource,
+              providerId: providerId ?? undefined,
+            }
+          : basePayload;
+
         const response = await authFetch(apiUrl(resource.watched), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             watchedAt: watchedAtIso,
-            [resource.payloadKey]: buildPayload(),
+            [resource.payloadKey]: createPayload,
           }),
         });
 

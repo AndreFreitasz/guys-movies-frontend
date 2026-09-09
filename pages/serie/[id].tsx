@@ -326,11 +326,11 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
             setIsModalOpen(false);
             if (dateMode === "edit") {
               await updateWatchedDate(isoDate);
+              if (watchSource !== undefined) {
+                saveWatchSource(watchSource, providerId);
+              }
             } else {
-              await toggleWatched(isoDate);
-            }
-            if (watchSource !== undefined) {
-              saveWatchSource(watchSource, providerId);
+              await toggleWatched(isoDate, watchSource, providerId);
             }
           }}
           onClear={() => {

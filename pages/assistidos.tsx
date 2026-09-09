@@ -168,10 +168,13 @@ const WatchedPage = () => {
     setRatings,
     setDirectors,
     setProviders,
-    activeCount,
+    activeCount: rawActiveCount,
     clearAll,
     isReady: filtersReady,
   } = useWatchedFilters();
+
+  const activeCount =
+    activeTab === "movies" ? rawActiveCount : rawActiveCount - directors.length;
 
   const providerQuery = providers.length
     ? `?providers=${providers.join(",")}`
@@ -277,7 +280,7 @@ const WatchedPage = () => {
     if (ratings.length > 0) {
       filtered = filtered.filter(
         (item) =>
-          item.rating != null && ratings.includes(Math.round(item.rating)),
+          item.rating != null && ratings.includes(Math.floor(item.rating)),
       );
     }
 
@@ -305,7 +308,7 @@ const WatchedPage = () => {
     if (ratings.length > 0) {
       filtered = filtered.filter(
         (item) =>
-          item.rating != null && ratings.includes(Math.round(item.rating)),
+          item.rating != null && ratings.includes(Math.floor(item.rating)),
       );
     }
 

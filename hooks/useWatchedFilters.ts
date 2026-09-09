@@ -34,6 +34,8 @@ export const useWatchedFilters = () => {
 
   const replaceQuery = useCallback(
     (patch: Record<string, string | undefined>) => {
+      if (!router.isReady) return;
+
       const base = pendingQueryRef.current ?? router.query;
       const next: ParsedUrlQuery = { ...base, ...patch };
       Object.keys(next).forEach((key) => {

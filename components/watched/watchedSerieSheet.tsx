@@ -240,8 +240,8 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
               initialWatchSource={serie.watchSource}
               initialProviderId={serie.providerId}
               loading={isUpdatingDate}
-              onSubmit={(isoDate, watchSource, providerId) => {
-                handleCompletedAtSubmit(isoDate);
+              onSubmit={async (isoDate, watchSource, providerId) => {
+                await handleCompletedAtSubmit(isoDate);
                 if (watchSource !== undefined) {
                   saveWatchSource(watchSource, providerId);
                 }
