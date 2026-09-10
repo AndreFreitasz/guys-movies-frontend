@@ -89,7 +89,7 @@ export const useWatchedFilters = () => {
       });
       pendingQueryRef.current = next;
       void router
-        .replace({ query: next }, undefined, { shallow: true })
+        .replace({ query: next }, undefined, { shallow: true, scroll: false })
         .catch(() => {})
         .finally(() => {
           if (pendingQueryRef.current === next) pendingQueryRef.current = null;
