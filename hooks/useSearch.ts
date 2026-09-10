@@ -3,7 +3,7 @@ import { SearchResult } from "../interfaces/search/types";
 
 const DEBOUNCE_MS = 300;
 
-export const useSearch = (query: string) => {
+export const useSearch = (query: string, delayMs = DEBOUNCE_MS) => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState("");
@@ -50,9 +50,9 @@ export const useSearch = (query: string) => {
     setIsSearching(true);
     setError("");
 
-    const timeout = setTimeout(() => run(query), DEBOUNCE_MS);
+    const timeout = setTimeout(() => run(query), delayMs);
     return () => clearTimeout(timeout);
-  }, [query, run]);
+  }, [delayMs, query, run]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
 

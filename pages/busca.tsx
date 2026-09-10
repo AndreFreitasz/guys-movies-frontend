@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Header from "../components/_ui/header";
@@ -39,6 +45,7 @@ const Busca: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isReady, setIsReady] = useState(false);
   const [term, setTerm] = useState("");
+  const [submittedTerm, setSubmittedTerm] = useState("");
   const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
   const [typeFilter, setTypeFilter] = useState<SearchTypeFilterValue>("all");
   const [popularMovies, setPopularMovies] = useState<PopularMovie[]>([]);
@@ -46,7 +53,7 @@ const Busca: React.FC = () => {
   const [popularError, setPopularError] = useState(false);
   const [popularReloadToken, setPopularReloadToken] = useState(0);
 
-  const { results, isSearching, error, retry } = useSearch(term);
+  const { results, isSearching, error, retry } = useSearch(submittedTerm, 0);
   const { watchedMovies, watchedSeries, watchlistMovies, watchlistSeries } =
     useUserLibrary();
 
@@ -57,6 +64,7 @@ const Busca: React.FC = () => {
     const initialTerm = typeof queryValue === "string" ? queryValue : "";
 
     setTerm(initialTerm);
+    setSubmittedTerm(initialTerm);
     setAutoFocusEnabled(!queryValue);
     setIsReady(true);
   }, [router.isReady, router.query.q, isReady]);
@@ -68,20 +76,25 @@ const Busca: React.FC = () => {
     const urlTerm = typeof queryValue === "string" ? queryValue : "";
 
     setTerm((currentTerm) => (currentTerm === urlTerm ? currentTerm : urlTerm));
+    setSubmittedTerm((currentTerm) =>
+      currentTerm === urlTerm ? currentTerm : urlTerm,
+    );
   }, [isReady, router.query.q]);
 
   useEffect(() => {
     if (isReady && autoFocusEnabled) inputRef.current?.focus();
   }, [isReady, autoFocusEnabled]);
 
-  useEffect(() => {
-    if (!isReady) return;
+  const submitSearch = useCallback(
+    (value: string) => {
+      const trimmedTerm = value.trim();
 
-    const timeout = setTimeout(() => {
-      const trimmedTerm = term.trim();
+      setSubmittedTerm(trimmedTerm);
+
+      if (!isReady) return;
+
       const currentTerm =
         typeof router.query.q === "string" ? router.query.q : "";
-
       if (trimmedTerm === currentTerm) return;
 
       router.replace(
@@ -92,10 +105,9 @@ const Busca: React.FC = () => {
         undefined,
         { shallow: true, scroll: false },
       );
-    }, URL_SYNC_DEBOUNCE_MS);
-
-    return () => clearTimeout(timeout);
-  }, [term, isReady]);
+    },
+    [isReady, router],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -140,7 +152,7 @@ const Busca: React.FC = () => {
     [results],
   );
 
-  const hasTerm = term.trim().length > 0;
+  const hasTerm = submittedTerm.length > 0;
   const showResting = !hasTerm && !isSearching;
   const showEmpty = hasTerm && !isSearching && !error && results.length === 0;
 
@@ -167,17 +179,27 @@ const Busca: React.FC = () => {
           </h1>
         </header>
 
-        <div className="relative mb-5 max-w-xl">
+        <form
+          role="search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            submitSearch(term);
+            inputRef.current?.blur();
+          }}
+          className="relative mb-5 max-w-xl"
+        >
           <input
             ref={inputRef}
-            type="text"
+            type="search"
+            enterKeyHint="search"
             value={term}
             onChange={(event) => setTerm(event.target.value)}
+            onBlur={() => submitSearch(term)}
             placeholder="Buscar filmes, séries..."
             aria-label="Buscar filmes e séries"
             className="w-full rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-medium text-white placeholder:text-white/35 backdrop-blur-xl focus:border-indigo-400/60 focus:outline-none"
           />
-        </div>
+        </form>
 
         <div className="mb-8">
           <SearchTypeFilter
@@ -230,8 +252,8 @@ const Busca: React.FC = () => {
           ) : showEmpty ? (
             <p className="mt-10 text-center text-sm leading-relaxed text-white/50">
               Nada encontrado para{" "}
-              <span className="font-bold text-white">{term.trim()}</span>. Tente
-              outro termo ou confira a grafia.
+              <span className="font-bold text-white">{submittedTerm}</span>.
+              Tente outro termo ou confira a grafia.
             </p>
           ) : (
             <SearchResultGrid
