@@ -59,7 +59,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             />
           </button>
           <input
-            type="text"
+            type="search"
+            enterKeyHint="search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Buscar filmes, séries, elenco..."
