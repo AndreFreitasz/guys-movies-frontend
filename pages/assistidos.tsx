@@ -218,7 +218,10 @@ const WatchedPage = () => {
 
   const switchTab = useCallback(
     (tab: WatchedTab) => {
-      router.push({ query: { tab } }, undefined, { shallow: true });
+      router.push({ query: { tab } }, undefined, {
+        shallow: true,
+        scroll: false,
+      });
     },
     [router],
   );

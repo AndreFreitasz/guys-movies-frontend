@@ -79,6 +79,10 @@ const Busca: React.FC = () => {
 
     const timeout = setTimeout(() => {
       const trimmedTerm = term.trim();
+      const currentTerm =
+        typeof router.query.q === "string" ? router.query.q : "";
+
+      if (trimmedTerm === currentTerm) return;
 
       router.replace(
         {
@@ -86,7 +90,7 @@ const Busca: React.FC = () => {
           query: trimmedTerm ? { q: trimmedTerm } : {},
         },
         undefined,
-        { shallow: true },
+        { shallow: true, scroll: false },
       );
     }, URL_SYNC_DEBOUNCE_MS);
 
@@ -183,60 +187,62 @@ const Busca: React.FC = () => {
           />
         </div>
 
-        {error ? (
-          <CatalogErrorState
-            title="Não foi possível buscar agora"
-            message="Verifique sua conexão e tente novamente."
-            onRetry={retry}
-          />
-        ) : showResting ? (
-          <section className="relative">
-            <h2 className="mb-4 text-lg font-black tracking-tight text-white">
-              Em alta agora
-            </h2>
-            {popularError ? (
-              <CatalogErrorState
-                title="Não conseguimos carregar os populares"
-                message="Tente novamente em alguns instantes."
-                onRetry={() => setPopularReloadToken((token) => token + 1)}
-              />
-            ) : isLoadingPopular ? (
-              <SearchSkeletonGrid />
-            ) : (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
-                {popularMovies.map((movie) => (
-                  <div key={movie.id} className="relative isolate">
-                    <LibraryBadge
-                      kind={getLibraryBadgeKind(movie.id, "movie", {
-                        watchedMovies,
-                        watchedSeries,
-                        watchlistMovies,
-                        watchlistSeries,
-                      })}
-                    />
-                    <MovieCard {...movie} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        ) : isSearching ? (
-          <SearchSkeletonGrid />
-        ) : showEmpty ? (
-          <p className="mt-10 text-center text-sm leading-relaxed text-white/50">
-            Nada encontrado para{" "}
-            <span className="font-bold text-white">{term.trim()}</span>. Tente
-            outro termo ou confira a grafia.
-          </p>
-        ) : (
-          <SearchResultGrid
-            results={visible}
-            watchedMovies={watchedMovies}
-            watchedSeries={watchedSeries}
-            watchlistMovies={watchlistMovies}
-            watchlistSeries={watchlistSeries}
-          />
-        )}
+        <div className="min-h-[70vh]">
+          {error ? (
+            <CatalogErrorState
+              title="Não foi possível buscar agora"
+              message="Verifique sua conexão e tente novamente."
+              onRetry={retry}
+            />
+          ) : showResting ? (
+            <section className="relative">
+              <h2 className="mb-4 text-lg font-black tracking-tight text-white">
+                Em alta agora
+              </h2>
+              {popularError ? (
+                <CatalogErrorState
+                  title="Não conseguimos carregar os populares"
+                  message="Tente novamente em alguns instantes."
+                  onRetry={() => setPopularReloadToken((token) => token + 1)}
+                />
+              ) : isLoadingPopular ? (
+                <SearchSkeletonGrid />
+              ) : (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+                  {popularMovies.map((movie) => (
+                    <div key={movie.id} className="relative isolate">
+                      <LibraryBadge
+                        kind={getLibraryBadgeKind(movie.id, "movie", {
+                          watchedMovies,
+                          watchedSeries,
+                          watchlistMovies,
+                          watchlistSeries,
+                        })}
+                      />
+                      <MovieCard {...movie} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          ) : isSearching ? (
+            <SearchSkeletonGrid />
+          ) : showEmpty ? (
+            <p className="mt-10 text-center text-sm leading-relaxed text-white/50">
+              Nada encontrado para{" "}
+              <span className="font-bold text-white">{term.trim()}</span>. Tente
+              outro termo ou confira a grafia.
+            </p>
+          ) : (
+            <SearchResultGrid
+              results={visible}
+              watchedMovies={watchedMovies}
+              watchedSeries={watchedSeries}
+              watchlistMovies={watchlistMovies}
+              watchlistSeries={watchlistSeries}
+            />
+          )}
+        </div>
       </main>
 
       <Footer />
