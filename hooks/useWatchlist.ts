@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { authFetch } from "../utils/authFetch";
 import { useAuth } from "./authContext";
 import {
@@ -12,24 +12,29 @@ interface WatchlistResponse {
   stats: WatchlistStats;
 }
 
-const EMPTY_STATS: WatchlistStats = { total: 0, movies: 0, series: 0 };
-
 export const useWatchlist = () => {
   const { user, authLoading } = useAuth();
   const [items, setItems] = useState<WatchlistItem[]>([]);
-  const [stats, setStats] = useState<WatchlistStats>(EMPTY_STATS);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
 
   const reload = useCallback(() => setReloadToken((token) => token + 1), []);
 
+  const stats = useMemo<WatchlistStats>(
+    () => ({
+      total: items.length,
+      movies: items.filter((item) => item.type === "movie").length,
+      series: items.filter((item) => item.type === "serie").length,
+    }),
+    [items],
+  );
+
   useEffect(() => {
     if (authLoading) return;
 
     if (!user) {
       setItems([]);
-      setStats(EMPTY_STATS);
       setIsLoading(false);
       return;
     }
@@ -46,7 +51,6 @@ export const useWatchlist = () => {
       .then((data: WatchlistResponse) => {
         if (cancelled) return;
         setItems(data.items);
-        setStats(data.stats);
       })
       .catch(() => {
         if (!cancelled) setHasError(true);
@@ -62,19 +66,15 @@ export const useWatchlist = () => {
 
   const removeItem = useCallback(
     async (type: WatchlistItemType, idTmdb: number) => {
-      const previous = items;
+      const removedItem = items.find(
+        (item) => item.type === type && item.idTmdb === idTmdb,
+      );
+
       setItems((current) =>
         current.filter(
           (item) => !(item.type === type && item.idTmdb === idTmdb),
         ),
       );
-      setStats((current) => ({
-        total: Math.max(0, current.total - 1),
-        movies:
-          type === "movie" ? Math.max(0, current.movies - 1) : current.movies,
-        series:
-          type === "serie" ? Math.max(0, current.series - 1) : current.series,
-      }));
 
       try {
         const response = await authFetch(
@@ -84,12 +84,13 @@ export const useWatchlist = () => {
         if (!response.ok) throw new Error("Falha ao remover");
         return true;
       } catch {
-        setItems(previous);
-        setStats((current) => ({
-          total: current.total + 1,
-          movies: type === "movie" ? current.movies + 1 : current.movies,
-          series: type === "serie" ? current.series + 1 : current.series,
-        }));
+        if (removedItem) {
+          setItems((current) =>
+            current.some((item) => item.type === type && item.idTmdb === idTmdb)
+              ? current
+              : [...current, removedItem],
+          );
+        }
         return false;
       }
     },
