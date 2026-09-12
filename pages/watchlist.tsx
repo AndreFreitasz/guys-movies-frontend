@@ -1,4 +1,5 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
+import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -6,10 +7,16 @@ import Header from "../components/_ui/header";
 import Footer from "../components/_ui/footer";
 import CatalogErrorState from "../components/_ui/catalogErrorState";
 import WatchlistGrid from "../components/watchlist/watchlistGrid";
+import WatchlistToolbar from "../components/watchlist/watchlistToolbar";
 import { useAuth } from "../hooks/authContext";
 import { useWatchlist } from "../hooks/useWatchlist";
 import { useWatchlistAvailability } from "../hooks/useWatchlistAvailability";
-import { WatchlistItemType } from "../interfaces/watchlist/types";
+import {
+  availabilityKey,
+  WatchlistItemType,
+  WatchlistSort,
+  WATCHLIST_SORTS,
+} from "../interfaces/watchlist/types";
 
 const PageShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <>
@@ -29,6 +36,78 @@ const WatchlistPage = () => {
   const { items, stats, isLoading, hasError, reload, removeItem } =
     useWatchlist();
   const availability = useWatchlistAvailability(items.length > 0);
+  const router = useRouter();
+
+  const sort: WatchlistSort = WATCHLIST_SORTS.some(
+    (option) => option.value === router.query.sort,
+  )
+    ? (router.query.sort as WatchlistSort)
+    : "recent";
+
+  const typeFilter: WatchlistItemType | null =
+    router.query.type === "movie" || router.query.type === "serie"
+      ? router.query.type
+      : null;
+
+  const providerIds = String(router.query.providers ?? "")
+    .split(",")
+    .map((value) => Number(value))
+    .filter((value) => Number.isInteger(value) && value > 0);
+
+  const replaceQuery = useCallback(
+    (patch: Record<string, string | null>) => {
+      const query = { ...router.query };
+
+      Object.entries(patch).forEach(([key, value]) => {
+        if (value === null) delete query[key];
+        else query[key] = value;
+      });
+
+      router.replace({ query }, undefined, { shallow: true, scroll: false });
+    },
+    [router],
+  );
+
+  const visibleItems = useMemo(() => {
+    const byType = typeFilter
+      ? items.filter((item) => item.type === typeFilter)
+      : items;
+
+    const byProvider =
+      providerIds.length === 0
+        ? byType
+        : byType.filter((item) => {
+            const providers =
+              availability.providersByKey.get(
+                availabilityKey(item.type, item.idTmdb),
+              ) ?? [];
+            return providers.some((provider) =>
+              providerIds.includes(provider.id),
+            );
+          });
+
+    const sorted = [...byProvider];
+
+    if (sort === "recent") {
+      sorted.sort((first, second) =>
+        second.addedAt.localeCompare(first.addedAt),
+      );
+    } else if (sort === "oldest") {
+      sorted.sort((first, second) =>
+        first.addedAt.localeCompare(second.addedAt),
+      );
+    } else if (sort === "rating") {
+      sorted.sort(
+        (first, second) => (second.voteAverage ?? 0) - (first.voteAverage ?? 0),
+      );
+    } else {
+      sorted.sort((first, second) =>
+        first.title.localeCompare(second.title, "pt-BR"),
+      );
+    }
+
+    return sorted;
+  }, [availability.providersByKey, items, providerIds, sort, typeFilter]);
 
   const handleRemove = useCallback(
     (type: WatchlistItemType, idTmdb: number) => {
@@ -133,13 +212,44 @@ const WatchlistPage = () => {
         </p>
       )}
 
-      <div className="mt-8">
-        <WatchlistGrid
-          items={items}
-          providersByKey={availability.providersByKey}
+      <div className="mt-6">
+        <WatchlistToolbar
+          stats={stats}
+          sort={sort}
+          onSortChange={(value) =>
+            replaceQuery({ sort: value === "recent" ? null : value })
+          }
+          typeFilter={typeFilter}
+          onTypeChange={(value) => replaceQuery({ type: value })}
+          providerIds={providerIds}
+          onProvidersChange={(ids) =>
+            replaceQuery({ providers: ids.length ? ids.join(",") : null })
+          }
           isAvailabilityLoading={availability.isLoading}
-          onRemove={handleRemove}
+          onClear={() =>
+            replaceQuery({ sort: null, type: null, providers: null })
+          }
+          activeCount={
+            (typeFilter ? 1 : 0) +
+            (providerIds.length ? 1 : 0) +
+            (sort !== "recent" ? 1 : 0)
+          }
         />
+      </div>
+
+      <div className="mt-8">
+        {visibleItems.length === 0 ? (
+          <p className="mt-10 text-center text-sm text-white/45">
+            Nenhum título da sua watchlist passa nos filtros escolhidos.
+          </p>
+        ) : (
+          <WatchlistGrid
+            items={visibleItems}
+            providersByKey={availability.providersByKey}
+            isAvailabilityLoading={availability.isLoading}
+            onRemove={handleRemove}
+          />
+        )}
       </div>
     </PageShell>
   );

@@ -23,6 +23,15 @@ export interface WatchlistStats {
   series: number;
 }
 
+export type WatchlistSort = "recent" | "oldest" | "rating" | "title";
+
+export const WATCHLIST_SORTS: { value: WatchlistSort; label: string }[] = [
+  { value: "recent", label: "Adicionado recentemente" },
+  { value: "oldest", label: "Esperando há mais tempo" },
+  { value: "rating", label: "Nota da TMDB" },
+  { value: "title", label: "Título A-Z" },
+];
+
 export const availabilityKey = (type: WatchlistItemType, idTmdb: number) =>
   `${type}:${idTmdb}`;
 
