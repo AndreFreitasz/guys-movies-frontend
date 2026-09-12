@@ -68,13 +68,16 @@ const WatchlistPage = () => {
     [router],
   );
 
+  const isProviderFilterPending =
+    providerIds.length > 0 && availability.isLoading;
+
   const visibleItems = useMemo(() => {
     const byType = typeFilter
       ? items.filter((item) => item.type === typeFilter)
       : items;
 
     const byProvider =
-      providerIds.length === 0
+      providerIds.length === 0 || isProviderFilterPending
         ? byType
         : byType.filter((item) => {
             const providers =
@@ -107,7 +110,14 @@ const WatchlistPage = () => {
     }
 
     return sorted;
-  }, [availability.providersByKey, items, providerIds, sort, typeFilter]);
+  }, [
+    availability.providersByKey,
+    isProviderFilterPending,
+    items,
+    providerIds,
+    sort,
+    typeFilter,
+  ]);
 
   const handleRemove = useCallback(
     (type: WatchlistItemType, idTmdb: number) => {
@@ -209,6 +219,13 @@ const WatchlistPage = () => {
         <p className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200/90">
           Não foi possível consultar a disponibilidade de alguns títulos. Os
           streamings mostrados podem estar incompletos.
+        </p>
+      )}
+
+      {isProviderFilterPending && (
+        <p className="mt-4 rounded-2xl border border-indigo-400/20 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-100/90">
+          Aplicando o filtro de streaming assim que a disponibilidade terminar
+          de carregar.
         </p>
       )}
 
