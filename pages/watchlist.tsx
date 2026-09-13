@@ -217,10 +217,11 @@ const WatchlistPage = () => {
         {stats.total === 1 ? "título esperando" : "títulos esperando"}
       </p>
 
-      {availability.failed && availability.providersByKey.size > 0 && (
+      {availability.failed && !isProviderFilterUnusable && (
         <p className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200/90">
-          Não foi possível consultar a disponibilidade de alguns títulos. Os
-          streamings mostrados podem estar incompletos.
+          Não foi possível consultar corretamente a disponibilidade de
+          streaming. As informações mostradas podem estar incompletas ou
+          ausentes.
         </p>
       )}
 
