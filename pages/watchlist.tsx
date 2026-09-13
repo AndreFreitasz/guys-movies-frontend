@@ -68,8 +68,10 @@ const WatchlistPage = () => {
     [router],
   );
 
-  const isProviderFilterPending =
-    providerIds.length > 0 && availability.isLoading;
+  const isProviderFilterUnusable =
+    providerIds.length > 0 &&
+    availability.providersByKey.size === 0 &&
+    (availability.isLoading || availability.failed);
 
   const visibleItems = useMemo(() => {
     const byType = typeFilter
@@ -77,7 +79,7 @@ const WatchlistPage = () => {
       : items;
 
     const byProvider =
-      providerIds.length === 0 || isProviderFilterPending
+      providerIds.length === 0 || isProviderFilterUnusable
         ? byType
         : byType.filter((item) => {
             const providers =
@@ -112,7 +114,7 @@ const WatchlistPage = () => {
     return sorted;
   }, [
     availability.providersByKey,
-    isProviderFilterPending,
+    isProviderFilterUnusable,
     items,
     providerIds,
     sort,
@@ -222,10 +224,18 @@ const WatchlistPage = () => {
         </p>
       )}
 
-      {isProviderFilterPending && (
+      {isProviderFilterUnusable && availability.isLoading && (
         <p className="mt-4 rounded-2xl border border-indigo-400/20 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-100/90">
           Aplicando o filtro de streaming assim que a disponibilidade terminar
           de carregar.
+        </p>
+      )}
+
+      {isProviderFilterUnusable && !availability.isLoading && (
+        <p className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200/90">
+          Não foi possível verificar a disponibilidade dos streamings, então o
+          filtro de streaming não pôde ser aplicado. Mostrando a watchlist
+          completa.
         </p>
       )}
 
