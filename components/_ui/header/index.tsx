@@ -159,7 +159,10 @@ const Header = () => {
               <NavItem href="/" label="Filmes" />
               <NavItem href="/series" label="Séries" />
               {isAuthenticated && (
-                <NavItem href="/assistidos" label="Assistidos" />
+                <>
+                  <NavItem href="/assistidos" label="Assistidos" />
+                  <NavItem href="/watchlist" label="Watchlist" />
+                </>
               )}
             </ul>
           </nav>
