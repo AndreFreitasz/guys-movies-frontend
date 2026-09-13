@@ -9,7 +9,6 @@ import {
 
 interface WatchlistResponse {
   items: WatchlistItem[];
-  stats: WatchlistStats;
 }
 
 export const useWatchlist = () => {

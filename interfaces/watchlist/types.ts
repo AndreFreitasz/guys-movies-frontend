@@ -23,6 +23,26 @@ export interface WatchlistStats {
   series: number;
 }
 
+export type AvailabilityStatus = "idle" | "loading" | "ready" | "failed";
+
+export type ProvidersState =
+  | { kind: "pending" }
+  | { kind: "unknown" }
+  | { kind: "empty" }
+  | { kind: "available"; providers: WatchlistProvider[] };
+
+export const resolveProvidersState = (
+  status: AvailabilityStatus,
+  failed: boolean,
+  providers: WatchlistProvider[] | undefined,
+): ProvidersState => {
+  if (providers && providers.length > 0)
+    return { kind: "available", providers };
+  if (status === "idle" || status === "loading") return { kind: "pending" };
+  if (status === "failed" || failed || !providers) return { kind: "unknown" };
+  return { kind: "empty" };
+};
+
 export type WatchlistSort = "recent" | "oldest" | "rating" | "title";
 
 export const WATCHLIST_SORTS: { value: WatchlistSort; label: string }[] = [

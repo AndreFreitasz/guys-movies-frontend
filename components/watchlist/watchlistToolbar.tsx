@@ -54,7 +54,7 @@ const WatchlistToolbar: React.FC<WatchlistToolbarProps> = ({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <FilterDropdown label="Ordenar">
+      <FilterDropdown label="Ordenar" isActive={sort !== "recent"}>
         {(close) => (
           <div className="space-y-1">
             {WATCHLIST_SORTS.map((option) => (

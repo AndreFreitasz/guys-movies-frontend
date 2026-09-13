@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import Header from "../components/_ui/header";
 import Footer from "../components/_ui/footer";
 import CatalogErrorState from "../components/_ui/catalogErrorState";
@@ -14,10 +15,43 @@ import { useWatchlist } from "../hooks/useWatchlist";
 import { useWatchlistAvailability } from "../hooks/useWatchlistAvailability";
 import {
   availabilityKey,
+  AvailabilityStatus,
+  resolveProvidersState,
   WatchlistItemType,
+  WatchlistProvider,
   WatchlistSort,
   WATCHLIST_SORTS,
 } from "../interfaces/watchlist/types";
+
+type AvailabilityNotice = "filterPending" | "filterUnusable" | "partialFailure";
+
+const isAvailabilityPending = (status: AvailabilityStatus) =>
+  status === "idle" || status === "loading";
+
+const hasAnyProvider = (providersByKey: Map<string, WatchlistProvider[]>) =>
+  Array.from(providersByKey.values()).some((providers) => providers.length > 0);
+
+const canFilterByProvider = (
+  status: AvailabilityStatus,
+  failed: boolean,
+  providersByKey: Map<string, WatchlistProvider[]>,
+) => {
+  if (status !== "ready") return false;
+  return !failed || hasAnyProvider(providersByKey);
+};
+
+const resolveAvailabilityNotice = (
+  status: AvailabilityStatus,
+  failed: boolean,
+  isProviderFilterActive: boolean,
+  isProviderFilterUsable: boolean,
+): AvailabilityNotice | null => {
+  if (isProviderFilterActive && !isProviderFilterUsable) {
+    return isAvailabilityPending(status) ? "filterPending" : "filterUnusable";
+  }
+  if (failed) return "partialFailure";
+  return null;
+};
 
 const PageShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <>
@@ -50,10 +84,16 @@ const WatchlistPage = () => {
       ? router.query.type
       : null;
 
-  const providerIds = String(router.query.providers ?? "")
-    .split(",")
-    .map((value) => Number(value))
-    .filter((value) => Number.isInteger(value) && value > 0);
+  const providersQuery = String(router.query.providers ?? "");
+
+  const providerIds = useMemo(
+    () =>
+      providersQuery
+        .split(",")
+        .map((value) => Number(value))
+        .filter((value) => Number.isInteger(value) && value > 0),
+    [providersQuery],
+  );
 
   const replaceQuery = useCallback(
     (patch: Record<string, string | null>) => {
@@ -69,10 +109,27 @@ const WatchlistPage = () => {
     [router],
   );
 
-  const isProviderFilterUnusable =
-    providerIds.length > 0 &&
-    availability.providersByKey.size === 0 &&
-    (availability.isLoading || availability.failed);
+  const isProviderFilterActive = providerIds.length > 0;
+
+  const isProviderFilterUsable = useMemo(
+    () =>
+      canFilterByProvider(
+        availability.status,
+        availability.failed,
+        availability.providersByKey,
+      ),
+    [availability.failed, availability.providersByKey, availability.status],
+  );
+
+  const isEmptyFromIncompleteAvailability =
+    isProviderFilterActive && isProviderFilterUsable && availability.failed;
+
+  const notice = resolveAvailabilityNotice(
+    availability.status,
+    availability.failed,
+    isProviderFilterActive,
+    isProviderFilterUsable,
+  );
 
   const visibleItems = useMemo(() => {
     const byType = typeFilter
@@ -80,7 +137,7 @@ const WatchlistPage = () => {
       : items;
 
     const byProvider =
-      providerIds.length === 0 || isProviderFilterUnusable
+      !isProviderFilterActive || !isProviderFilterUsable
         ? byType
         : byType.filter((item) => {
             const providers =
@@ -115,7 +172,8 @@ const WatchlistPage = () => {
     return sorted;
   }, [
     availability.providersByKey,
-    isProviderFilterUnusable,
+    isProviderFilterActive,
+    isProviderFilterUsable,
     items,
     providerIds,
     sort,
@@ -123,8 +181,13 @@ const WatchlistPage = () => {
   ]);
 
   const handleRemove = useCallback(
-    (type: WatchlistItemType, idTmdb: number) => {
-      removeItem(type, idTmdb);
+    async (type: WatchlistItemType, idTmdb: number) => {
+      const removed = await removeItem(type, idTmdb);
+      if (!removed) {
+        toast.error(
+          "Não foi possível remover o título da watchlist. Tente de novo.",
+        );
+      }
     },
     [removeItem],
   );
@@ -149,6 +212,10 @@ const WatchlistPage = () => {
     visibleItems.find(
       (item) => availabilityKey(item.type, item.idTmdb) === shuffledKey,
     ) ?? null;
+
+  useEffect(() => {
+    if (shuffledKey && !shuffledItem) setShuffledKey(null);
+  }, [shuffledItem, shuffledKey]);
 
   if (authLoading) {
     return (
@@ -239,26 +306,26 @@ const WatchlistPage = () => {
         {stats.total === 1 ? "título esperando" : "títulos esperando"}
       </p>
 
-      {availability.failed && !isProviderFilterUnusable && (
-        <p className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200/90">
-          Não foi possível consultar corretamente a disponibilidade de
-          streaming. As informações mostradas podem estar incompletas ou
-          ausentes.
-        </p>
-      )}
-
-      {isProviderFilterUnusable && availability.isLoading && (
+      {notice === "filterPending" && (
         <p className="mt-4 rounded-2xl border border-indigo-400/20 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-100/90">
           Aplicando o filtro de streaming assim que a disponibilidade terminar
           de carregar.
         </p>
       )}
 
-      {isProviderFilterUnusable && !availability.isLoading && (
+      {notice === "filterUnusable" && (
         <p className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200/90">
           Não foi possível verificar a disponibilidade dos streamings, então o
           filtro de streaming não pôde ser aplicado. Mostrando a watchlist
           completa.
+        </p>
+      )}
+
+      {notice === "partialFailure" && (
+        <p className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200/90">
+          Não foi possível consultar corretamente a disponibilidade de
+          streaming. As informações mostradas podem estar incompletas ou
+          ausentes.
         </p>
       )}
 
@@ -275,13 +342,13 @@ const WatchlistPage = () => {
           onProvidersChange={(ids) =>
             replaceQuery({ providers: ids.length ? ids.join(",") : null })
           }
-          isAvailabilityLoading={availability.isLoading}
+          isAvailabilityLoading={isAvailabilityPending(availability.status)}
           onClear={() =>
             replaceQuery({ sort: null, type: null, providers: null })
           }
           activeCount={
             (typeFilter ? 1 : 0) +
-            (providerIds.length ? 1 : 0) +
+            (isProviderFilterActive ? 1 : 0) +
             (sort !== "recent" ? 1 : 0)
           }
           onShuffle={shuffle}
@@ -292,13 +359,16 @@ const WatchlistPage = () => {
       <div className="mt-8">
         {visibleItems.length === 0 ? (
           <p className="mt-10 text-center text-sm text-white/45">
-            Nenhum título da sua watchlist passa nos filtros escolhidos.
+            {isEmptyFromIncompleteAvailability
+              ? "Não foi possível verificar a disponibilidade de todos os títulos, então não dá para dizer o que está nos streamings escolhidos. Tente de novo em instantes."
+              : "Nenhum título da sua watchlist passa nos filtros escolhidos."}
           </p>
         ) : (
           <WatchlistGrid
             items={visibleItems}
             providersByKey={availability.providersByKey}
-            isAvailabilityLoading={availability.isLoading}
+            availabilityStatus={availability.status}
+            availabilityFailed={availability.failed}
             onRemove={handleRemove}
           />
         )}
@@ -306,13 +376,15 @@ const WatchlistPage = () => {
 
       <ShuffleDialog
         item={shuffledItem}
-        providers={
+        providersState={resolveProvidersState(
+          availability.status,
+          availability.failed,
           shuffledItem
-            ? (availability.providersByKey.get(
+            ? availability.providersByKey.get(
                 availabilityKey(shuffledItem.type, shuffledItem.idTmdb),
-              ) ?? [])
-            : []
-        }
+              )
+            : undefined,
+        )}
         onClose={() => setShuffledKey(null)}
         onShuffleAgain={shuffle}
         canShuffleAgain={visibleItems.length > 1}

@@ -3,6 +3,7 @@ import { authFetch } from "../utils/authFetch";
 import { useAuth } from "./authContext";
 import {
   availabilityKey,
+  AvailabilityStatus,
   WatchlistItemType,
   WatchlistProvider,
 } from "../interfaces/watchlist/types";
@@ -21,14 +22,14 @@ export const useWatchlistAvailability = (enabled: boolean) => {
   const [providersByKey, setProvidersByKey] = useState<
     Map<string, WatchlistProvider[]>
   >(new Map());
-  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<AvailabilityStatus>("idle");
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     if (authLoading || !user || !enabled) return;
 
     let cancelled = false;
-    setIsLoading(true);
+    setStatus("loading");
 
     authFetch(`${process.env.NEXT_PUBLIC_URL_API}/me/watchlist/availability`)
       .then((response) => {
@@ -46,12 +47,12 @@ export const useWatchlistAvailability = (enabled: boolean) => {
           ),
         );
         setFailed(data.failed);
+        setStatus("ready");
       })
       .catch(() => {
-        if (!cancelled) setFailed(true);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
+        if (cancelled) return;
+        setFailed(true);
+        setStatus("failed");
       });
 
     return () => {
@@ -59,5 +60,5 @@ export const useWatchlistAvailability = (enabled: boolean) => {
     };
   }, [authLoading, enabled, user]);
 
-  return { providersByKey, isLoading, failed };
+  return { providersByKey, status, failed };
 };

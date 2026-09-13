@@ -2,15 +2,15 @@ import React from "react";
 import Link from "next/link";
 import { FaTimes } from "react-icons/fa";
 import {
+  FALLBACK_POSTER,
+  ProvidersState,
   resolvePosterUrl,
   WatchlistItem,
-  WatchlistProvider,
 } from "../../interfaces/watchlist/types";
 
 interface WatchlistCardProps {
   item: WatchlistItem;
-  providers: WatchlistProvider[] | undefined;
-  isAvailabilityLoading: boolean;
+  providersState: ProvidersState;
   onRemove: () => void;
 }
 
@@ -18,8 +18,7 @@ const typeLabel = { movie: "Filme", serie: "Série" };
 
 const WatchlistCard: React.FC<WatchlistCardProps> = ({
   item,
-  providers,
-  isAvailabilityLoading,
+  providersState,
   onRemove,
 }) => {
   const href =
@@ -34,6 +33,13 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({
             src={resolvePosterUrl(item.posterPath)}
             alt={item.title}
             loading="lazy"
+            decoding="async"
+            onError={(event) => {
+              const target = event.currentTarget;
+              if (target.src.endsWith(FALLBACK_POSTER)) return;
+              target.src = FALLBACK_POSTER;
+              target.classList.add("object-contain", "p-6", "opacity-40");
+            }}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
 
@@ -61,27 +67,29 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({
       </Link>
 
       <div className="mt-2 flex h-6 items-center gap-1.5">
-        {isAvailabilityLoading && !providers ? (
+        {providersState.kind === "pending" && (
           <span className="h-6 w-6 animate-pulse rounded-md bg-white/[0.08]" />
-        ) : (
-          providers?.map((provider) => (
-            <img
-              key={provider.id}
-              src={provider.logoPath ?? ""}
-              alt={provider.name}
-              title={provider.name}
-              loading="lazy"
-              className="h-6 w-6 rounded-md object-cover"
-            />
-          ))
         )}
+        {providersState.kind === "available" &&
+          providersState.providers.map((provider) =>
+            provider.logoPath ? (
+              <img
+                key={provider.id}
+                src={provider.logoPath}
+                alt={provider.name}
+                title={provider.name}
+                loading="lazy"
+                className="h-6 w-6 rounded-md object-cover"
+              />
+            ) : null,
+          )}
       </div>
 
       <button
         type="button"
         onClick={onRemove}
         aria-label={`Remover ${item.title} da watchlist`}
-        className="absolute right-2 top-10 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white/70 opacity-0 transition-all duration-300 hover:bg-red-500/90 hover:text-white focus:opacity-100 group-hover:opacity-100"
+        className="absolute right-2 top-10 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white/70 opacity-100 transition-all duration-300 hover:bg-red-500/90 hover:text-white focus:opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
       >
         <FaTimes size={12} />
       </button>
