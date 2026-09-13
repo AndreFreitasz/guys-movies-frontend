@@ -63,7 +63,8 @@ const MobileTabBar = ({
       label: isAuthenticated ? "Conta" : "Entrar",
       icon: isAuthenticated ? FaUserCircle : FaSignInAlt,
       onClick: onAccountClick,
-      isActive: isMenuOpen || pathname === "/assistidos",
+      isActive:
+        isMenuOpen || pathname === "/assistidos" || pathname === "/watchlist",
     },
   ];
 

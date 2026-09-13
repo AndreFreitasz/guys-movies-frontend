@@ -247,19 +247,23 @@ const MobileMenu = ({
                 </Link>
               </motion.li>
               <motion.li variants={itemVariants}>
-                <span className="flex items-center gap-3.5 rounded-2xl border border-transparent bg-white/[0.02] px-4 py-3.5 opacity-60">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.05] text-white/35">
-                    <FaBookmark size={15} />
+                <Link
+                  href="/watchlist"
+                  onClick={onClose}
+                  className={rowClass(pathname === "/watchlist")}
+                >
+                  <span className={iconClass(pathname === "/watchlist")}>
+                    <FaBookmark size={16} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[0.95rem] font-bold text-white/60">
+                    <span className="block text-[0.95rem] font-bold text-white">
                       Watchlist
                     </span>
-                    <span className="block truncate text-xs text-white/30">
-                      Em breve
+                    <span className="block truncate text-xs text-white/40">
+                      O que você guardou para depois
                     </span>
                   </span>
-                </span>
+                </Link>
               </motion.li>
               <motion.li variants={itemVariants}>
                 <button
