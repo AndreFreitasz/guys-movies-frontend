@@ -73,6 +73,8 @@ function RouteProgressBar() {
 }
 
 function MyApp({ Component, pageProps, router }: AppProps) {
+  const routeKey = router.asPath.split("?")[0];
+
   return (
     <div
       className={`${figtree.variable} min-h-screen bg-defaultBackground font-sans`}
@@ -94,7 +96,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
           <RouteProgressBar />
           <AnimatePresence initial={false}>
             <motion.div
-              key={router.asPath}
+              key={routeKey}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
