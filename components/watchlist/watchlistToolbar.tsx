@@ -19,6 +19,8 @@ interface WatchlistToolbarProps {
   isAvailabilityLoading: boolean;
   onClear: () => void;
   activeCount: number;
+  onShuffle: () => void;
+  canShuffle: boolean;
 }
 
 const optionClass = (isActive: boolean) =>
@@ -39,6 +41,8 @@ const WatchlistToolbar: React.FC<WatchlistToolbarProps> = ({
   isAvailabilityLoading,
   onClear,
   activeCount,
+  onShuffle,
+  canShuffle,
 }) => {
   const toggleProvider = (id: number) => {
     onProvidersChange(
@@ -120,6 +124,15 @@ const WatchlistToolbar: React.FC<WatchlistToolbarProps> = ({
           )}
         </FilterDropdown>
       )}
+
+      <button
+        type="button"
+        onClick={onShuffle}
+        disabled={!canShuffle}
+        className="rounded-2xl bg-indigo-500/90 px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Escolhe por mim
+      </button>
 
       {activeCount > 0 && (
         <button

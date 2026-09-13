@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import Footer from "../components/_ui/footer";
 import CatalogErrorState from "../components/_ui/catalogErrorState";
 import WatchlistGrid from "../components/watchlist/watchlistGrid";
 import WatchlistToolbar from "../components/watchlist/watchlistToolbar";
+import ShuffleDialog from "../components/watchlist/shuffleDialog";
 import { useAuth } from "../hooks/authContext";
 import { useWatchlist } from "../hooks/useWatchlist";
 import { useWatchlistAvailability } from "../hooks/useWatchlistAvailability";
@@ -127,6 +128,27 @@ const WatchlistPage = () => {
     },
     [removeItem],
   );
+
+  const [shuffledKey, setShuffledKey] = useState<string | null>(null);
+
+  const shuffle = useCallback(() => {
+    if (visibleItems.length === 0) return;
+
+    const candidates =
+      visibleItems.length > 1
+        ? visibleItems.filter(
+            (item) => availabilityKey(item.type, item.idTmdb) !== shuffledKey,
+          )
+        : visibleItems;
+
+    const picked = candidates[Math.floor(Math.random() * candidates.length)];
+    setShuffledKey(availabilityKey(picked.type, picked.idTmdb));
+  }, [shuffledKey, visibleItems]);
+
+  const shuffledItem =
+    visibleItems.find(
+      (item) => availabilityKey(item.type, item.idTmdb) === shuffledKey,
+    ) ?? null;
 
   if (authLoading) {
     return (
@@ -262,6 +284,8 @@ const WatchlistPage = () => {
             (providerIds.length ? 1 : 0) +
             (sort !== "recent" ? 1 : 0)
           }
+          onShuffle={shuffle}
+          canShuffle={visibleItems.length > 0}
         />
       </div>
 
@@ -279,6 +303,20 @@ const WatchlistPage = () => {
           />
         )}
       </div>
+
+      <ShuffleDialog
+        item={shuffledItem}
+        providers={
+          shuffledItem
+            ? (availability.providersByKey.get(
+                availabilityKey(shuffledItem.type, shuffledItem.idTmdb),
+              ) ?? [])
+            : []
+        }
+        onClose={() => setShuffledKey(null)}
+        onShuffleAgain={shuffle}
+        canShuffleAgain={visibleItems.length > 1}
+      />
     </PageShell>
   );
 };
