@@ -41,6 +41,12 @@ const Footer = () => {
           >
             Assistidos
           </Link>
+          <Link
+            href="/watchlist"
+            className="text-sm font-semibold text-white/50 transition-colors duration-300 hover:text-white"
+          >
+            Watchlist
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
