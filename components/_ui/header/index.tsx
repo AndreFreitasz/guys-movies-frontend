@@ -223,13 +223,17 @@ const Header = () => {
                             </Link>
                           </li>
                           <li>
-                            <span className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white/30">
-                              <FaBookmark size={13} />
+                            <Link
+                              href="/watchlist"
+                              onClick={() => setIsDropdownOpen(false)}
+                              className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white/80 transition-colors duration-200 hover:bg-white/[0.07] hover:text-white"
+                            >
+                              <FaBookmark
+                                size={13}
+                                className="text-indigo-300"
+                              />
                               Watchlist
-                              <span className="ml-auto rounded-full bg-white/[0.07] px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-wider">
-                                em breve
-                              </span>
-                            </span>
+                            </Link>
                           </li>
                           <li>
                             <button
