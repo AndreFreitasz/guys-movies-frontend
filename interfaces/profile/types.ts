@@ -84,8 +84,14 @@ const GRADIENTS = [
   "from-fuchsia-500 to-purple-600",
 ];
 
-export const avatarGradient = (id: number): string =>
-  GRADIENTS[Math.abs(id) % GRADIENTS.length];
+export const avatarGradient = (username: string): string => {
+  let hash = 0;
+  for (let index = 0; index < username.length; index += 1) {
+    hash = (hash * 31 + username.charCodeAt(index)) | 0;
+  }
+
+  return GRADIENTS[Math.abs(hash) % GRADIENTS.length];
+};
 
 export const initialsOf = (name: string, username: string): string => {
   const source = name.trim() || username.trim();
