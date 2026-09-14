@@ -35,8 +35,44 @@ export const useProfile = (username: string | undefined) => {
   }, [username]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+
+    (async () => {
+      if (!username) return;
+
+      setStatus("loading");
+
+      try {
+        const response = await authFetch(
+          `${process.env.NEXT_PUBLIC_URL_API}/profiles/${encodeURIComponent(username)}`,
+        );
+
+        if (cancelled) return;
+
+        if (response.status === 404) {
+          setProfile(null);
+          setStatus("notFound");
+          return;
+        }
+
+        if (!response.ok) throw new Error("Falha ao carregar o perfil");
+
+        const data = (await response.json()) as Profile;
+        if (cancelled) return;
+
+        setProfile(data);
+        setStatus("ready");
+      } catch {
+        if (cancelled) return;
+        setProfile(null);
+        setStatus("failed");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [username]);
 
   return { profile, status, setProfile, reload: load };
 };
