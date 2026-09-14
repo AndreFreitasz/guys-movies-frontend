@@ -77,7 +77,7 @@ const FavoriteShelf: React.FC<FavoriteShelfProps> = ({
                     className="aspect-[2/3] w-full object-cover transition-transform duration-500 ease-ios group-hover:scale-105"
                   />
                 </span>
-                <span className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-2xl bg-gradient-to-t from-black/90 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <span className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-2xl bg-gradient-to-t from-black/90 to-transparent p-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
                   <span className="block truncate text-xs font-bold text-white">
                     {favorite.title}
                   </span>

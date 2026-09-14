@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import Modal from "../_ui/modal";
@@ -34,9 +34,13 @@ const UserListSheet: React.FC<UserListSheetProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [hasFailed, setHasFailed] = useState(false);
   const [pendingUsername, setPendingUsername] = useState<string | null>(null);
+  const requestRef = useRef(0);
 
   const fetchPage = useCallback(
     async (nextCursor: string | null) => {
+      const requestId = requestRef.current + 1;
+      requestRef.current = requestId;
+
       setIsLoading(true);
       setHasFailed(false);
 
@@ -51,14 +55,17 @@ const UserListSheet: React.FC<UserListSheetProps> = ({
         if (!response.ok) throw new Error("Falha ao carregar");
 
         const page = (await response.json()) as UserListPage;
+        if (requestRef.current !== requestId) return;
+
         setUsers((current) =>
           nextCursor ? [...current, ...page.users] : page.users,
         );
         setCursor(page.nextCursor);
       } catch {
+        if (requestRef.current !== requestId) return;
         setHasFailed(true);
       } finally {
-        setIsLoading(false);
+        if (requestRef.current === requestId) setIsLoading(false);
       }
     },
     [mode, username],
