@@ -30,7 +30,7 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
     <>
       <div
         aria-hidden={!cover}
-        className="pointer-events-none absolute inset-x-0 top-0 h-[26rem] sm:h-[35rem] lg:h-[43rem]"
+        className="pointer-events-none absolute inset-x-0 top-0 aspect-video"
       >
         {narrow ? (
           <picture className="block h-full w-full">
@@ -39,7 +39,7 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
               src={narrow}
               alt={`Capa do perfil: ${cover?.title ?? ""}`}
               decoding="async"
-              className="h-full w-full object-cover object-top opacity-[0.76]"
+              className="h-full w-full object-contain object-top opacity-[0.76]"
               style={FADE_MASK}
             />
           </picture>
