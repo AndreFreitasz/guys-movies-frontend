@@ -26,6 +26,7 @@ import FormLogin from "./formLogin";
 import ConfirmLogoutModal from "../modal/confirmLogoutModal";
 import MobileTabBar from "../mobileTabBar";
 import { useAuth } from "../../../hooks/authContext";
+import { resolveAvatarUrl } from "../../../interfaces/profile/types";
 
 const SCROLL_THRESHOLD = 12;
 
@@ -189,6 +190,11 @@ const Header = () => {
                   <UserChip
                     ref={chipRef}
                     username={user.username}
+                    name={user.name}
+                    avatarUrl={resolveAvatarUrl(
+                      user.username,
+                      user.avatarUpdatedAt,
+                    )}
                     isOpen={isDropdownOpen}
                     onClick={() => setIsDropdownOpen((previous) => !previous)}
                   />

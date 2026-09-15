@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import Avatar from "../../profile/avatar";
+import { resolveAvatarUrl } from "../../../interfaces/profile/types";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { IconType } from "react-icons";
@@ -18,6 +20,7 @@ interface MobileMenuUser {
   username: string;
   name: string;
   email: string;
+  avatarUpdatedAt: string | null;
 }
 
 interface MobileMenuProps {
@@ -73,15 +76,6 @@ const itemVariants = {
   },
 };
 
-const getInitials = (value: string) =>
-  value
-    .replace(/[^a-zA-Z0-9\s]/g, "")
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("") || "U";
-
 const MobileMenu = ({
   user,
   onClose,
@@ -133,9 +127,15 @@ const MobileMenu = ({
           {user ? (
             <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-white/[0.05] p-[1px]">
               <div className="flex items-center gap-3 rounded-[calc(1.5rem-1px)] bg-[#0a0a16]/85 p-4 backdrop-blur-xl">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/15 bg-white/[0.1] text-sm font-black text-white">
-                  {getInitials(user.username)}
-                </span>
+                <Avatar
+                  name={user.name}
+                  username={user.username}
+                  size="md"
+                  imageUrl={resolveAvatarUrl(
+                    user.username,
+                    user.avatarUpdatedAt,
+                  )}
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />

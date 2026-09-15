@@ -41,6 +41,7 @@ export interface Profile {
   favorites: Favorite[];
   cover: Cover | null;
   joinedAt: string | null;
+  avatarUpdatedAt: string | null;
 }
 
 export interface UserSummary {
@@ -48,6 +49,7 @@ export interface UserSummary {
   name: string;
   isSelf: boolean;
   isFollowing: boolean;
+  avatarUpdatedAt: string | null;
 }
 
 export interface UserListPage {
@@ -173,4 +175,16 @@ export const joinedYear = (joinedAt: string | null): number | null => {
   if (!joinedAt) return null;
   const year = new Date(joinedAt).getFullYear();
   return Number.isFinite(year) ? year : null;
+};
+
+export const resolveAvatarUrl = (
+  username: string,
+  avatarUpdatedAt: string | null | undefined,
+): string | null => {
+  if (!avatarUpdatedAt) return null;
+  const stamp = Date.parse(avatarUpdatedAt);
+  const version = Number.isNaN(stamp) ? avatarUpdatedAt : String(stamp);
+  return `${process.env.NEXT_PUBLIC_URL_API}/users/${encodeURIComponent(
+    username,
+  )}/avatar?v=${encodeURIComponent(version)}`;
 };

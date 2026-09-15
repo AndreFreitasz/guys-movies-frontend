@@ -4,7 +4,11 @@ import { toast } from "react-toastify";
 import Modal from "../_ui/modal";
 import Avatar from "./avatar";
 import { authFetch } from "../../utils/authFetch";
-import { UserListPage, UserSummary } from "../../interfaces/profile/types";
+import {
+  UserListPage,
+  UserSummary,
+  resolveAvatarUrl,
+} from "../../interfaces/profile/types";
 
 interface UserListSheetProps {
   isOpen: boolean;
@@ -143,7 +147,12 @@ const UserListSheet: React.FC<UserListSheetProps> = ({
               onClick={onClose}
               className="flex min-w-0 flex-1 items-center gap-3"
             >
-              <Avatar name={user.name} username={user.username} size="md" />
+              <Avatar
+                name={user.name}
+                username={user.username}
+                size="md"
+                imageUrl={resolveAvatarUrl(user.username, user.avatarUpdatedAt)}
+              />
               <span className="min-w-0">
                 <span className="block truncate text-sm font-bold text-white">
                   {user.name || user.username}

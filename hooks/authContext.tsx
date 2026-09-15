@@ -18,6 +18,7 @@ interface UserData {
   email: string;
   name: string;
   id: number;
+  avatarUpdatedAt: string | null;
 }
 
 interface AuthContextProps {
@@ -88,6 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         username: data.username,
         email: data.email,
         name: data.name,
+        avatarUpdatedAt: data.avatarUpdatedAt ?? null,
       });
     } catch {
       clearSession();

@@ -157,8 +157,15 @@ const Perfil: React.FC = () => {
                   bio={profile.bio}
                   name={profile.name}
                   username={profile.username}
+                  avatarUpdatedAt={profile.avatarUpdatedAt}
                   favorites={profile.favorites}
                   onCancel={() => setIsEditing(false)}
+                  onAvatarChanged={(avatarUpdatedAt) => {
+                    setProfile((current) =>
+                      current ? { ...current, avatarUpdatedAt } : current,
+                    );
+                    dataUser();
+                  }}
                   onSaved={(identity, favorites) => {
                     const changedUsername =
                       identity.username !== profile.username;

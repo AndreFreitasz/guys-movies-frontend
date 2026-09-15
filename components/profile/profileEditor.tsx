@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { FaTimes } from "react-icons/fa";
+import { FaCamera, FaTimes } from "react-icons/fa";
 import FavoritePicker from "./favoritePicker";
+import Avatar from "./avatar";
 import { authFetch } from "../../utils/authFetch";
 import {
   Favorite,
   FavoriteType,
+  resolveAvatarUrl,
   resolvePosterUrl,
 } from "../../interfaces/profile/types";
 
@@ -19,10 +21,20 @@ interface ProfileEditorProps {
   bio: string | null;
   name: string;
   username: string;
+  avatarUpdatedAt: string | null;
   favorites: Favorite[];
   onCancel: () => void;
   onSaved: (identity: SavedIdentity, favorites: Favorite[]) => void;
+  onAvatarChanged: (avatarUpdatedAt: string | null) => void;
 }
+
+const MAX_AVATAR_BYTES = 8 * 1024 * 1024;
+const ACCEPTED_AVATAR_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
 
 const BIO_LIMIT = 280;
 const NAME_LIMIT = 120;
@@ -46,10 +58,78 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
   bio,
   name,
   username,
+  avatarUpdatedAt,
   favorites,
   onCancel,
   onSaved,
+  onAvatarChanged,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const savedAvatarUrl = resolveAvatarUrl(username, avatarUpdatedAt);
+  const shownAvatarUrl = avatarPreview ?? savedAvatarUrl;
+
+  const uploadAvatar = async (file: File) => {
+    if (!ACCEPTED_AVATAR_TYPES.includes(file.type)) {
+      toast.error("Use uma imagem JPG, PNG, WebP ou AVIF.");
+      return;
+    }
+
+    if (file.size > MAX_AVATAR_BYTES) {
+      toast.error("A imagem passa de 8MB. Escolha uma menor.");
+      return;
+    }
+
+    const localPreview = URL.createObjectURL(file);
+    setAvatarPreview(localPreview);
+    setIsUploadingAvatar(true);
+
+    try {
+      const body = new FormData();
+      body.append("file", file);
+
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/me/avatar`,
+        { method: "POST", body },
+      );
+
+      if (!response.ok) throw new Error("Falha ao enviar a foto");
+
+      const saved = (await response.json()) as { avatarUpdatedAt: string };
+      onAvatarChanged(saved.avatarUpdatedAt);
+      toast.success("Foto atualizada!");
+    } catch {
+      setAvatarPreview(null);
+      toast.error("Não foi possível enviar a foto. Tente de novo.");
+    } finally {
+      URL.revokeObjectURL(localPreview);
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const removeAvatar = async () => {
+    setIsUploadingAvatar(true);
+
+    try {
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/me/avatar`,
+        { method: "DELETE" },
+      );
+
+      if (!response.ok) throw new Error("Falha ao remover a foto");
+
+      setAvatarPreview(null);
+      onAvatarChanged(null);
+      toast.success("Foto removida.");
+    } catch {
+      toast.error("Não foi possível remover a foto.");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   const [draftBio, setDraftBio] = useState(bio ?? "");
   const [draftName, setDraftName] = useState(name);
   const [draftUsername, setDraftUsername] = useState(username);
@@ -161,6 +241,63 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
 
   return (
     <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+      <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-brand-300">
+        Foto
+      </p>
+      <div className="mb-5 mt-2 flex items-center gap-4">
+        <span
+          className={`relative shrink-0 rounded-full ring-2 ring-white/10 transition-opacity duration-300 ${
+            isUploadingAvatar ? "opacity-60" : ""
+          }`}
+        >
+          <Avatar
+            name={name}
+            username={username}
+            size="lg"
+            imageUrl={shownAvatarUrl}
+          />
+        </span>
+
+        <div className="min-w-0">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={isUploadingAvatar}
+              onClick={() => fileInputRef.current?.click()}
+              className="flex min-h-[44px] items-center gap-2 rounded-full border border-brand-400/50 px-5 text-sm font-bold text-brand-200 transition-colors duration-300 hover:bg-brand-500/15 disabled:opacity-60"
+            >
+              <FaCamera size={12} />
+              {shownAvatarUrl ? "Trocar foto" : "Enviar foto"}
+            </button>
+            {savedAvatarUrl && (
+              <button
+                type="button"
+                disabled={isUploadingAvatar}
+                onClick={removeAvatar}
+                className="min-h-[44px] rounded-full border border-white/15 px-5 text-sm font-semibold text-white/70 transition-colors duration-300 hover:text-white disabled:opacity-60"
+              >
+                Remover
+              </button>
+            )}
+          </div>
+          <p className="mt-2 text-xs text-white/35">
+            JPG, PNG, WebP ou AVIF, até 8MB. Recortamos o centro em um quadrado.
+          </p>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={ACCEPTED_AVATAR_TYPES.join(",")}
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) uploadAvatar(file);
+          }}
+        />
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label

@@ -4,7 +4,11 @@ import { FaPen } from "react-icons/fa";
 import Avatar from "./avatar";
 import FollowButton from "./followButton";
 import ProfileCounters from "./profileCounters";
-import { Profile, joinedYear } from "../../interfaces/profile/types";
+import {
+  Profile,
+  joinedYear,
+  resolveAvatarUrl,
+} from "../../interfaces/profile/types";
 
 interface ProfileHeroProps {
   profile: Profile;
@@ -36,7 +40,15 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
     >
       <div className="flex flex-wrap items-end gap-4 sm:gap-6">
         <span className="shrink-0 rounded-full shadow-lift ring-[5px] ring-[#05050c]/75">
-          <Avatar name={profile.name} username={profile.username} size="xl" />
+          <Avatar
+            name={profile.name}
+            username={profile.username}
+            size="xl"
+            imageUrl={resolveAvatarUrl(
+              profile.username,
+              profile.avatarUpdatedAt,
+            )}
+          />
         </span>
 
         <div className="min-w-0 flex-1 basis-60">
