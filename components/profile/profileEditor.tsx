@@ -9,14 +9,25 @@ import {
   resolvePosterUrl,
 } from "../../interfaces/profile/types";
 
+export interface SavedIdentity {
+  bio: string | null;
+  name: string;
+  username: string;
+}
+
 interface ProfileEditorProps {
   bio: string | null;
+  name: string;
+  username: string;
   favorites: Favorite[];
   onCancel: () => void;
-  onSaved: (bio: string | null, favorites: Favorite[]) => void;
+  onSaved: (identity: SavedIdentity, favorites: Favorite[]) => void;
 }
 
 const BIO_LIMIT = 280;
+const NAME_LIMIT = 120;
+const USERNAME_LIMIT = 40;
+const USERNAME_PATTERN = /^[A-Za-z0-9._-]+$/;
 
 interface DraftFavorite {
   type: FavoriteType;
@@ -25,13 +36,25 @@ interface DraftFavorite {
   posterPath: string | null;
 }
 
+const firstMessage = (payload: unknown): string | null => {
+  const message = (payload as { message?: string | string[] })?.message;
+  if (Array.isArray(message)) return message[0] ?? null;
+  return typeof message === "string" ? message : null;
+};
+
 const ProfileEditor: React.FC<ProfileEditorProps> = ({
   bio,
+  name,
+  username,
   favorites,
   onCancel,
   onSaved,
 }) => {
   const [draftBio, setDraftBio] = useState(bio ?? "");
+  const [draftName, setDraftName] = useState(name);
+  const [draftUsername, setDraftUsername] = useState(username);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftFavorite[]>(
     favorites.map((favorite) => ({
       type: favorite.type,
@@ -45,17 +68,65 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
 
   const remaining = BIO_LIMIT - draftBio.length;
 
+  const validate = (): boolean => {
+    const trimmedName = draftName.trim();
+    const trimmedUsername = draftUsername.trim();
+    let isValid = true;
+
+    setNameError(null);
+    setUsernameError(null);
+
+    if (trimmedName.length === 0) {
+      setNameError("Escreva um nome.");
+      isValid = false;
+    }
+
+    if (trimmedUsername.length < 3) {
+      setUsernameError("Use ao menos 3 caracteres.");
+      isValid = false;
+    } else if (!USERNAME_PATTERN.test(trimmedUsername)) {
+      setUsernameError("Use apenas letras, números, ponto, hífen e underline.");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
   const save = async () => {
+    if (!validate()) return;
+
     setIsSaving(true);
 
     try {
-      const [bioResponse, favoritesResponse] = await Promise.all([
-        authFetch(`${process.env.NEXT_PUBLIC_URL_API}/me/profile`, {
+      const profileResponse = await authFetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/me/profile`,
+        {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bio: draftBio.trim() || null }),
-        }),
-        authFetch(`${process.env.NEXT_PUBLIC_URL_API}/me/profile/favorites`, {
+          body: JSON.stringify({
+            bio: draftBio.trim() || null,
+            name: draftName.trim(),
+            username: draftUsername.trim(),
+          }),
+        },
+      );
+
+      if (profileResponse.status === 409) {
+        setUsernameError("Esse nome de usuário já está em uso.");
+        return;
+      }
+
+      if (profileResponse.status === 400) {
+        const detail = await profileResponse.json().catch(() => null);
+        setUsernameError(firstMessage(detail) ?? "Confira os campos.");
+        return;
+      }
+
+      if (!profileResponse.ok) throw new Error("Falha ao salvar");
+
+      const favoritesResponse = await authFetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/me/profile/favorites`,
+        {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -64,17 +135,22 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
               idTmdb: item.idTmdb,
             })),
           }),
-        }),
-      ]);
+        },
+      );
 
-      if (!bioResponse.ok || !favoritesResponse.ok) {
-        throw new Error("Falha ao salvar");
-      }
+      if (!favoritesResponse.ok) throw new Error("Falha ao salvar");
 
-      const savedBio = (await bioResponse.json()) as { bio: string | null };
+      const saved = (await profileResponse.json()) as Partial<SavedIdentity>;
       const savedFavorites = (await favoritesResponse.json()) as Favorite[];
 
-      onSaved(savedBio.bio, savedFavorites);
+      onSaved(
+        {
+          bio: saved.bio ?? null,
+          name: saved.name ?? draftName.trim(),
+          username: saved.username ?? draftUsername.trim(),
+        },
+        savedFavorites,
+      );
       toast.success("Perfil atualizado!");
     } catch {
       toast.error("Não foi possível salvar. Tente de novo.");
@@ -85,9 +161,94 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
 
   return (
     <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label
+            htmlFor="profile-name"
+            className="block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-brand-300"
+          >
+            Nome
+          </label>
+          <input
+            id="profile-name"
+            type="text"
+            value={draftName}
+            maxLength={NAME_LIMIT}
+            onChange={(event) => setDraftName(event.target.value)}
+            placeholder="Como você quer ser chamado"
+            aria-invalid={nameError !== null}
+            aria-describedby={nameError ? "profile-name-error" : undefined}
+            className={`mt-2 w-full rounded-2xl border bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none ${
+              nameError
+                ? "border-rose-400/70"
+                : "border-white/10 focus:border-brand-400/60"
+            }`}
+          />
+          {nameError && (
+            <p id="profile-name-error" className="mt-1.5 text-xs text-rose-300">
+              {nameError}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="profile-username"
+            className="block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-brand-300"
+          >
+            Nome de usuário
+          </label>
+          <div className="relative mt-2">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-white/35">
+              @
+            </span>
+            <input
+              id="profile-username"
+              type="text"
+              value={draftUsername}
+              maxLength={USERNAME_LIMIT}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              onChange={(event) => {
+                setDraftUsername(event.target.value);
+                setUsernameError(null);
+              }}
+              placeholder="seu.usuario"
+              aria-invalid={usernameError !== null}
+              aria-describedby={
+                usernameError
+                  ? "profile-username-error"
+                  : "profile-username-help"
+              }
+              className={`w-full rounded-2xl border bg-white/[0.04] py-3 pl-7 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none ${
+                usernameError
+                  ? "border-rose-400/70"
+                  : "border-white/10 focus:border-brand-400/60"
+              }`}
+            />
+          </div>
+          {usernameError ? (
+            <p
+              id="profile-username-error"
+              className="mt-1.5 text-xs text-rose-300"
+            >
+              {usernameError}
+            </p>
+          ) : (
+            <p
+              id="profile-username-help"
+              className="mt-1.5 text-xs text-white/35"
+            >
+              Muda o endereço do seu perfil.
+            </p>
+          )}
+        </div>
+      </div>
+
       <label
         htmlFor="profile-bio"
-        className="block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-indigo-300"
+        className="mt-5 block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-brand-300"
       >
         Descrição
       </label>
@@ -98,13 +259,13 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
         rows={3}
         onChange={(event) => setDraftBio(event.target.value)}
         placeholder="Conte em poucas linhas o que você gosta de assistir."
-        className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/60 focus:outline-none"
+        className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-brand-400/60 focus:outline-none"
       />
       <p className="mt-1 text-right text-xs tabular-nums text-white/35">
         {remaining}
       </p>
 
-      <p className="mt-5 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-indigo-300">
+      <p className="mt-5 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-brand-300">
         Favoritos
       </p>
       <div className="mt-2 grid grid-cols-3 gap-3">

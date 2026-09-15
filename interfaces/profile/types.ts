@@ -148,15 +148,17 @@ export const formatEventDate = (isoDate: string): string => {
   return `${Number.parseInt(day, 10)} de ${MONTHS[index]}`;
 };
 
+export type BackdropSize = "w780" | "w1280" | "original";
+
 export const resolveBackdropUrl = (
   backdropPath: string | null,
-  width: 780 | 1280,
+  size: BackdropSize,
 ): string | null => {
   if (!backdropPath) return null;
   if (backdropPath.startsWith("http")) {
-    return backdropPath.replace(/\/t\/p\/w\d+\//, `/t/p/w${width}/`);
+    return backdropPath.replace(/\/t\/p\/(w\d+|original)\//, `/t/p/${size}/`);
   }
-  return `https://image.tmdb.org/t/p/w${width}${backdropPath}`;
+  return `https://image.tmdb.org/t/p/${size}${backdropPath}`;
 };
 
 export const favoritesOfType = (

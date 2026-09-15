@@ -23,8 +23,8 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
   isSelf,
   onChangeCover,
 }) => {
-  const wide = resolveBackdropUrl(cover?.backdropPath ?? null, 1280);
-  const narrow = resolveBackdropUrl(cover?.backdropPath ?? null, 780);
+  const wide = resolveBackdropUrl(cover?.backdropPath ?? null, "original");
+  const narrow = resolveBackdropUrl(cover?.backdropPath ?? null, "w780");
 
   return (
     <>
@@ -39,7 +39,7 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
               src={narrow}
               alt={`Capa do perfil: ${cover?.title ?? ""}`}
               decoding="async"
-              className="h-full w-full object-cover object-top opacity-[0.82]"
+              className="h-full w-full object-cover object-top opacity-[0.76]"
               style={FADE_MASK}
             />
           </picture>
@@ -50,8 +50,8 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
           />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-[#05050c]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-[#05050c]/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/28 to-[#05050c]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/52 via-transparent to-[#05050c]/80" />
         <div className="absolute inset-0 backdrop-blur-[2px]" />
         <div className="absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(124,77,255,0.14),transparent_62%)]" />
         <div

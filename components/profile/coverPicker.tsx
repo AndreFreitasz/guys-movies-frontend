@@ -177,7 +177,8 @@ const CoverPicker: React.FC<CoverPickerProps> = ({
                       >
                         <img
                           src={
-                            resolveBackdropUrl(option.backdropPath, 780) ?? ""
+                            resolveBackdropUrl(option.backdropPath, "w780") ??
+                            ""
                           }
                           alt={option.title}
                           loading="lazy"

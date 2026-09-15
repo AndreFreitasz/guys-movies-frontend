@@ -22,7 +22,7 @@ import { Cover, CoverOption } from "../../interfaces/profile/types";
 
 const Perfil: React.FC = () => {
   const router = useRouter();
-  const { authLoading, isAuthenticated } = useAuth();
+  const { authLoading, isAuthenticated, dataUser } = useAuth();
   const username =
     typeof router.query.username === "string"
       ? router.query.username
@@ -155,13 +155,29 @@ const Perfil: React.FC = () => {
               {isEditing ? (
                 <ProfileEditor
                   bio={profile.bio}
+                  name={profile.name}
+                  username={profile.username}
                   favorites={profile.favorites}
                   onCancel={() => setIsEditing(false)}
-                  onSaved={(bio, favorites) => {
+                  onSaved={(identity, favorites) => {
+                    const changedUsername =
+                      identity.username !== profile.username;
+
                     setProfile((current) =>
-                      current ? { ...current, bio, favorites } : current,
+                      current
+                        ? { ...current, ...identity, favorites }
+                        : current,
                     );
                     setIsEditing(false);
+                    dataUser();
+
+                    if (changedUsername) {
+                      router.replace(
+                        `/perfil/${encodeURIComponent(identity.username)}`,
+                        undefined,
+                        { shallow: true },
+                      );
+                    }
                   }}
                 />
               ) : (
