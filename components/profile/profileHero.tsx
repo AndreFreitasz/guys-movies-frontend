@@ -32,14 +32,14 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="relative z-10 -mt-[3.25rem]"
+      className="relative z-10"
     >
       <div className="flex flex-wrap items-end gap-4 sm:gap-6">
-        <span className="shrink-0 rounded-full ring-[6px] ring-[#05050c]">
-          <Avatar name={profile.name} username={profile.username} size="lg" />
+        <span className="-mt-12 shrink-0 rounded-full ring-[6px] ring-[#05050c] sm:-mt-20">
+          <Avatar name={profile.name} username={profile.username} size="xl" />
         </span>
 
-        <div className="min-w-0 flex-1 basis-60 pb-1.5">
+        <div className="min-w-0 flex-1 basis-60">
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="truncate text-3xl font-black tracking-tight text-white sm:text-4xl">
               {profile.name || profile.username}

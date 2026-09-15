@@ -4,7 +4,7 @@ import { avatarGradient, initialsOf } from "../../interfaces/profile/types";
 interface AvatarProps {
   name: string;
   username: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   imageUrl?: string | null;
 }
 
@@ -12,6 +12,7 @@ const SIZES = {
   sm: "h-9 w-9 text-[0.7rem]",
   md: "h-12 w-12 text-sm",
   lg: "h-24 w-24 text-2xl sm:h-28 sm:w-28 sm:text-3xl",
+  xl: "h-32 w-32 text-3xl sm:h-40 sm:w-40 sm:text-5xl",
 };
 
 const Avatar: React.FC<AvatarProps> = ({
