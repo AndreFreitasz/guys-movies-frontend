@@ -13,6 +13,15 @@ export interface Favorite {
   position: number;
 }
 
+export interface Cover {
+  type: FavoriteType;
+  idTmdb: number;
+  title: string;
+  backdropPath: string | null;
+}
+
+export type CoverOption = Cover;
+
 export interface ProfileCounts {
   followers: number;
   following: number;
@@ -30,6 +39,9 @@ export interface Profile {
   followsYou: boolean;
   counts: ProfileCounts;
   favorites: Favorite[];
+  cover: Cover | null;
+  joinedAt: string | null;
+  avatarUpdatedAt: string | null;
 }
 
 export interface UserSummary {
@@ -37,6 +49,7 @@ export interface UserSummary {
   name: string;
   isSelf: boolean;
   isFollowing: boolean;
+  avatarUpdatedAt: string | null;
 }
 
 export interface UserListPage {
@@ -135,4 +148,43 @@ export const formatEventDate = (isoDate: string): string => {
   const index = Number.parseInt(month, 10) - 1;
   if (index < 0 || index > 11) return isoDate;
   return `${Number.parseInt(day, 10)} de ${MONTHS[index]}`;
+};
+
+export type BackdropSize = "w780" | "w1280" | "original";
+
+export const resolveBackdropUrl = (
+  backdropPath: string | null,
+  size: BackdropSize,
+): string | null => {
+  if (!backdropPath) return null;
+  if (backdropPath.startsWith("http")) {
+    return backdropPath.replace(/\/t\/p\/(w\d+|original)\//, `/t/p/${size}/`);
+  }
+  return `https://image.tmdb.org/t/p/${size}${backdropPath}`;
+};
+
+export const favoritesOfType = (
+  favorites: Favorite[],
+  type: FavoriteType,
+): Favorite[] =>
+  favorites
+    .filter((favorite) => favorite.type === type)
+    .sort((first, second) => first.position - second.position);
+
+export const joinedYear = (joinedAt: string | null): number | null => {
+  if (!joinedAt) return null;
+  const year = new Date(joinedAt).getFullYear();
+  return Number.isFinite(year) ? year : null;
+};
+
+export const resolveAvatarUrl = (
+  username: string,
+  avatarUpdatedAt: string | null | undefined,
+): string | null => {
+  if (!avatarUpdatedAt) return null;
+  const stamp = Date.parse(avatarUpdatedAt);
+  const version = Number.isNaN(stamp) ? avatarUpdatedAt : String(stamp);
+  return `${process.env.NEXT_PUBLIC_URL_API}/users/${encodeURIComponent(
+    username,
+  )}/avatar?v=${encodeURIComponent(version)}`;
 };

@@ -14,6 +14,7 @@ interface PickerOption {
 
 interface FavoritePickerProps {
   isOpen: boolean;
+  type: FavoriteType;
   onClose: () => void;
   onSelect: (option: PickerOption) => void;
   excludedKeys: string[];
@@ -21,6 +22,7 @@ interface FavoritePickerProps {
 
 const FavoritePicker: React.FC<FavoritePickerProps> = ({
   isOpen,
+  type,
   onClose,
   onSelect,
   excludedKeys,
@@ -84,19 +86,26 @@ const FavoritePicker: React.FC<FavoritePickerProps> = ({
     const normalized = term.trim().toLowerCase();
 
     return options
+      .filter((option) => option.type === type)
       .filter((option) => !excluded.has(`${option.type}:${option.idTmdb}`))
       .filter((option) =>
         normalized ? option.title.toLowerCase().includes(normalized) : true,
       );
-  }, [excludedKeys, options, term]);
+  }, [excludedKeys, options, term, type]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Escolher favorito">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={type === "movie" ? "Escolher filme" : "Escolher série"}
+    >
       <input
         type="search"
         value={term}
         onChange={(event) => setTerm(event.target.value)}
-        placeholder="Buscar no que você assistiu..."
+        placeholder={
+          type === "movie" ? "Buscar um filme..." : "Buscar uma série..."
+        }
         aria-label="Buscar na sua biblioteca"
         className="mb-4 w-full rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-medium text-white placeholder:text-white/35 focus:border-indigo-400/60 focus:outline-none"
       />
@@ -122,7 +131,7 @@ const FavoritePicker: React.FC<FavoritePickerProps> = ({
         {!isLoading && !hasFailed && visible.length === 0 && (
           <p className="py-8 text-center text-sm leading-relaxed text-white/50">
             {options.length === 0
-              ? "Você ainda não marcou nada como assistido. Marque um filme ou série para escolher seus favoritos."
+              ? `Você ainda não marcou ${type === "movie" ? "nenhum filme" : "nenhuma série"} como assistido.`
               : "Nada encontrado com esse termo."}
           </p>
         )}

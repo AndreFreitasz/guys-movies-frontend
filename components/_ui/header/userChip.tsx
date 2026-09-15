@@ -1,26 +1,18 @@
 import { forwardRef } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import Avatar from "../../profile/avatar";
 
 interface UserChipProps {
   username: string;
+  name?: string;
+  avatarUrl?: string | null;
   isOpen?: boolean;
   onClick: () => void;
   compact?: boolean;
 }
 
-const getInitials = (username: string) =>
-  username
-    .replace(/[^a-zA-Z0-9\s]/g, "")
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("") || "U";
-
 const UserChip = forwardRef<HTMLButtonElement, UserChipProps>(
-  ({ username, isOpen, onClick, compact }, ref) => {
-    const initials = getInitials(username);
-
+  ({ username, name, avatarUrl, isOpen, onClick, compact }, ref) => {
     return (
       <button
         ref={ref}
@@ -32,8 +24,13 @@ const UserChip = forwardRef<HTMLButtonElement, UserChipProps>(
           compact ? "p-1" : "py-1 pl-1 pr-3"
         }`}
       >
-        <span className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/[0.1] text-xs font-black tracking-wide text-white">
-          {initials}
+        <span className="relative flex items-center justify-center">
+          <Avatar
+            name={name ?? ""}
+            username={username}
+            size="sm"
+            imageUrl={avatarUrl ?? null}
+          />
           <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#05050c] bg-emerald-400" />
         </span>
         {!compact && (

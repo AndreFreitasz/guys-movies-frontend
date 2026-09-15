@@ -7,13 +7,18 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { authFetch, clearAccessToken, setAccessToken } from "../utils/authFetch";
+import {
+  authFetch,
+  clearAccessToken,
+  setAccessToken,
+} from "../utils/authFetch";
 
 interface UserData {
   username: string;
   email: string;
   name: string;
   id: number;
+  avatarUpdatedAt: string | null;
 }
 
 interface AuthContextProps {
@@ -84,6 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         username: data.username,
         email: data.email,
         name: data.name,
+        avatarUpdatedAt: data.avatarUpdatedAt ?? null,
       });
     } catch {
       clearSession();

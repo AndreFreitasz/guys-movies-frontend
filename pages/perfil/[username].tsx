@@ -1,22 +1,30 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 import Header from "../../components/_ui/header";
 import Footer from "../../components/_ui/footer";
+import ProfileCover from "../../components/profile/profileCover";
 import ProfileHero from "../../components/profile/profileHero";
-import ProfileEditor from "../../components/profile/profileEditor";
+import ProfileEditor, {
+  ProfileEditorHandle,
+} from "../../components/profile/profileEditor";
 import FavoriteShelf from "../../components/profile/favoriteShelf";
+import SectionHeader from "../../components/profile/sectionHeader";
 import TimelineList from "../../components/profile/timelineList";
 import UserListSheet from "../../components/profile/userListSheet";
+import CoverPicker from "../../components/profile/coverPicker";
 import { useProfile } from "../../hooks/useProfile";
 import { useTimeline } from "../../hooks/useTimeline";
 import { useFollow } from "../../hooks/useFollow";
 import { useAuth } from "../../hooks/authContext";
+import { authFetch } from "../../utils/authFetch";
+import { Cover, CoverOption } from "../../interfaces/profile/types";
 
 const Perfil: React.FC = () => {
   const router = useRouter();
-  const { authLoading, isAuthenticated } = useAuth();
+  const { authLoading, isAuthenticated, dataUser } = useAuth();
   const username =
     typeof router.query.username === "string"
       ? router.query.username
@@ -34,10 +42,39 @@ const Perfil: React.FC = () => {
   const [sheetMode, setSheetMode] = useState<"followers" | "following" | null>(
     null,
   );
+  const [isCoverPickerOpen, setIsCoverPickerOpen] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const editorRef = useRef<ProfileEditorHandle>(null);
 
   const pageTitle = profile
     ? `${profile.name || profile.username} - GuysMovies`
     : "Perfil - GuysMovies";
+
+  const saveCover = async (cover: CoverOption | null) => {
+    setIsCoverPickerOpen(false);
+
+    try {
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/me/profile/cover`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cover: cover ? { type: cover.type, idTmdb: cover.idTmdb } : null,
+          }),
+        },
+      );
+
+      if (!response.ok) throw new Error("Falha ao salvar a capa");
+
+      const saved = (await response.json()) as Cover | null;
+      setProfile((current) =>
+        current ? { ...current, cover: saved } : current,
+      );
+    } catch {
+      toast.error("Não foi possível salvar a capa.");
+    }
+  };
 
   return (
     <>
@@ -47,19 +84,17 @@ const Perfil: React.FC = () => {
       </Head>
       <Header />
 
-      <main className="relative mx-auto w-full max-w-[1100px] px-4 pb-16 pt-8 sm:px-6 lg:px-10">
-        <div className="aurora" />
-
+      <main className="relative w-full pb-16">
         {(authLoading ||
           (isAuthenticated && (status === "loading" || status === "idle"))) && (
-          <div className="relative space-y-4">
-            <div className="skeleton h-28 w-full rounded-3xl" />
+          <div className="mx-auto w-full max-w-[1100px] space-y-4 px-4 pt-24 sm:px-6 lg:px-10">
             <div className="skeleton h-40 w-full rounded-3xl" />
+            <div className="skeleton h-28 w-full rounded-3xl" />
           </div>
         )}
 
         {!authLoading && !isAuthenticated && (
-          <div className="relative py-20 text-center">
+          <div className="mx-auto w-full max-w-[1100px] px-4 py-24 text-center sm:px-6 lg:px-10">
             <h1 className="text-2xl font-black text-white">
               Entre para ver perfis
             </h1>
@@ -70,7 +105,7 @@ const Perfil: React.FC = () => {
         )}
 
         {status === "notFound" && (
-          <div className="relative py-20 text-center">
+          <div className="mx-auto w-full max-w-[1100px] px-4 py-24 text-center sm:px-6 lg:px-10">
             <h1 className="text-2xl font-black text-white">
               Perfil não encontrado
             </h1>
@@ -88,7 +123,7 @@ const Perfil: React.FC = () => {
         )}
 
         {status === "failed" && (
-          <div className="relative py-20 text-center">
+          <div className="mx-auto w-full max-w-[1100px] px-4 py-24 text-center sm:px-6 lg:px-10">
             <p className="text-sm text-white/60">
               Não foi possível carregar este perfil.
             </p>
@@ -103,56 +138,96 @@ const Perfil: React.FC = () => {
         )}
 
         {status === "ready" && profile && (
-          <div className="relative">
-            <ProfileHero
-              profile={profile}
-              isEditing={isEditing}
-              isFollowPending={isPending}
-              onToggleFollow={toggle}
-              onStartEditing={() => setIsEditing(true)}
-              onOpenFollowers={() => setSheetMode("followers")}
-              onOpenFollowing={() => setSheetMode("following")}
+          <section className="relative isolate -mt-[4.25rem] overflow-hidden lg:-mt-20">
+            <ProfileCover
+              cover={profile.cover}
+              isSelf={profile.isSelf}
+              onChangeCover={() => setIsCoverPickerOpen(true)}
             />
 
-            {isEditing ? (
-              <ProfileEditor
-                bio={profile.bio}
-                favorites={profile.favorites}
-                onCancel={() => setIsEditing(false)}
-                onSaved={(bio, favorites) => {
+            <div className="relative z-10 mx-auto w-full max-w-[1100px] px-4 pt-[15rem] sm:px-6 sm:pt-[22rem] lg:px-10 lg:pt-[28rem]">
+              <ProfileHero
+                profile={profile}
+                isEditing={isEditing}
+                isSaving={isSavingProfile}
+                isFollowPending={isPending}
+                onToggleFollow={toggle}
+                onStartEditing={() => setIsEditing(true)}
+                onSaveEditing={() => editorRef.current?.save()}
+                onCancelEditing={() => setIsEditing(false)}
+                onAvatarChanged={(avatarUpdatedAt) => {
                   setProfile((current) =>
-                    current ? { ...current, bio, favorites } : current,
+                    current ? { ...current, avatarUpdatedAt } : current,
                   );
-                  setIsEditing(false);
+                  dataUser();
                 }}
+                onOpenFollowers={() => setSheetMode("followers")}
+                onOpenFollowing={() => setSheetMode("following")}
               />
-            ) : (
-              <FavoriteShelf
-                favorites={profile.favorites}
-                isSelf={profile.isSelf}
-                onEdit={() => setIsEditing(true)}
-              />
-            )}
 
-            <section className="mt-12">
-              <h2 className="mb-4 text-lg font-black tracking-tight text-white">
-                Histórico
-              </h2>
-              <TimelineList
-                events={timeline.events}
-                status={timeline.status}
-                isLoadingMore={timeline.isLoadingMore}
-                hasMore={Boolean(timeline.nextCursor)}
-                onLoadMore={timeline.loadMore}
-                onRetry={timeline.retry}
-                emptyMessage={
-                  profile.isSelf
-                    ? "Você ainda não marcou nada como assistido. Quando marcar, sua linha do tempo aparece aqui."
-                    : "Este perfil ainda não tem nada no histórico."
-                }
-              />
-            </section>
-          </div>
+              {isEditing ? (
+                <ProfileEditor
+                  ref={editorRef}
+                  bio={profile.bio}
+                  name={profile.name}
+                  username={profile.username}
+                  hasAvatar={profile.avatarUpdatedAt !== null}
+                  favorites={profile.favorites}
+                  onCancel={() => setIsEditing(false)}
+                  onSavingChange={setIsSavingProfile}
+                  onAvatarChanged={(avatarUpdatedAt) => {
+                    setProfile((current) =>
+                      current ? { ...current, avatarUpdatedAt } : current,
+                    );
+                    dataUser();
+                  }}
+                  onSaved={(identity, favorites) => {
+                    const changedUsername =
+                      identity.username !== profile.username;
+
+                    setProfile((current) =>
+                      current
+                        ? { ...current, ...identity, favorites }
+                        : current,
+                    );
+                    setIsEditing(false);
+                    dataUser();
+
+                    if (changedUsername) {
+                      router.replace(
+                        `/perfil/${encodeURIComponent(identity.username)}`,
+                        undefined,
+                        { shallow: true },
+                      );
+                    }
+                  }}
+                />
+              ) : (
+                <FavoriteShelf
+                  favorites={profile.favorites}
+                  isSelf={profile.isSelf}
+                  onEdit={() => setIsEditing(true)}
+                />
+              )}
+
+              <section className="mt-12">
+                <SectionHeader title="Histórico" />
+                <TimelineList
+                  events={timeline.events}
+                  status={timeline.status}
+                  isLoadingMore={timeline.isLoadingMore}
+                  hasMore={Boolean(timeline.nextCursor)}
+                  onLoadMore={timeline.loadMore}
+                  onRetry={timeline.retry}
+                  emptyMessage={
+                    profile.isSelf
+                      ? "Você ainda não marcou nada como assistido. Quando marcar, sua linha do tempo aparece aqui."
+                      : "Este perfil ainda não tem nada no histórico."
+                  }
+                />
+              </section>
+            </div>
+          </section>
         )}
       </main>
 
@@ -162,6 +237,20 @@ const Perfil: React.FC = () => {
           onClose={() => setSheetMode(null)}
           username={profile.username}
           mode={sheetMode ?? "followers"}
+        />
+      )}
+
+      {profile?.isSelf && (
+        <CoverPicker
+          isOpen={isCoverPickerOpen}
+          selectedKey={
+            profile.cover
+              ? `${profile.cover.type}:${profile.cover.idTmdb}`
+              : null
+          }
+          onClose={() => setIsCoverPickerOpen(false)}
+          onSelect={saveCover}
+          onRemove={() => saveCover(null)}
         />
       )}
 
