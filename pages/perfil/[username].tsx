@@ -145,7 +145,7 @@ const Perfil: React.FC = () => {
               onChangeCover={() => setIsCoverPickerOpen(true)}
             />
 
-            <div className="relative z-10 mx-auto w-full max-w-[1100px] px-4 pt-[max(7rem,calc(56.25vw-10rem))] sm:px-6 lg:px-10">
+            <div className="relative z-10 mx-auto w-full max-w-[1100px] px-4 pt-[15rem] sm:px-6 sm:pt-[22rem] lg:px-10 lg:pt-[28rem]">
               <ProfileHero
                 profile={profile}
                 isEditing={isEditing}
