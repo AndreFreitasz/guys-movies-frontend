@@ -134,14 +134,14 @@ const Perfil: React.FC = () => {
         )}
 
         {status === "ready" && profile && (
-          <>
+          <section className="relative isolate -mt-[4.25rem] overflow-hidden lg:-mt-20">
             <ProfileCover
               cover={profile.cover}
               isSelf={profile.isSelf}
               onChangeCover={() => setIsCoverPickerOpen(true)}
             />
 
-            <div className="relative mx-auto w-full max-w-[1100px] px-4 sm:px-6 lg:px-10">
+            <div className="relative z-10 mx-auto w-full max-w-[1100px] px-4 pt-[15rem] sm:px-6 sm:pt-[22rem] lg:px-10 lg:pt-[28rem]">
               <ProfileHero
                 profile={profile}
                 isEditing={isEditing}
@@ -189,7 +189,7 @@ const Perfil: React.FC = () => {
                 />
               </section>
             </div>
-          </>
+          </section>
         )}
       </main>
 

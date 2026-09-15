@@ -35,13 +35,13 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
       className="relative z-10"
     >
       <div className="flex flex-wrap items-end gap-4 sm:gap-6">
-        <span className="-mt-12 shrink-0 rounded-full ring-[6px] ring-[#05050c] sm:-mt-20">
+        <span className="shrink-0 rounded-full shadow-lift ring-[5px] ring-[#05050c]/75">
           <Avatar name={profile.name} username={profile.username} size="xl" />
         </span>
 
         <div className="min-w-0 flex-1 basis-60">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="truncate text-3xl font-black tracking-tight text-white sm:text-4xl">
+            <h1 className="truncate text-3xl font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] sm:text-4xl">
               {profile.name || profile.username}
             </h1>
             {profile.followsYou && !profile.isSelf && (
@@ -50,7 +50,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm font-semibold text-white/45">
+          <p className="mt-1 text-sm font-semibold text-white/60 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
             @{profile.username}
             {year && ` · Entrou em ${year}`}
           </p>
