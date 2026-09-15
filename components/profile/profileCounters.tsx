@@ -51,15 +51,15 @@ const ProfileCounters: React.FC<ProfileCountersProps> = ({
   onOpenFollowers,
   onOpenFollowing,
 }) => {
-  const actionClass =
-    "flex min-h-[44px] flex-col items-start rounded-2xl px-3 py-2 text-left transition-colors duration-300 hover:bg-white/[0.06] active:scale-95";
-  const staticClass = "flex flex-col items-start px-3 py-2 text-left";
-  const valueClass = "text-xl font-black text-white sm:text-2xl";
+  const cardClass =
+    "rounded-2xl border border-white/[0.09] bg-gradient-to-br from-white/[0.07] to-white/[0.02] px-4 py-3.5 text-left backdrop-blur-xl";
+  const actionClass = `${cardClass} min-h-[44px] transition-colors duration-300 hover:border-white/20 hover:from-white/[0.11] active:scale-[0.97]`;
+  const valueClass = "block text-xl font-black tracking-tight text-white";
   const labelClass =
-    "text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white/45";
+    "mt-1.5 block text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/45";
 
   return (
-    <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       <button type="button" onClick={onOpenFollowers} className={actionClass}>
         <span className={valueClass}>
           <AnimatedNumber value={counts.followers} />
@@ -72,13 +72,15 @@ const ProfileCounters: React.FC<ProfileCountersProps> = ({
         </span>
         <span className={labelClass}>Seguindo</span>
       </button>
-      <div className={staticClass}>
+      <div
+        className={`${cardClass} border-brand-400/20 from-brand-500/15 to-brand-500/[0.04]`}
+      >
         <span className={valueClass}>
           <AnimatedNumber value={counts.movies} />
         </span>
         <span className={labelClass}>Filmes</span>
       </div>
-      <div className={staticClass}>
+      <div className={cardClass}>
         <span className={valueClass}>
           <AnimatedNumber value={counts.episodes} />
         </span>
