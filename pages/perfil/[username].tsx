@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -7,7 +7,9 @@ import Header from "../../components/_ui/header";
 import Footer from "../../components/_ui/footer";
 import ProfileCover from "../../components/profile/profileCover";
 import ProfileHero from "../../components/profile/profileHero";
-import ProfileEditor from "../../components/profile/profileEditor";
+import ProfileEditor, {
+  ProfileEditorHandle,
+} from "../../components/profile/profileEditor";
 import FavoriteShelf from "../../components/profile/favoriteShelf";
 import SectionHeader from "../../components/profile/sectionHeader";
 import TimelineList from "../../components/profile/timelineList";
@@ -41,6 +43,8 @@ const Perfil: React.FC = () => {
     null,
   );
   const [isCoverPickerOpen, setIsCoverPickerOpen] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const editorRef = useRef<ProfileEditorHandle>(null);
 
   const pageTitle = profile
     ? `${profile.name || profile.username} - GuysMovies`
@@ -145,21 +149,32 @@ const Perfil: React.FC = () => {
               <ProfileHero
                 profile={profile}
                 isEditing={isEditing}
+                isSaving={isSavingProfile}
                 isFollowPending={isPending}
                 onToggleFollow={toggle}
                 onStartEditing={() => setIsEditing(true)}
+                onSaveEditing={() => editorRef.current?.save()}
+                onCancelEditing={() => setIsEditing(false)}
+                onAvatarChanged={(avatarUpdatedAt) => {
+                  setProfile((current) =>
+                    current ? { ...current, avatarUpdatedAt } : current,
+                  );
+                  dataUser();
+                }}
                 onOpenFollowers={() => setSheetMode("followers")}
                 onOpenFollowing={() => setSheetMode("following")}
               />
 
               {isEditing ? (
                 <ProfileEditor
+                  ref={editorRef}
                   bio={profile.bio}
                   name={profile.name}
                   username={profile.username}
-                  avatarUpdatedAt={profile.avatarUpdatedAt}
+                  hasAvatar={profile.avatarUpdatedAt !== null}
                   favorites={profile.favorites}
                   onCancel={() => setIsEditing(false)}
+                  onSavingChange={setIsSavingProfile}
                   onAvatarChanged={(avatarUpdatedAt) => {
                     setProfile((current) =>
                       current ? { ...current, avatarUpdatedAt } : current,

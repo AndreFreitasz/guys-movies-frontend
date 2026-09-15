@@ -1,21 +1,21 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaPen } from "react-icons/fa";
-import Avatar from "./avatar";
+import EditableAvatar from "./editableAvatar";
 import FollowButton from "./followButton";
 import ProfileCounters from "./profileCounters";
-import {
-  Profile,
-  joinedYear,
-  resolveAvatarUrl,
-} from "../../interfaces/profile/types";
+import { Profile, joinedYear } from "../../interfaces/profile/types";
 
 interface ProfileHeroProps {
   profile: Profile;
   isEditing: boolean;
+  isSaving: boolean;
   isFollowPending: boolean;
   onToggleFollow: () => void;
   onStartEditing: () => void;
+  onSaveEditing: () => void;
+  onCancelEditing: () => void;
+  onAvatarChanged: (avatarUpdatedAt: string | null) => void;
   onOpenFollowers: () => void;
   onOpenFollowing: () => void;
 }
@@ -23,9 +23,13 @@ interface ProfileHeroProps {
 const ProfileHero: React.FC<ProfileHeroProps> = ({
   profile,
   isEditing,
+  isSaving,
   isFollowPending,
   onToggleFollow,
   onStartEditing,
+  onSaveEditing,
+  onCancelEditing,
+  onAvatarChanged,
   onOpenFollowers,
   onOpenFollowing,
 }) => {
@@ -40,14 +44,12 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
     >
       <div className="flex flex-wrap items-end gap-4 sm:gap-6">
         <span className="shrink-0 rounded-full shadow-lift ring-[5px] ring-[#05050c]/75">
-          <Avatar
+          <EditableAvatar
             name={profile.name}
             username={profile.username}
-            size="xl"
-            imageUrl={resolveAvatarUrl(
-              profile.username,
-              profile.avatarUpdatedAt,
-            )}
+            avatarUpdatedAt={profile.avatarUpdatedAt}
+            isSelf={profile.isSelf}
+            onChanged={onAvatarChanged}
           />
         </span>
 
@@ -70,7 +72,26 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
 
         <div className="pb-1.5">
           {profile.isSelf ? (
-            !isEditing && (
+            isEditing ? (
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={onSaveEditing}
+                  disabled={isSaving}
+                  className="min-h-[44px] rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 px-6 text-sm font-bold text-white transition-opacity duration-300 disabled:opacity-60"
+                >
+                  {isSaving ? "Salvando..." : "Salvar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={onCancelEditing}
+                  disabled={isSaving}
+                  className="min-h-[44px] rounded-full border border-white/15 px-5 text-sm font-semibold text-white/70 transition-colors duration-300 hover:text-white disabled:opacity-60"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
               <button
                 type="button"
                 onClick={onStartEditing}
