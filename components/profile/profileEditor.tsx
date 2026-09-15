@@ -40,7 +40,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
       posterPath: favorite.posterPath,
     })),
   );
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [pickerType, setPickerType] = useState<FavoriteType | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const remaining = BIO_LIMIT - draftBio.length;
@@ -108,49 +108,53 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
         Favoritos
       </p>
       <div className="mt-2 grid grid-cols-3 gap-3">
-        {Array.from({ length: 3 }).map((_, index) => {
-          const item = draft[index];
+        {(["movie", "serie"] as FavoriteType[]).flatMap((type) => {
+          const owned = draft.filter((item) => item.type === type);
 
-          if (!item) {
+          return Array.from({ length: 3 }).map((_, index) => {
+            const item = owned[index];
+
+            if (!item) {
+              return (
+                <button
+                  key={`${type}-empty-${index}`}
+                  type="button"
+                  onClick={() => setPickerType(type)}
+                  className="flex aspect-[2/3] w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/15 px-2 text-center text-xs font-semibold text-white/40 hover:border-brand-400/50"
+                >
+                  {type === "movie" ? "Filme" : "Série"}
+                </button>
+              );
+            }
+
             return (
-              <button
-                key={index}
-                type="button"
-                onClick={() => setIsPickerOpen(true)}
-                className="flex aspect-[2/3] w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/15 text-xs font-semibold text-white/40 hover:border-indigo-400/50"
-              >
-                Adicionar
-              </button>
+              <div key={`${item.type}:${item.idTmdb}`} className="relative">
+                <img
+                  src={resolvePosterUrl(item.posterPath)}
+                  alt={item.title}
+                  className="aspect-[2/3] w-full rounded-2xl border border-white/10 object-cover"
+                />
+                <button
+                  type="button"
+                  aria-label={`Remover ${item.title}`}
+                  onClick={() =>
+                    setDraft((current) =>
+                      current.filter(
+                        (candidate) =>
+                          !(
+                            candidate.type === item.type &&
+                            candidate.idTmdb === item.idTmdb
+                          ),
+                      ),
+                    )
+                  }
+                  className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/80 text-white"
+                >
+                  <FaTimes size={11} />
+                </button>
+              </div>
             );
-          }
-
-          return (
-            <div key={`${item.type}:${item.idTmdb}`} className="relative">
-              <img
-                src={resolvePosterUrl(item.posterPath)}
-                alt={item.title}
-                className="aspect-[2/3] w-full rounded-2xl border border-white/10 object-cover"
-              />
-              <button
-                type="button"
-                aria-label={`Remover ${item.title}`}
-                onClick={() =>
-                  setDraft((current) =>
-                    current.filter(
-                      (candidate) =>
-                        !(
-                          candidate.type === item.type &&
-                          candidate.idTmdb === item.idTmdb
-                        ),
-                    ),
-                  )
-                }
-                className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/80 text-white"
-              >
-                <FaTimes size={11} />
-              </button>
-            </div>
-          );
+          });
         })}
       </div>
 
@@ -174,14 +178,17 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({
       </div>
 
       <FavoritePicker
-        isOpen={isPickerOpen}
-        onClose={() => setIsPickerOpen(false)}
+        isOpen={pickerType !== null}
+        type={pickerType ?? "movie"}
+        onClose={() => setPickerType(null)}
         excludedKeys={draft.map((item) => `${item.type}:${item.idTmdb}`)}
         onSelect={(option) => {
           setDraft((current) =>
-            current.length >= 3 ? current : [...current, option],
+            current.filter((item) => item.type === option.type).length >= 3
+              ? current
+              : [...current, option],
           );
-          setIsPickerOpen(false);
+          setPickerType(null);
         }}
       />
     </div>
