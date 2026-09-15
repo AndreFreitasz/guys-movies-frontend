@@ -23,6 +23,7 @@ import WatchedDetailSheet from "../components/watched/watchedDetailSheet";
 import WatchedSerieSheet from "../components/watched/watchedSerieSheet";
 import FilterBar from "../components/watched/filterBar";
 import FilterDrawer from "../components/watched/filterDrawer";
+import LibrarySummary from "../components/watched/librarySummary";
 import { useAuth } from "../hooks/authContext";
 import {
   RatingRangeFilter,
@@ -533,6 +534,8 @@ const WatchedPage = () => {
             ? "Tudo o que você marcou como assistido fica aqui. Use a busca e os filtros para reencontrar um filme, e toque em qualquer pôster para ver a nota que deu, a direção e a data em que assistiu."
             : "Tudo o que você já assistiu fica aqui, temporada por temporada. Toque em qualquer pôster para ver o progresso, marcar temporadas e acompanhar quando completou."}
         </p>
+
+        <LibrarySummary enabled={Boolean(user) && !authLoading} />
 
         <div
           role="tablist"
