@@ -7,7 +7,11 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { authFetch, clearAccessToken, setAccessToken } from "../utils/authFetch";
+import {
+  authFetch,
+  clearAccessToken,
+  setAccessToken,
+} from "../utils/authFetch";
 
 interface UserData {
   username: string;
