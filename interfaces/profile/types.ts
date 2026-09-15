@@ -13,6 +13,15 @@ export interface Favorite {
   position: number;
 }
 
+export interface Cover {
+  type: FavoriteType;
+  idTmdb: number;
+  title: string;
+  backdropPath: string | null;
+}
+
+export type CoverOption = Cover;
+
 export interface ProfileCounts {
   followers: number;
   following: number;
@@ -30,6 +39,8 @@ export interface Profile {
   followsYou: boolean;
   counts: ProfileCounts;
   favorites: Favorite[];
+  cover: Cover | null;
+  joinedAt: string | null;
 }
 
 export interface UserSummary {
@@ -135,4 +146,29 @@ export const formatEventDate = (isoDate: string): string => {
   const index = Number.parseInt(month, 10) - 1;
   if (index < 0 || index > 11) return isoDate;
   return `${Number.parseInt(day, 10)} de ${MONTHS[index]}`;
+};
+
+export const resolveBackdropUrl = (
+  backdropPath: string | null,
+  width: 780 | 1280,
+): string | null => {
+  if (!backdropPath) return null;
+  if (backdropPath.startsWith("http")) {
+    return backdropPath.replace(/\/t\/p\/w\d+\//, `/t/p/w${width}/`);
+  }
+  return `https://image.tmdb.org/t/p/w${width}${backdropPath}`;
+};
+
+export const favoritesOfType = (
+  favorites: Favorite[],
+  type: FavoriteType,
+): Favorite[] =>
+  favorites
+    .filter((favorite) => favorite.type === type)
+    .sort((first, second) => first.position - second.position);
+
+export const joinedYear = (joinedAt: string | null): number | null => {
+  if (!joinedAt) return null;
+  const year = new Date(joinedAt).getFullYear();
+  return Number.isFinite(year) ? year : null;
 };
