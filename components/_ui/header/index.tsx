@@ -10,6 +10,7 @@ import {
 import {
   FaSignInAlt,
   FaUserPlus,
+  FaUser,
   FaEye,
   FaBookmark,
   FaSignOutAlt,
@@ -212,6 +213,16 @@ const Header = () => {
                           </p>
                         </div>
                         <ul className="mt-1.5 space-y-0.5">
+                          <li>
+                            <Link
+                              href={`/perfil/${user.username}`}
+                              onClick={() => setIsDropdownOpen(false)}
+                              className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white/80 transition-colors duration-200 hover:bg-white/[0.07] hover:text-white"
+                            >
+                              <FaUser size={13} className="text-indigo-300" />
+                              Meu perfil
+                            </Link>
+                          </li>
                           <li>
                             <Link
                               href="/assistidos"

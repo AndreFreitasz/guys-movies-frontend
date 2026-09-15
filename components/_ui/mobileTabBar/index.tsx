@@ -64,7 +64,10 @@ const MobileTabBar = ({
       icon: isAuthenticated ? FaUserCircle : FaSignInAlt,
       onClick: onAccountClick,
       isActive:
-        isMenuOpen || pathname === "/assistidos" || pathname === "/watchlist",
+        isMenuOpen ||
+        pathname === "/assistidos" ||
+        pathname === "/watchlist" ||
+        pathname.startsWith("/perfil"),
     },
   ];
 

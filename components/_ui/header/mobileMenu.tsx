@@ -8,6 +8,7 @@ import {
   FaSignOutAlt,
   FaTv,
   FaUserPlus,
+  FaUser,
   FaSignInAlt,
   FaEye,
   FaTimes,
@@ -227,6 +228,25 @@ const MobileMenu = ({
               Sua conta
             </motion.p>
             <ul className="space-y-1.5">
+              <motion.li variants={itemVariants}>
+                <Link
+                  href={`/perfil/${user.username}`}
+                  onClick={onClose}
+                  className={rowClass(pathname.startsWith("/perfil"))}
+                >
+                  <span className={iconClass(pathname.startsWith("/perfil"))}>
+                    <FaUser size={16} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[0.95rem] font-bold text-white">
+                      Meu perfil
+                    </span>
+                    <span className="block truncate text-xs text-white/40">
+                      Seus favoritos e seu histórico
+                    </span>
+                  </span>
+                </Link>
+              </motion.li>
               <motion.li variants={itemVariants}>
                 <Link
                   href="/assistidos"
