@@ -13,6 +13,7 @@ import {
   WatchSourceValue,
 } from "../../constants/watchProviders";
 import RatingStars from "./ratingStars";
+import CompanionStrip from "./companionStrip";
 import WatchedDateForm from "./watchedDateForm";
 
 interface WatchedSerieSheetProps {
@@ -222,6 +223,12 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
           </span>
         )}
       </div>
+
+      {serie.companions.length > 0 && (
+        <div className="mt-3">
+          <CompanionStrip companions={serie.companions} max={5} />
+        </div>
+      )}
 
       {serie.overview && (
         <p className="mt-4 text-sm leading-relaxed text-white/65">

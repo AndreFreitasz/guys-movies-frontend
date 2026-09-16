@@ -1,4 +1,6 @@
 import { memo } from "react";
+import CompanionStrip from "../watched/companionStrip";
+import { UserSummary } from "../../interfaces/profile/types";
 import LoadingSpinner from "../_ui/loadingSpinner";
 import { FaClock, FaEye } from "react-icons/fa";
 import ReactStars from "react-stars";
@@ -24,6 +26,7 @@ interface RatingConfig {
 
 interface WatchedDateConfig {
   watchedAt: string | null;
+  companions: UserSummary[];
   onEdit: () => void;
 }
 
@@ -131,6 +134,20 @@ const MediaExperiencePanel = memo(
               </button>
             </div>
           )}
+
+          {watchedConfig.isActive &&
+            watchedDateConfig &&
+            watchedDateConfig.companions.length > 0 && (
+              <div className="rounded-2xl border border-white/5 bg-black/30 px-4 py-3">
+                <p className="mb-2 text-[10px] uppercase tracking-[0.3em] text-white/60">
+                  Você assistiu com
+                </p>
+                <CompanionStrip
+                  companions={watchedDateConfig.companions}
+                  max={5}
+                />
+              </div>
+            )}
 
           <div className="rounded-2xl border border-white/5 bg-black/30 p-4 md:p-5 backdrop-blur">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

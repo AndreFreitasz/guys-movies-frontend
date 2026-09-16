@@ -65,6 +65,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     isWatched,
     rating,
     watchedAt,
+    companions,
     isWaiting,
     watchedLoading,
     isWaitingLoading,
@@ -247,7 +248,11 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                 onChange: setRating,
                 isClient,
               }}
-              watchedDateConfig={{ watchedAt, onEdit: openDateEditor }}
+              watchedDateConfig={{
+                watchedAt,
+                companions,
+                onEdit: openDateEditor,
+              }}
             />
           }
           details={
