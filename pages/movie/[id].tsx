@@ -279,6 +279,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
           mode={dateMode}
           availableProviders={availableProviders}
           loading={watchedLoading}
+          companionTarget={{ type: "movie", idTmdb: movie.id }}
           onSubmit={async (isoDate, watchSource, providerId) => {
             setIsModalOpen(false);
             if (dateMode === "edit") {

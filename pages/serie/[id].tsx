@@ -322,6 +322,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
           mode={dateMode}
           availableProviders={availableProviders}
           loading={watchedLoading}
+          companionTarget={{ type: "serie", idTmdb: serie.id }}
           onSubmit={async (isoDate, watchSource, providerId) => {
             setIsModalOpen(false);
             if (dateMode === "edit") {
