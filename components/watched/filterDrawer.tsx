@@ -9,6 +9,9 @@ interface FilterDrawerProps {
   rating: RatingRangeFilter;
   decade: number | null;
   directors: string[];
+  companions: string[];
+  companionOptions: { username: string; label: string }[];
+  onCompanionsChange: (value: string[]) => void;
   providers: number[];
   decadeOptions: number[];
   directorOptions: string[];
@@ -27,6 +30,9 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
   rating,
   decade,
   directors,
+  companions,
+  companionOptions,
+  onCompanionsChange,
   providers,
   decadeOptions,
   directorOptions,
@@ -128,6 +134,9 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
                     rating={rating}
                     decade={decade}
                     directors={directors}
+                    companions={companions}
+                    companionOptions={companionOptions}
+                    onCompanionsChange={onCompanionsChange}
                     providers={providers}
                     decadeOptions={decadeOptions}
                     directorOptions={directorOptions}

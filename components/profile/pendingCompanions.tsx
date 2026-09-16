@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import ReactStars from "react-stars";
 import SectionHeader from "./sectionHeader";
 import Avatar from "./avatar";
 import {
@@ -18,7 +19,7 @@ interface PendingCompanionsProps {
   ) => Promise<void>;
 }
 
-const RATINGS = [6, 7, 8, 9, 10];
+const NO_RATING = 0;
 
 const PendingCompanions: React.FC<PendingCompanionsProps> = ({
   pending,
@@ -75,18 +76,16 @@ const PendingCompanions: React.FC<PendingCompanionsProps> = ({
               Assistido com {rating.requester.name || rating.requester.username}
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {RATINGS.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  disabled={busyId !== null}
-                  onClick={() => respond(rating, "accept", value)}
-                  className="min-h-[44px] min-w-[44px] rounded-full border border-brand-400/50 px-4 text-sm font-bold text-brand-200 transition-colors duration-300 hover:bg-brand-500/20 disabled:opacity-60"
-                >
-                  {value}
-                </button>
-              ))}
+            <div className="mt-4 flex items-center gap-3">
+              <ReactStars
+                count={5}
+                value={NO_RATING}
+                onChange={(value: number) => respond(rating, "accept", value)}
+                size={32}
+                color2="#F97316"
+                half
+              />
+              <span className="text-xs text-white/35">de 5</span>
             </div>
 
             <button

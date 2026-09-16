@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { authFetch } from "../utils/authFetch";
+import { UserSummary } from "../interfaces/profile/types";
 import { useAuth } from "./authContext";
 import { WatchSourceValue } from "../constants/watchProviders";
 
@@ -54,6 +55,7 @@ export const useWatchedMedia = ({
   const [isWatched, setIsWatched] = useState(false);
   const [rating, setRatingValue] = useState(0);
   const [watchedAt, setWatchedAt] = useState<string | null>(null);
+  const [companions, setCompanions] = useState<UserSummary[]>([]);
   const [watchedLoading, setWatchedLoading] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
   const [isWaitingLoading, setIsWaitingLoading] = useState(false);
@@ -79,6 +81,7 @@ export const useWatchedMedia = ({
       const data = await watchedResponse.value.json();
       setIsWatched(Boolean(data.watched));
       setWatchedAt(data.watchedAt ?? null);
+      setCompanions(data.companions ?? []);
     }
 
     if (waitingResponse.status === "fulfilled" && waitingResponse.value.ok) {
@@ -282,6 +285,7 @@ export const useWatchedMedia = ({
     isWatched,
     rating,
     watchedAt,
+    companions,
     isWaiting,
     watchedLoading,
     isWaitingLoading,

@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { WatchedSerieItem } from "../../interfaces/watched/serieTypes";
 import RatingStars from "./ratingStars";
+import CompanionStrip from "./companionStrip";
 
 interface WatchedSerieTileProps {
   serie: WatchedSerieItem;
@@ -64,6 +65,7 @@ const WatchedSerieTile: React.FC<WatchedSerieTileProps> = ({
         {serie.name ?? "Título indisponível"}
       </h3>
       <RatingStars rating={serie.rating} />
+      <CompanionStrip companions={serie.companions} max={3} />
 
       <div className="mt-1">
         {serie.completedAt ? (

@@ -67,6 +67,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     isWatched,
     rating,
     watchedAt,
+    companions,
     isWaiting,
     watchedLoading,
     isWaitingLoading,
@@ -278,7 +279,11 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
                 onChange: setRating,
                 isClient,
               }}
-              watchedDateConfig={{ watchedAt, onEdit: openDateEditor }}
+              watchedDateConfig={{
+                watchedAt,
+                companions,
+                onEdit: openDateEditor,
+              }}
             />
           }
           details={

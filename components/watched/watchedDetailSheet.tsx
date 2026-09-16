@@ -11,6 +11,7 @@ import {
 import { authFetch } from "../../utils/authFetch";
 import { useAuth } from "../../hooks/authContext";
 import RatingStars from "./ratingStars";
+import CompanionStrip from "./companionStrip";
 import { formatWatchedDate } from "./watchedTile";
 import WatchedDateForm from "./watchedDateForm";
 
@@ -156,6 +157,12 @@ const DetailSheetBody: React.FC<DetailSheetBodyProps> = ({
           </span>
         )}
       </div>
+
+      {movie.companions.length > 0 && (
+        <div className="mt-3">
+          <CompanionStrip companions={movie.companions} max={5} />
+        </div>
+      )}
 
       {movie.overview && (
         <p className="mt-4 text-sm leading-relaxed text-white/65">

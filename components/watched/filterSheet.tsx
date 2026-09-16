@@ -7,6 +7,9 @@ interface FilterSheetProps {
   rating: RatingRangeFilter;
   decade: number | null;
   directors: string[];
+  companions: string[];
+  companionOptions: { username: string; label: string }[];
+  onCompanionsChange: (value: string[]) => void;
   providers: number[];
   decadeOptions: number[];
   directorOptions: string[];
@@ -60,6 +63,9 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
   rating,
   decade,
   directors,
+  companions,
+  companionOptions,
+  onCompanionsChange,
   providers,
   decadeOptions,
   directorOptions,
@@ -188,6 +194,29 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                 </button>
               ))
             )}
+          </div>
+        </Section>
+      )}
+
+      {companionOptions.length > 0 && (
+        <Section
+          label="Assistido com"
+          summary={companions.length ? `${companions.length}` : undefined}
+        >
+          <div className="hide-scrollbar flex max-h-56 flex-wrap gap-2 overflow-y-auto">
+            {companionOptions.map((person) => (
+              <button
+                key={person.username}
+                type="button"
+                aria-pressed={companions.includes(person.username)}
+                onClick={() =>
+                  onCompanionsChange(toggle(companions, person.username))
+                }
+                className={pillClass(companions.includes(person.username))}
+              >
+                {person.label}
+              </button>
+            ))}
           </div>
         </Section>
       )}
