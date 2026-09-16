@@ -15,6 +15,8 @@ import SectionHeader from "../../components/profile/sectionHeader";
 import TimelineList from "../../components/profile/timelineList";
 import UserListSheet from "../../components/profile/userListSheet";
 import CoverPicker from "../../components/profile/coverPicker";
+import PendingCompanions from "../../components/profile/pendingCompanions";
+import { usePendingCompanions } from "../../hooks/usePendingCompanions";
 import { useProfile } from "../../hooks/useProfile";
 import { useTimeline } from "../../hooks/useTimeline";
 import { useFollow } from "../../hooks/useFollow";
@@ -37,6 +39,7 @@ const Perfil: React.FC = () => {
     authLoading || !isAuthenticated ? undefined : username,
   );
   const { toggle, isPending } = useFollow(profile, setProfile);
+  const companions = usePendingCompanions(Boolean(profile?.isSelf));
 
   const [isEditing, setIsEditing] = useState(false);
   const [sheetMode, setSheetMode] = useState<"followers" | "following" | null>(
@@ -164,6 +167,13 @@ const Perfil: React.FC = () => {
                 onOpenFollowers={() => setSheetMode("followers")}
                 onOpenFollowing={() => setSheetMode("following")}
               />
+
+              {profile.isSelf && (
+                <PendingCompanions
+                  pending={companions.pending}
+                  onRespond={companions.respond}
+                />
+              )}
 
               {isEditing ? (
                 <ProfileEditor
