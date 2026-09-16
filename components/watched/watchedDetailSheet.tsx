@@ -187,6 +187,7 @@ const DetailSheetBody: React.FC<DetailSheetBodyProps> = ({
               availableProviders={flatrateProviders}
               initialWatchSource={movie.watchSource}
               initialProviderId={movie.providerId}
+              companionTarget={{ type: "movie", idTmdb: movie.idTmdb }}
               onSubmit={async (isoDate, watchSource, providerId) => {
                 setIsEditingDate(false);
                 await onWatchedAtChange(movie.idTmdb, isoDate);
