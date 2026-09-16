@@ -102,7 +102,7 @@ export const useWatchedMedia = ({
 
   const toggleWatched = useCallback(
     async (
-      watchedAtIso: string,
+      watchedAtIso: string | null,
       watchSource?: WatchSourceValue | null,
       providerId?: number | null,
     ) => {

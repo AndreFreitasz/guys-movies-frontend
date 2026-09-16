@@ -138,7 +138,7 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
   }, [watchedSeasons, completedAt, serie.idTmdb, onProgressChange]);
 
   const handleCompletedAtSubmit = useCallback(
-    async (isoDate: string) => {
+    async (isoDate: string | null) => {
       setIsEditingDate(false);
       setIsUpdatingDate(true);
 
