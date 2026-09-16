@@ -1,17 +1,18 @@
 import React from "react";
 
-export type SearchTypeFilterValue = "all" | "movie" | "serie";
+export type SearchTypeFilterValue = "all" | "movie" | "serie" | "people";
 
 interface SearchTypeFilterProps {
   value: SearchTypeFilterValue;
   onChange: (value: SearchTypeFilterValue) => void;
-  counts: { all: number; movie: number; serie: number };
+  counts: { all: number; movie: number; serie: number; people: number | null };
 }
 
 const OPTIONS: { value: SearchTypeFilterValue; label: string }[] = [
   { value: "all", label: "Tudo" },
   { value: "movie", label: "Filmes" },
   { value: "serie", label: "Séries" },
+  { value: "people", label: "Pessoas" },
 ];
 
 const SearchTypeFilter: React.FC<SearchTypeFilterProps> = ({
@@ -33,9 +34,11 @@ const SearchTypeFilter: React.FC<SearchTypeFilterProps> = ({
         }`}
       >
         {option.label}
-        <span className="ml-2 tabular-nums text-white/40">
-          {counts[option.value]}
-        </span>
+        {counts[option.value] !== null && (
+          <span className="ml-2 tabular-nums text-white/40">
+            {counts[option.value]}
+          </span>
+        )}
       </button>
     ))}
   </div>

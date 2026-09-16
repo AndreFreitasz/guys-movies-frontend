@@ -1,14 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { toast } from "react-toastify";
 import Modal from "../_ui/modal";
-import Avatar from "./avatar";
+import UserRow from "./userRow";
 import { authFetch } from "../../utils/authFetch";
-import {
-  UserListPage,
-  UserSummary,
-  resolveAvatarUrl,
-} from "../../interfaces/profile/types";
+import { UserListPage, UserSummary } from "../../interfaces/profile/types";
 
 interface UserListSheetProps {
   isOpen: boolean;
@@ -138,46 +133,13 @@ const UserListSheet: React.FC<UserListSheetProps> = ({
         )}
 
         {users.map((user) => (
-          <div
+          <UserRow
             key={user.username}
-            className="flex items-center gap-3 rounded-2xl px-2 py-2 transition-colors duration-200 hover:bg-white/[0.04]"
-          >
-            <Link
-              href={`/perfil/${user.username}`}
-              onClick={onClose}
-              className="flex min-w-0 flex-1 items-center gap-3"
-            >
-              <Avatar
-                name={user.name}
-                username={user.username}
-                size="md"
-                imageUrl={resolveAvatarUrl(user.username, user.avatarUpdatedAt)}
-              />
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-bold text-white">
-                  {user.name || user.username}
-                </span>
-                <span className="block truncate text-xs text-white/45">
-                  @{user.username}
-                </span>
-              </span>
-            </Link>
-
-            {!user.isSelf && (
-              <button
-                type="button"
-                onClick={() => toggleFollow(user)}
-                disabled={pendingUsername === user.username}
-                className={`min-h-[36px] shrink-0 rounded-full px-4 text-xs font-bold transition-colors duration-300 disabled:opacity-60 ${
-                  user.isFollowing
-                    ? "border border-white/15 bg-white/[0.07] text-white"
-                    : "bg-gradient-to-r from-violet-500 to-indigo-600 text-white"
-                }`}
-              >
-                {user.isFollowing ? "Seguindo" : "Seguir"}
-              </button>
-            )}
-          </div>
+            user={user}
+            isPending={pendingUsername === user.username}
+            onToggleFollow={toggleFollow}
+            onNavigate={onClose}
+          />
         ))}
 
         {cursor && (
