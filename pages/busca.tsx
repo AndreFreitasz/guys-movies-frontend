@@ -19,6 +19,9 @@ import SearchTypeFilter, {
   SearchTypeFilterValue,
 } from "../components/search/searchTypeFilter";
 import { useSearch } from "../hooks/useSearch";
+import { usePeopleSearch } from "../hooks/usePeopleSearch";
+import { useAuth } from "../hooks/authContext";
+import PeopleResults from "../components/search/peopleResults";
 import { useUserLibrary } from "../hooks/useUserLibrary";
 
 interface PopularMovie {
@@ -54,6 +57,11 @@ const Busca: React.FC = () => {
   const [popularReloadToken, setPopularReloadToken] = useState(0);
 
   const { results, isSearching, error, retry } = useSearch(submittedTerm, 0);
+  const { isAuthenticated } = useAuth();
+  const people = usePeopleSearch(
+    submittedTerm,
+    typeFilter === "people" && isAuthenticated,
+  );
   const { watchedMovies, watchedSeries, watchlistMovies, watchlistSeries } =
     useUserLibrary();
 
@@ -148,8 +156,9 @@ const Busca: React.FC = () => {
       all: results.length,
       movie: results.filter((item) => item.type === "movie").length,
       serie: results.filter((item) => item.type === "serie").length,
+      people: people.status === "ready" ? people.users.length : null,
     }),
-    [results],
+    [people.status, people.users.length, results],
   );
 
   const hasTerm = submittedTerm.length > 0;
@@ -210,7 +219,19 @@ const Busca: React.FC = () => {
         </div>
 
         <div className="min-h-[70vh]">
-          {error ? (
+          {typeFilter === "people" ? (
+            <PeopleResults
+              users={people.users}
+              status={people.status}
+              hasMore={people.hasMore}
+              isLoadingMore={people.isLoadingMore}
+              term={submittedTerm}
+              isAuthenticated={isAuthenticated}
+              onLoadMore={people.loadMore}
+              onRetry={people.retry}
+              onFollowStateChange={people.setFollowState}
+            />
+          ) : error ? (
             <CatalogErrorState
               title="Não foi possível buscar agora"
               message="Verifique sua conexão e tente novamente."
