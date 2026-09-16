@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import Input from "../_ui/form/input";
+import DatePicker from "../_ui/form/datePicker";
 import WatchSourceSelect, { WatchSourceValueState } from "./watchSourceSelect";
 import CompanionPicker from "./companionPicker";
 import { authFetch } from "../../utils/authFetch";
@@ -27,7 +27,7 @@ interface WatchedDateFormProps {
   loading?: boolean;
   companionTarget?: CompanionTarget;
   onSubmit: (
-    isoDate: string,
+    isoDate: string | null,
     watchSource: WatchSourceValue | null | undefined,
     providerId: number | null,
   ) => void;
@@ -65,10 +65,9 @@ const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
     <form
       onSubmit={async (event) => {
         event.preventDefault();
-        if (!date) return;
 
         await onSubmit(
-          new Date(`${date}T00:00:00`).toISOString(),
+          date ? new Date(`${date}T00:00:00`).toISOString() : null,
           watchSourceTouched ? watchSourceValue.watchSource : undefined,
           watchSourceTouched ? watchSourceValue.providerId : null,
         );
@@ -110,17 +109,17 @@ const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
     >
       <p className="text-sm leading-relaxed text-white/45">
         {mode === "create"
-          ? "Conte pra gente quando você assistiu para manter seu histórico sempre em ordem."
+          ? "Se lembrar quando assistiu, conte pra gente. A data é opcional."
           : "Ajuste a data em que você assistiu, ou limpe o registro para deixá-la em branco."}
       </p>
 
-      <Input
-        type="date"
+      <DatePicker
+        id="watched-date"
         label="Quando você assistiu?"
         value={date}
         max={new Date().toISOString().slice(0, 10)}
-        onChange={(event) => setDate(event.target.value)}
-        className="font-medium"
+        onChange={setDate}
+        helper="Pode deixar em branco se não lembrar."
       />
 
       <WatchSourceSelect
@@ -138,7 +137,7 @@ const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
 
       <button
         type="submit"
-        disabled={loading || !date}
+        disabled={loading}
         className="flex h-12 items-center justify-center rounded-2xl text-sm font-bold tracking-tight bg-white text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_10px_30px_-12px_rgba(255,255,255,0.5)] active:translate-y-0 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-50"
       >
         {loading ? "Salvando..." : "Salvar momento"}
