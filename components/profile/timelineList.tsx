@@ -1,4 +1,5 @@
 import React from "react";
+import Avatar from "./avatar";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -7,6 +8,7 @@ import {
   formatEventDate,
   monthLabel,
   resolvePosterUrl,
+  resolveAvatarUrl,
 } from "../../interfaces/profile/types";
 
 interface TimelineListProps {
@@ -143,6 +145,38 @@ const TimelineList: React.FC<TimelineListProps> = ({
                         `${event.episodeCount} episódios · `}
                       {formatEventDate(event.occurredAt)}
                     </span>
+                    {event.companions.length > 0 && (
+                      <span className="mt-1.5 flex items-center gap-1.5">
+                        <span className="flex -space-x-2">
+                          {event.companions.slice(0, 3).map((person) => (
+                            <span
+                              key={person.username}
+                              title={person.name || person.username}
+                              className="rounded-full ring-2 ring-[#05050c]"
+                            >
+                              <Avatar
+                                name={person.name}
+                                username={person.username}
+                                size="sm"
+                                imageUrl={resolveAvatarUrl(
+                                  person.username,
+                                  person.avatarUpdatedAt,
+                                )}
+                              />
+                            </span>
+                          ))}
+                        </span>
+                        <span className="truncate text-xs text-white/40">
+                          com{" "}
+                          {event.companions
+                            .slice(0, 2)
+                            .map((person) => person.name || person.username)
+                            .join(", ")}
+                          {event.companions.length > 2 &&
+                            ` e mais ${event.companions.length - 2}`}
+                        </span>
+                      </span>
+                    )}
                   </span>
                   {event.kind === "movie" && event.rating !== null && (
                     <RatingStars rating={event.rating} />

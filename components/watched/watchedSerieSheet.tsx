@@ -239,6 +239,7 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
               availableProviders={flatrateProviders}
               initialWatchSource={serie.watchSource}
               initialProviderId={serie.providerId}
+              companionTarget={{ type: "serie", idTmdb: serie.idTmdb }}
               loading={isUpdatingDate}
               onSubmit={async (isoDate, watchSource, providerId) => {
                 await handleCompletedAtSubmit(isoDate);
