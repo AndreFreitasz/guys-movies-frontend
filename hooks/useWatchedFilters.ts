@@ -77,6 +77,10 @@ export const useWatchedFilters = () => {
     () => parseNumbers(router.query.providers),
     [router.query.providers],
   );
+  const companions = useMemo(
+    () => parseStrings(router.query.companions),
+    [router.query.companions],
+  );
 
   const replaceQuery = useCallback(
     (patch: Record<string, string | undefined>) => {
@@ -102,7 +106,8 @@ export const useWatchedFilters = () => {
     (rating !== null ? 1 : 0) +
     (decade !== null ? 1 : 0) +
     directors.length +
-    providers.length;
+    providers.length +
+    companions.length;
 
   const setRating = useCallback(
     (value: RatingRangeFilter) => replaceQuery({ rating: formatRating(value) }),
@@ -121,6 +126,10 @@ export const useWatchedFilters = () => {
     (value: number[]) => replaceQuery({ providers: value.join(",") }),
     [replaceQuery],
   );
+  const setCompanions = useCallback(
+    (value: string[]) => replaceQuery({ companions: value.join(",") }),
+    [replaceQuery],
+  );
   const clearAll = useCallback(
     () =>
       replaceQuery({
@@ -128,6 +137,7 @@ export const useWatchedFilters = () => {
         decade: undefined,
         directors: undefined,
         providers: undefined,
+        companions: undefined,
         ratings: undefined,
       }),
     [replaceQuery],
@@ -138,10 +148,12 @@ export const useWatchedFilters = () => {
     decade,
     directors,
     providers,
+    companions,
     setRating,
     setDecade,
     setDirectors,
     setProviders,
+    setCompanions,
     activeCount,
     clearAll,
     isReady: router.isReady,

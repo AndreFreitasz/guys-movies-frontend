@@ -1,3 +1,4 @@
+import { UserSummary } from "../profile/types";
 import { WatchSourceValue } from "../../constants/watchProviders";
 
 export interface WatchedMovieItem {
@@ -13,6 +14,7 @@ export interface WatchedMovieItem {
   createdAt: string;
   providerId: number | null;
   watchSource: WatchSourceValue | null;
+  companions: UserSummary[];
 }
 
 export interface WatchedMovieStats {

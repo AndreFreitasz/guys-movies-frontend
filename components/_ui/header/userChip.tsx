@@ -6,13 +6,17 @@ interface UserChipProps {
   username: string;
   name?: string;
   avatarUrl?: string | null;
+  pendingCount?: number;
   isOpen?: boolean;
   onClick: () => void;
   compact?: boolean;
 }
 
 const UserChip = forwardRef<HTMLButtonElement, UserChipProps>(
-  ({ username, name, avatarUrl, isOpen, onClick, compact }, ref) => {
+  (
+    { username, name, avatarUrl, pendingCount = 0, isOpen, onClick, compact },
+    ref,
+  ) => {
     return (
       <button
         ref={ref}
@@ -31,7 +35,16 @@ const UserChip = forwardRef<HTMLButtonElement, UserChipProps>(
             size="sm"
             imageUrl={avatarUrl ?? null}
           />
-          <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#05050c] bg-emerald-400" />
+          {pendingCount > 0 ? (
+            <span
+              aria-label={`${pendingCount} confirmação(ões) pendente(s)`}
+              className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full border-2 border-[#05050c] bg-rose-500 px-1 text-[0.6rem] font-black tabular-nums text-white"
+            >
+              {pendingCount > 99 ? "99+" : pendingCount}
+            </span>
+          ) : (
+            <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#05050c] bg-emerald-400" />
+          )}
         </span>
         {!compact && (
           <>

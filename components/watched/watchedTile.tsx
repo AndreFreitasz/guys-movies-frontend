@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { WatchedMovieItem } from "../../interfaces/watched/types";
 import RatingStars from "./ratingStars";
+import CompanionStrip from "./companionStrip";
 
 interface WatchedTileProps {
   movie: WatchedMovieItem;
@@ -80,6 +81,7 @@ const WatchedTile: React.FC<WatchedTileProps> = ({
       <p className="text-xs font-medium text-white/45">
         {formatWatchedDate(movie.watchedAt)}
       </p>
+      <CompanionStrip companions={movie.companions} max={3} />
     </div>
   </motion.button>
 );

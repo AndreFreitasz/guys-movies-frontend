@@ -197,6 +197,8 @@ const WatchedPage = () => {
     rating,
     decade,
     directors,
+    companions,
+    setCompanions,
     providers,
     setRating,
     setDecade,
@@ -211,6 +213,18 @@ const WatchedPage = () => {
     activeTab === "movies" ? rawActiveCount : rawActiveCount - directors.length;
 
   const hasProviderFilter = providers.length > 0;
+
+  const companionOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+    (data?.items ?? []).forEach((item) =>
+      item.companions.forEach((person) =>
+        seen.set(person.username, person.name || person.username),
+      ),
+    );
+    return Array.from(seen, ([username, label]) => ({ username, label })).sort(
+      (first, second) => first.label.localeCompare(second.label, "pt-BR"),
+    );
+  }, [data]);
   const providerQuery = providers.length
     ? `?providers=${providers.join(",")}`
     : "";
@@ -344,8 +358,14 @@ const WatchedPage = () => {
       );
     }
 
+    if (companions.length > 0) {
+      filtered = filtered.filter((item) =>
+        item.companions.some((person) => companions.includes(person.username)),
+      );
+    }
+
     return sortMovies(filtered, sortKey);
-  }, [data, decade, directors, query, rating, sortKey]);
+  }, [companions, data, decade, directors, query, rating, sortKey]);
 
   const visibleSeries = useMemo(() => {
     if (!serieData) return [];
@@ -1008,6 +1028,9 @@ const WatchedPage = () => {
         rating={rating}
         decade={decade}
         directors={directors}
+        companions={companions}
+        companionOptions={companionOptions}
+        onCompanionsChange={setCompanions}
         providers={providers}
         decadeOptions={
           activeTab === "movies" ? movieDecadeOptions : serieDecadeOptions

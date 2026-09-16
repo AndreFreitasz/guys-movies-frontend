@@ -27,6 +27,7 @@ import ConfirmLogoutModal from "../modal/confirmLogoutModal";
 import MobileTabBar from "../mobileTabBar";
 import { useAuth } from "../../../hooks/authContext";
 import { resolveAvatarUrl } from "../../../interfaces/profile/types";
+import { usePendingCount } from "../../../hooks/usePendingCount";
 
 const SCROLL_THRESHOLD = 12;
 
@@ -45,6 +46,7 @@ const Header = () => {
   const router = useRouter();
   const { isAuthenticated, user, authLoading, logout } = useAuth();
   const { scrollY } = useScroll();
+  const pending = usePendingCount(isAuthenticated);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > SCROLL_THRESHOLD);
@@ -195,6 +197,7 @@ const Header = () => {
                       user.username,
                       user.avatarUpdatedAt,
                     )}
+                    pendingCount={pending.count}
                     isOpen={isDropdownOpen}
                     onClick={() => setIsDropdownOpen((previous) => !previous)}
                   />
