@@ -1,6 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaChevronLeft, FaChevronRight, FaRegCalendar } from "react-icons/fa";
+import { DayPicker } from "react-day-picker";
+import { ptBR } from "react-day-picker/locale";
+import { format, parse, isValid } from "date-fns";
+import { FaRegCalendar } from "react-icons/fa";
+import "react-day-picker/style.css";
 
 interface DatePickerProps {
   id?: string;
@@ -11,37 +15,10 @@ interface DatePickerProps {
   helper?: string;
 }
 
-const WEEKDAYS = ["D", "S", "T", "Q", "Q", "S", "S"];
-
-const MONTHS = [
-  "janeiro",
-  "fevereiro",
-  "março",
-  "abril",
-  "maio",
-  "junho",
-  "julho",
-  "agosto",
-  "setembro",
-  "outubro",
-  "novembro",
-  "dezembro",
-];
-
-const toIsoDay = (year: number, month: number, day: number): string =>
-  `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-
-const parseIsoDay = (value: string): Date | null => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-  const [year, month, day] = value.split("-").map(Number);
-  const parsed = new Date(year, month - 1, day);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-};
-
-const formatLong = (value: string): string => {
-  const parsed = parseIsoDay(value);
-  if (!parsed) return "";
-  return `${parsed.getDate()} de ${MONTHS[parsed.getMonth()]} de ${parsed.getFullYear()}`;
+const toDate = (value: string): Date | undefined => {
+  if (!value) return undefined;
+  const parsed = parse(value, "yyyy-MM-dd", new Date());
+  return isValid(parsed) ? parsed : undefined;
 };
 
 const DatePicker: React.FC<DatePickerProps> = ({
@@ -55,14 +32,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const selected = parseIsoDay(value);
-  const today = useMemo(() => new Date(), []);
-  const maxDate = max ? parseIsoDay(max) : null;
-
-  const [cursor, setCursor] = useState(() => {
-    const base = selected ?? today;
-    return { year: base.getFullYear(), month: base.getMonth() };
-  });
+  const selected = toDate(value);
+  const maxDate = max ? toDate(max) : undefined;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -83,28 +54,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
       window.removeEventListener("keydown", onKey);
     };
   }, [isOpen]);
-
-  const days = useMemo(() => {
-    const first = new Date(cursor.year, cursor.month, 1);
-    const total = new Date(cursor.year, cursor.month + 1, 0).getDate();
-    const blanks = first.getDay();
-
-    return [
-      ...Array.from({ length: blanks }, () => null),
-      ...Array.from({ length: total }, (_, index) => index + 1),
-    ];
-  }, [cursor]);
-
-  const isAfterMax = (day: number): boolean => {
-    if (!maxDate) return false;
-    return new Date(cursor.year, cursor.month, day) > maxDate;
-  };
-
-  const step = (direction: -1 | 1) =>
-    setCursor((current) => {
-      const next = new Date(current.year, current.month + direction, 1);
-      return { year: next.getFullYear(), month: next.getMonth() };
-    });
 
   return (
     <div ref={containerRef} className="relative">
@@ -133,7 +82,9 @@ const DatePicker: React.FC<DatePickerProps> = ({
             className={value ? "text-brand-300" : "text-white/35"}
           />
           <span className={value ? "text-white" : "text-white/35"}>
-            {value ? formatLong(value) : "Escolher data (opcional)"}
+            {selected
+              ? format(selected, "d 'de' MMMM 'de' yyyy", { locale: ptBR })
+              : "Escolher data (opcional)"}
           </span>
         </button>
 
@@ -159,91 +110,29 @@ const DatePicker: React.FC<DatePickerProps> = ({
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             role="dialog"
             aria-label="Escolher data"
-            className="absolute left-0 right-0 z-30 mt-2 rounded-3xl border border-white/12 bg-ink-800/95 p-4 shadow-lift backdrop-blur-2xl"
+            className="gm-calendar absolute left-0 z-30 mt-2 rounded-3xl border border-white/12 bg-ink-800/95 p-4 shadow-lift backdrop-blur-2xl"
           >
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => step(-1)}
-                aria-label="Mês anterior"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 transition-colors duration-200 hover:bg-white/10 hover:text-white"
-              >
-                <FaChevronLeft size={12} />
-              </button>
+            <DayPicker
+              mode="single"
+              locale={ptBR}
+              captionLayout="dropdown"
+              startMonth={new Date(1900, 0)}
+              endMonth={maxDate ?? new Date()}
+              disabled={maxDate ? { after: maxDate } : undefined}
+              defaultMonth={selected ?? maxDate ?? new Date()}
+              selected={selected}
+              onSelect={(day) => {
+                if (!day) return;
+                onChange(format(day, "yyyy-MM-dd"));
+                setIsOpen(false);
+              }}
+            />
 
-              <span className="text-sm font-bold capitalize text-white">
-                {MONTHS[cursor.month]} {cursor.year}
-              </span>
-
-              <button
-                type="button"
-                onClick={() => step(1)}
-                aria-label="Próximo mês"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 transition-colors duration-200 hover:bg-white/10 hover:text-white"
-              >
-                <FaChevronRight size={12} />
-              </button>
-            </div>
-
-            <div className="mt-3 grid grid-cols-7 gap-1">
-              {WEEKDAYS.map((weekday, index) => (
-                <span
-                  key={`${weekday}-${index}`}
-                  className="flex h-8 items-center justify-center text-[0.65rem] font-bold uppercase text-white/30"
-                >
-                  {weekday}
-                </span>
-              ))}
-
-              {days.map((day, index) => {
-                if (day === null) return <span key={`blank-${index}`} />;
-
-                const iso = toIsoDay(cursor.year, cursor.month, day);
-                const isSelected = iso === value;
-                const isToday =
-                  iso ===
-                  toIsoDay(
-                    today.getFullYear(),
-                    today.getMonth(),
-                    today.getDate(),
-                  );
-                const disabled = isAfterMax(day);
-
-                return (
-                  <button
-                    key={iso}
-                    type="button"
-                    disabled={disabled}
-                    aria-pressed={isSelected}
-                    onClick={() => {
-                      onChange(iso);
-                      setIsOpen(false);
-                    }}
-                    className={`flex h-9 items-center justify-center rounded-xl text-sm font-semibold tabular-nums transition-colors duration-200 disabled:cursor-not-allowed disabled:text-white/15 ${
-                      isSelected
-                        ? "bg-gradient-to-r from-violet-500 to-indigo-600 text-white"
-                        : isToday
-                          ? "text-brand-200 ring-1 ring-brand-400/40 hover:bg-white/10"
-                          : "text-white/70 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
-                    {day}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-3 flex items-center justify-between border-t border-white/[0.07] pt-3">
+            <div className="mt-1 flex items-center justify-between border-t border-white/[0.07] pt-3">
               <button
                 type="button"
                 onClick={() => {
-                  onChange(
-                    toIsoDay(
-                      today.getFullYear(),
-                      today.getMonth(),
-                      today.getDate(),
-                    ),
-                  );
+                  onChange(format(new Date(), "yyyy-MM-dd"));
                   setIsOpen(false);
                 }}
                 className="text-xs font-bold text-brand-200 transition-colors duration-200 hover:text-brand-100"
