@@ -10,6 +10,7 @@ import React, {
 import {
   authFetch,
   clearAccessToken,
+  isSessionExpired,
   setAccessToken,
 } from "../utils/authFetch";
 
@@ -78,10 +79,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         { method: "GET" },
       );
 
-      if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
         clearSession();
         return;
       }
+
+      if (!response.ok) return;
 
       const data = await response.json();
       persistUser({
@@ -92,7 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         avatarUpdatedAt: data.avatarUpdatedAt ?? null,
       });
     } catch {
-      clearSession();
+      return;
     } finally {
       setLoading(false);
       setAuthLoading(false);
@@ -100,11 +103,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [clearSession, persistUser]);
 
   useEffect(() => {
+    if (isSessionExpired()) {
+      clearSession();
+      setAuthLoading(false);
+      return;
+    }
+
     const stored = readStoredUser();
-    if (stored) setUser(stored);
+    if (stored) {
+      setUser(stored);
+      setAuthLoading(false);
+    }
 
     dataUser();
-  }, [dataUser]);
+  }, [clearSession, dataUser]);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -124,7 +136,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(data.message || "Erro ao realizar login.");
       }
 
-      if (data.accessToken) setAccessToken(data.accessToken);
+      if (data.accessToken) setAccessToken(data.accessToken, data.expiresIn);
 
       await dataUser();
     },
