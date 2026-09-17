@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { DayPicker } from "react-day-picker";
 import { ptBR } from "react-day-picker/locale";
 import { format, parse, isValid } from "date-fns";
 import { FaRegCalendar } from "react-icons/fa";
+import Calendar, { type CalendarView } from "./calendar";
 import "react-day-picker/style.css";
 
 interface DatePickerProps {
@@ -11,6 +11,7 @@ interface DatePickerProps {
   label: string;
   value: string;
   max?: string;
+  min?: string;
   onChange: (value: string) => void;
   helper?: string;
 }
@@ -26,14 +27,22 @@ const DatePicker: React.FC<DatePickerProps> = ({
   label,
   value,
   max,
+  min,
   onChange,
   helper,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [view, setView] = useState<CalendarView>("days");
 
   const selected = toDate(value);
-  const maxDate = max ? toDate(max) : undefined;
+  const maxDate = (max ? toDate(max) : undefined) ?? new Date();
+  const minDate = (min ? toDate(min) : undefined) ?? new Date(1900, 0, 1);
+
+  const close = () => {
+    setIsOpen(false);
+    setView("days");
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -41,10 +50,15 @@ const DatePicker: React.FC<DatePickerProps> = ({
     const onClickOutside = (event: MouseEvent) => {
       if (!containerRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
+        setView("days");
       }
     };
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key !== "Escape") return;
+
+      if (view === "years") setView("months");
+      else if (view === "months") setView("days");
+      else setIsOpen(false);
     };
 
     document.addEventListener("mousedown", onClickOutside);
@@ -53,7 +67,12 @@ const DatePicker: React.FC<DatePickerProps> = ({
       document.removeEventListener("mousedown", onClickOutside);
       window.removeEventListener("keydown", onKey);
     };
-  }, [isOpen]);
+  }, [isOpen, view]);
+
+  const commit = (date: Date) => {
+    onChange(format(date, "yyyy-MM-dd"));
+    close();
+  };
 
   return (
     <div ref={containerRef} className="relative">
@@ -68,7 +87,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
         <button
           id={id}
           type="button"
-          onClick={() => setIsOpen((previous) => !previous)}
+          onClick={() => (isOpen ? close() : setIsOpen(true))}
           aria-haspopup="dialog"
           aria-expanded={isOpen}
           className={`flex min-h-[44px] flex-1 items-center gap-3 rounded-2xl border bg-white/[0.04] px-4 text-left text-sm transition-colors duration-300 focus:outline-none ${
@@ -112,36 +131,26 @@ const DatePicker: React.FC<DatePickerProps> = ({
             aria-label="Escolher data"
             className="gm-calendar absolute left-0 z-30 mt-2 rounded-3xl border border-white/12 bg-ink-800/95 p-4 shadow-lift backdrop-blur-2xl"
           >
-            <DayPicker
-              mode="single"
-              locale={ptBR}
-              captionLayout="dropdown"
-              startMonth={new Date(1900, 0)}
-              endMonth={maxDate ?? new Date()}
-              disabled={maxDate ? { after: maxDate } : undefined}
-              defaultMonth={selected ?? maxDate ?? new Date()}
+            <Calendar
               selected={selected}
-              onSelect={(day) => {
-                if (!day) return;
-                onChange(format(day, "yyyy-MM-dd"));
-                setIsOpen(false);
-              }}
+              minDate={minDate}
+              maxDate={maxDate}
+              view={view}
+              onViewChange={setView}
+              onSelect={commit}
             />
 
             <div className="mt-1 flex items-center justify-between border-t border-white/[0.07] pt-3">
               <button
                 type="button"
-                onClick={() => {
-                  onChange(format(new Date(), "yyyy-MM-dd"));
-                  setIsOpen(false);
-                }}
+                onClick={() => commit(new Date())}
                 className="text-xs font-bold text-brand-200 transition-colors duration-200 hover:text-brand-100"
               >
                 Hoje
               </button>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={close}
                 className="text-xs font-semibold text-white/45 transition-colors duration-200 hover:text-white/70"
               >
                 Fechar

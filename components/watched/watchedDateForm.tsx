@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { format } from "date-fns";
 import { toast } from "react-toastify";
 import DatePicker from "../_ui/form/datePicker";
 import WatchSourceSelect, { WatchSourceValueState } from "./watchSourceSelect";
@@ -38,7 +39,7 @@ const toInputValue = (value: string | null): string => {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 10);
+  return format(date, "yyyy-MM-dd");
 };
 
 const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
@@ -117,7 +118,7 @@ const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
         id="watched-date"
         label="Quando você assistiu?"
         value={date}
-        max={new Date().toISOString().slice(0, 10)}
+        max={format(new Date(), "yyyy-MM-dd")}
         onChange={setDate}
         helper="Pode deixar em branco se não lembrar."
       />

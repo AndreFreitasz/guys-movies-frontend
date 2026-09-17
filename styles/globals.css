@@ -267,19 +267,10 @@
   font-family: inherit;
 }
 
-.gm-calendar .rdp-month_caption,
-.gm-calendar .rdp-dropdowns {
+.gm-calendar .rdp-month_caption {
+  display: flex;
+  justify-content: center;
   font-weight: 800;
-  color: #fff;
-  text-transform: capitalize;
-}
-
-.gm-calendar .rdp-dropdown {
-  color: #fff;
-}
-
-.gm-calendar .rdp-dropdown option {
-  background: #12122a;
   color: #fff;
 }
 
