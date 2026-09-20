@@ -845,7 +845,7 @@ const WatchedPage = () => {
                 label="Tempo assistido"
                 value={serieData?.stats.runtimeMinutes ?? null}
                 formatValue={formatRuntime}
-                hint="Estimativa a partir da duração média dos episódios"
+                hint="Somado pela duração real dos episódios de cada temporada"
                 accent="indigo"
                 delay={0.15}
               />
