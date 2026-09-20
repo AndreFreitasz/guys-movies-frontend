@@ -25,6 +25,7 @@ interface RatingConfig {
 }
 
 interface WatchedDateConfig {
+  isActive: boolean;
   watchedAt: string | null;
   companions: UserSummary[];
   onEdit: () => void;
@@ -33,7 +34,7 @@ interface WatchedDateConfig {
 interface MediaExperiencePanelProps {
   heading: string;
   description: string;
-  watchedConfig: ExperienceActionConfig;
+  watchedConfig?: ExperienceActionConfig;
   waitingConfig: ExperienceActionConfig;
   ratingConfig: RatingConfig;
   watchedDateConfig?: WatchedDateConfig;
@@ -110,12 +111,14 @@ const MediaExperiencePanel = memo(
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            {renderButton(watchedConfig)}
+          <div
+            className={`grid gap-3 ${watchedConfig ? "sm:grid-cols-2" : ""}`}
+          >
+            {watchedConfig && renderButton(watchedConfig)}
             {renderButton(waitingConfig)}
           </div>
 
-          {watchedConfig.isActive && watchedDateConfig && (
+          {watchedDateConfig?.isActive && (
             <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-black/30 px-4 py-3">
               <div className="space-y-1">
                 <p className="text-[10px] uppercase tracking-[0.3em] text-white/60">
@@ -135,8 +138,7 @@ const MediaExperiencePanel = memo(
             </div>
           )}
 
-          {watchedConfig.isActive &&
-            watchedDateConfig &&
+          {watchedDateConfig?.isActive &&
             watchedDateConfig.companions.length > 0 && (
               <div className="rounded-2xl border border-white/5 bg-black/30 px-4 py-3">
                 <p className="mb-2 text-[10px] uppercase tracking-[0.3em] text-white/60">

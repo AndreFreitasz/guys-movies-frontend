@@ -113,6 +113,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     isBusy: isSeasonBusy,
     toggleSeason,
     completeAll,
+    resetProgress,
   } = useWatchedSeasons({ idTmdb: serie.id, buildPayload: buildSeriePayload });
 
   useEffect(() => {
@@ -122,20 +123,22 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
-  const handleWatchedClick = useCallback(() => {
-    if (!requireUser()) return;
-    if (!isWatched) {
-      setDateMode("create");
-      openModal();
-      return;
-    }
-    toggleWatched(new Date().toISOString());
-  }, [isWatched, openModal, requireUser, toggleWatched]);
-
   const openDateEditor = useCallback(() => {
     setDateMode("edit");
     setIsModalOpen(true);
   }, []);
+
+  const handleCompleteAllClick = useCallback(() => {
+    if (!requireUser()) return;
+    setDateMode("create");
+    openModal();
+  }, [openModal, requireUser]);
+
+  const handleUnmarkAllClick = useCallback(async () => {
+    if (!requireUser()) return;
+    await toggleWatched(null);
+    resetProgress();
+  }, [requireUser, resetProgress, toggleWatched]);
 
   const availableProviders = useMemo<WatchProviderOption[]>(
     () =>
@@ -253,15 +256,6 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
             <MediaExperiencePanel
               heading="Sua experiência"
               description="Gerencie o que você já assistiu, organize sua watchlist e registre sua avaliação personalizada."
-              watchedConfig={{
-                isActive: isWatched,
-                isLoading: watchedLoading,
-                onClick: handleWatchedClick,
-                title: "Assistido",
-                activeLabel: "Remover do assistido",
-                inactiveLabel: "Marcar como assistido",
-                icon: "eye",
-              }}
               waitingConfig={{
                 isActive: isWaiting,
                 isLoading: isWaitingLoading,
@@ -280,6 +274,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
                 isClient,
               }}
               watchedDateConfig={{
+                isActive: isWatched,
                 watchedAt,
                 companions,
                 onEdit: openDateEditor,
@@ -293,17 +288,12 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
           <SeasonChecklist
             seasons={seasonOptions}
             watchedSeasons={watchedSeasons}
-            isBusy={isSeasonBusy}
+            isBusy={isSeasonBusy || watchedLoading}
+            isWatched={isWatched}
             completedAt={completedAt}
             onToggle={toggleSeason}
-            onCompleteAll={() =>
-              completeAll(
-                seasonOptions.map((season) => ({
-                  seasonNumber: season.seasonNumber,
-                  episodeCount: season.episodeCount,
-                })),
-              )
-            }
+            onCompleteAll={handleCompleteAllClick}
+            onUnmarkAll={handleUnmarkAllClick}
           />
 
           <MediaSynopsis title="Sinopse" overview={serie.overview ?? ""} />
@@ -330,14 +320,30 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
           companionTarget={{ type: "serie", idTmdb: serie.id }}
           onSubmit={async (isoDate, watchSource, providerId) => {
             setIsModalOpen(false);
+
             if (dateMode === "edit") {
               await updateWatchedDate(isoDate);
               if (watchSource !== undefined) {
-                saveWatchSource(watchSource, providerId);
+                await saveWatchSource(watchSource, providerId);
+              }
+              return;
+            }
+
+            if (isWatched) {
+              await updateWatchedDate(isoDate);
+              if (watchSource !== undefined) {
+                await saveWatchSource(watchSource, providerId);
               }
             } else {
               await toggleWatched(isoDate, watchSource, providerId);
             }
+
+            await completeAll(
+              seasonOptions.map((season) => ({
+                seasonNumber: season.seasonNumber,
+                episodeCount: season.episodeCount,
+              })),
+            );
           }}
           onClear={() => {
             setIsModalOpen(false);
