@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { WATCH_PROVIDERS } from "../../constants/watchProviders";
 import { RatingRangeFilter } from "../../hooks/useWatchedFilters";
+import { CompanionOption } from "./filterBar";
 import RatingRangeSlider from "./ratingRangeSlider";
 
 interface FilterSheetProps {
@@ -8,7 +9,7 @@ interface FilterSheetProps {
   decade: number | null;
   directors: string[];
   companions: string[];
-  companionOptions: { username: string; label: string }[];
+  companionOptions: CompanionOption[];
   onCompanionsChange: (value: string[]) => void;
   providers: number[];
   decadeOptions: number[];

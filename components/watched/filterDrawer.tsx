@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { RatingRangeFilter } from "../../hooks/useWatchedFilters";
+import { CompanionOption } from "./filterBar";
 import FilterSheet from "./filterSheet";
 
 interface FilterDrawerProps {
@@ -10,7 +11,7 @@ interface FilterDrawerProps {
   decade: number | null;
   directors: string[];
   companions: string[];
-  companionOptions: { username: string; label: string }[];
+  companionOptions: CompanionOption[];
   onCompanionsChange: (value: string[]) => void;
   providers: number[];
   decadeOptions: number[];
