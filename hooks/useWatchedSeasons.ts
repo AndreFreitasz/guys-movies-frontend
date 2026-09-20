@@ -124,7 +124,6 @@ export const useWatchedSeasons = ({
 
         const progress = await response.json();
         setCompletedAt(progress.completedAt ?? null);
-        toast.success("Série marcada como assistida!");
       } catch {
         setWatchedSeasons(previous);
         setCompletedAt(previousCompleted);
@@ -136,12 +135,18 @@ export const useWatchedSeasons = ({
     [buildPayload, completedAt, idTmdb, requireUser, watchedSeasons],
   );
 
+  const resetProgress = useCallback(() => {
+    setWatchedSeasons([]);
+    setCompletedAt(null);
+  }, []);
+
   return {
     watchedSeasons,
     completedAt,
     isBusy,
     toggleSeason,
     completeAll,
+    resetProgress,
     reload: load,
   };
 };

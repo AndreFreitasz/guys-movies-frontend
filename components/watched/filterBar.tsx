@@ -4,18 +4,26 @@ import { RatingRangeFilter } from "../../hooks/useWatchedFilters";
 import FilterDropdown from "./filterDropdown";
 import RatingRangeSlider from "./ratingRangeSlider";
 
+export interface CompanionOption {
+  username: string;
+  label: string;
+}
+
 interface FilterBarProps {
   rating: RatingRangeFilter;
   decade: number | null;
   directors: string[];
   providers: number[];
+  companions: string[];
   decadeOptions: number[];
   directorOptions: string[];
+  companionOptions: CompanionOption[];
   showDirectors: boolean;
   onRatingChange: (value: RatingRangeFilter) => void;
   onDecadeChange: (value: number | null) => void;
   onDirectorsChange: (value: string[]) => void;
   onProvidersChange: (value: number[]) => void;
+  onCompanionsChange: (value: string[]) => void;
   className?: string;
 }
 
@@ -32,6 +40,14 @@ const optionRowClass = (active: boolean) =>
   }`;
 
 const DIRECTOR_SEARCH_THRESHOLD = 15;
+const COMPANION_SEARCH_THRESHOLD = 10;
+
+const checkboxClass = (active: boolean) =>
+  `flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+    active
+      ? "border-indigo-300 bg-indigo-400 text-[#05050c]"
+      : "border-white/25"
+  }`;
 
 const ratingLabel = (rating: RatingRangeFilter): string => {
   if (rating === null) return "Nota";
@@ -45,16 +61,20 @@ const FilterBar: React.FC<FilterBarProps> = ({
   decade,
   directors,
   providers,
+  companions,
   decadeOptions,
   directorOptions,
+  companionOptions,
   showDirectors,
   onRatingChange,
   onDecadeChange,
   onDirectorsChange,
   onProvidersChange,
+  onCompanionsChange,
   className,
 }) => {
   const [directorSearch, setDirectorSearch] = useState("");
+  const [companionSearch, setCompanionSearch] = useState("");
 
   const filteredDirectorOptions = useMemo(() => {
     const normalized = directorSearch.trim().toLowerCase();
@@ -63,6 +83,16 @@ const FilterBar: React.FC<FilterBarProps> = ({
       name.toLowerCase().includes(normalized),
     );
   }, [directorOptions, directorSearch]);
+
+  const filteredCompanionOptions = useMemo(() => {
+    const normalized = companionSearch.trim().toLowerCase();
+    if (!normalized) return companionOptions;
+    return companionOptions.filter(
+      (person) =>
+        person.label.toLowerCase().includes(normalized) ||
+        person.username.toLowerCase().includes(normalized),
+    );
+  }, [companionOptions, companionSearch]);
 
   return (
     <div className={`flex flex-wrap gap-2 ${className ?? ""}`}>
@@ -161,13 +191,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                   className={optionRowClass(active)}
                 >
                   {provider.name}
-                  <span
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
-                      active
-                        ? "border-indigo-300 bg-indigo-400 text-[#05050c]"
-                        : "border-white/25"
-                    }`}
-                  >
+                  <span className={checkboxClass(active)}>
                     {active && (
                       <svg viewBox="0 0 20 20" className="h-3 w-3">
                         <path
@@ -214,13 +238,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                       className={optionRowClass(active)}
                     >
                       {name}
-                      <span
-                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
-                          active
-                            ? "border-indigo-300 bg-indigo-400 text-[#05050c]"
-                            : "border-white/25"
-                        }`}
-                      >
+                      <span className={checkboxClass(active)}>
                         {active && (
                           <svg viewBox="0 0 20 20" className="h-3 w-3">
                             <path
@@ -236,6 +254,67 @@ const FilterBar: React.FC<FilterBarProps> = ({
                 {filteredDirectorOptions.length === 0 && (
                   <p className="px-3 py-2 text-sm text-white/40">
                     Nenhum diretor encontrado.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </FilterDropdown>
+      )}
+
+      {companionOptions.length > 0 && (
+        <FilterDropdown
+          label="Assistido com"
+          badge={companions.length}
+          isActive={companions.length > 0}
+        >
+          {() => (
+            <div>
+              {companionOptions.length > COMPANION_SEARCH_THRESHOLD && (
+                <input
+                  type="search"
+                  value={companionSearch}
+                  onChange={(event) => setCompanionSearch(event.target.value)}
+                  placeholder="Buscar pessoa..."
+                  aria-label="Buscar pessoa"
+                  className="mb-2 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/60 focus:outline-none"
+                />
+              )}
+              <div className="max-h-72 space-y-1 overflow-y-auto">
+                {filteredCompanionOptions.map((person) => {
+                  const active = companions.includes(person.username);
+                  return (
+                    <button
+                      key={person.username}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() =>
+                        onCompanionsChange(toggle(companions, person.username))
+                      }
+                      className={optionRowClass(active)}
+                    >
+                      <span className="min-w-0 truncate">
+                        {person.label}
+                        <span className="ml-1 text-xs text-white/35">
+                          @{person.username}
+                        </span>
+                      </span>
+                      <span className={checkboxClass(active)}>
+                        {active && (
+                          <svg viewBox="0 0 20 20" className="h-3 w-3">
+                            <path
+                              fill="currentColor"
+                              d="M8.2 13.2L4.9 9.9l1.2-1.2 2.1 2.1 5.7-5.7 1.2 1.2z"
+                            />
+                          </svg>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+                {filteredCompanionOptions.length === 0 && (
+                  <p className="px-3 py-2 text-sm text-white/40">
+                    Ninguém encontrado.
                   </p>
                 )}
               </div>

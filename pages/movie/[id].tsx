@@ -249,6 +249,7 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
                 isClient,
               }}
               watchedDateConfig={{
+                isActive: isWatched,
                 watchedAt,
                 companions,
                 onEdit: openDateEditor,

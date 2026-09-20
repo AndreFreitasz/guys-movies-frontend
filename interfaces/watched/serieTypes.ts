@@ -15,6 +15,7 @@ export interface WatchedSerieItem {
   createdAt: string;
   watchedSeasons: number;
   watchedEpisodes: number;
+  runtimeMinutes: number;
   episodeRunTime: number | null;
   providerId: number | null;
   watchSource: WatchSourceValue | null;

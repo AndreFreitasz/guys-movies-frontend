@@ -21,7 +21,7 @@ import WatchedToolbar, {
 } from "../components/watched/watchedToolbar";
 import WatchedDetailSheet from "../components/watched/watchedDetailSheet";
 import WatchedSerieSheet from "../components/watched/watchedSerieSheet";
-import FilterBar from "../components/watched/filterBar";
+import FilterBar, { CompanionOption } from "../components/watched/filterBar";
 import FilterDrawer from "../components/watched/filterDrawer";
 import LibrarySummary from "../components/watched/librarySummary";
 import { useAuth } from "../hooks/authContext";
@@ -40,6 +40,7 @@ import {
   WatchedSerieList,
   WatchedSerieSortKey,
 } from "../interfaces/watched/serieTypes";
+import { UserSummary } from "../interfaces/profile/types";
 
 const SKELETON_COUNT = 10;
 
@@ -132,6 +133,20 @@ const matchesRating = (
   return itemRating >= filter.min && itemRating <= filter.max;
 };
 
+const collectCompanions = (
+  items: { companions: UserSummary[] }[],
+): CompanionOption[] => {
+  const seen = new Map<string, string>();
+  items.forEach((item) =>
+    item.companions.forEach((person) =>
+      seen.set(person.username, person.name || person.username),
+    ),
+  );
+  return Array.from(seen, ([username, label]) => ({ username, label })).sort(
+    (first, second) => first.label.localeCompare(second.label, "pt-BR"),
+  );
+};
+
 const collectDecades = (dates: (string | null)[]): number[] => {
   const decades = new Set<number>();
   dates.forEach((date) => {
@@ -214,17 +229,16 @@ const WatchedPage = () => {
 
   const hasProviderFilter = providers.length > 0;
 
-  const companionOptions = useMemo(() => {
-    const seen = new Map<string, string>();
-    (data?.items ?? []).forEach((item) =>
-      item.companions.forEach((person) =>
-        seen.set(person.username, person.name || person.username),
-      ),
-    );
-    return Array.from(seen, ([username, label]) => ({ username, label })).sort(
-      (first, second) => first.label.localeCompare(second.label, "pt-BR"),
-    );
-  }, [data]);
+  const movieCompanionOptions = useMemo(
+    () => collectCompanions(data?.items ?? []),
+    [data],
+  );
+  const serieCompanionOptions = useMemo(
+    () => collectCompanions(serieData?.items ?? []),
+    [serieData],
+  );
+  const companionOptions =
+    activeTab === "movies" ? movieCompanionOptions : serieCompanionOptions;
   const providerQuery = providers.length
     ? `?providers=${providers.join(",")}`
     : "";
@@ -386,8 +400,14 @@ const WatchedPage = () => {
       );
     }
 
+    if (companions.length > 0) {
+      filtered = filtered.filter((item) =>
+        item.companions.some((person) => companions.includes(person.username)),
+      );
+    }
+
     return sortSeries(filtered, serieSortKey);
-  }, [decade, rating, serieData, serieQuery, serieSortKey]);
+  }, [companions, decade, rating, serieData, serieQuery, serieSortKey]);
 
   const showSerieRuntimeCard = !serieData || serieData.stats.runtimeMinutes > 0;
   const serieStatsGridClass = showSerieRuntimeCard
@@ -672,13 +692,16 @@ const WatchedPage = () => {
                   decade={decade}
                   directors={directors}
                   providers={providers}
+                  companions={companions}
                   decadeOptions={movieDecadeOptions}
                   directorOptions={directorOptions}
+                  companionOptions={movieCompanionOptions}
                   showDirectors
                   onRatingChange={setRating}
                   onDecadeChange={setDecade}
                   onDirectorsChange={setDirectors}
                   onProvidersChange={setProviders}
+                  onCompanionsChange={setCompanions}
                   className="hidden lg:flex"
                 />
                 <button
@@ -822,7 +845,7 @@ const WatchedPage = () => {
                 label="Tempo assistido"
                 value={serieData?.stats.runtimeMinutes ?? null}
                 formatValue={formatRuntime}
-                hint="Estimativa a partir da duração média dos episódios"
+                hint="Somado pela duração real dos episódios de cada temporada"
                 accent="indigo"
                 delay={0.15}
               />
@@ -887,13 +910,16 @@ const WatchedPage = () => {
                     decade={decade}
                     directors={directors}
                     providers={providers}
+                    companions={companions}
                     decadeOptions={serieDecadeOptions}
                     directorOptions={[]}
+                    companionOptions={serieCompanionOptions}
                     showDirectors={false}
                     onRatingChange={setRating}
                     onDecadeChange={setDecade}
                     onDirectorsChange={setDirectors}
                     onProvidersChange={setProviders}
+                    onCompanionsChange={setCompanions}
                     className="hidden lg:flex"
                   />
                   <button

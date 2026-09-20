@@ -18,6 +18,7 @@ interface SeasonChecklistProps {
   seasons: SeasonOption[];
   watchedSeasons: WatchedSeasonEntry[];
   isBusy: boolean;
+  isWatched?: boolean;
   completedAt: string | null;
   onToggle: (
     seasonNumber: number,
@@ -25,6 +26,7 @@ interface SeasonChecklistProps {
     episodeCount: number,
   ) => void;
   onCompleteAll: () => void;
+  onUnmarkAll?: () => void;
 }
 
 const VISIBLE_LIMIT = 8;
@@ -49,9 +51,11 @@ const SeasonChecklist: React.FC<SeasonChecklistProps> = ({
   seasons,
   watchedSeasons,
   isBusy,
+  isWatched = false,
   completedAt,
   onToggle,
   onCompleteAll,
+  onUnmarkAll,
 }) => {
   const [showAll, setShowAll] = useState(false);
 
@@ -78,40 +82,59 @@ const SeasonChecklist: React.FC<SeasonChecklistProps> = ({
           </p>
         </div>
 
-        {completedAt ? (
-          <span className="flex h-10 items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/20 px-4 text-xs font-bold text-emerald-200">
-            <FaCheck size={11} />
-            Série completa · {formatCompletedAt(completedAt)}
-          </span>
-        ) : (
-          seasons.length > 0 && (
-            <button
-              type="button"
-              onClick={onCompleteAll}
-              disabled={isBusy}
-              className="h-10 rounded-full bg-white px-5 text-xs font-bold tracking-tight text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40"
-            >
-              Assisti a série inteira
-            </button>
-          )
+        {seasons.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            {completedAt && (
+              <span className="flex h-10 items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/20 px-4 text-xs font-bold text-emerald-200">
+                <FaCheck size={11} />
+                Série completa · {formatCompletedAt(completedAt)}
+              </span>
+            )}
+
+            {!completedAt && (
+              <button
+                type="button"
+                onClick={onCompleteAll}
+                disabled={isBusy}
+                className="h-10 rounded-full bg-white px-5 text-xs font-bold tracking-tight text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40"
+              >
+                Assisti a série inteira
+              </button>
+            )}
+
+            {onUnmarkAll && isWatched && (
+              <button
+                type="button"
+                onClick={onUnmarkAll}
+                disabled={isBusy}
+                className="h-10 rounded-full border border-white/12 bg-white/[0.04] px-5 text-xs font-bold tracking-tight text-white/70 transition-all duration-300 ease-ios hover:bg-white/[0.09] hover:text-white active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40"
+              >
+                Remover dos assistidos
+              </button>
+            )}
+          </div>
         )}
       </div>
 
       <ul className="mt-4 space-y-1.5">
         {visible.map((season) => {
-          const isWatched = watchedSeasonNumbers.has(season.seasonNumber);
+          const isSeasonWatched = watchedSeasonNumbers.has(season.seasonNumber);
 
           return (
             <li key={season.seasonNumber}>
               <button
                 type="button"
                 onClick={() =>
-                  onToggle(season.seasonNumber, !isWatched, season.episodeCount)
+                  onToggle(
+                    season.seasonNumber,
+                    !isSeasonWatched,
+                    season.episodeCount,
+                  )
                 }
                 disabled={isBusy}
-                aria-pressed={isWatched}
+                aria-pressed={isSeasonWatched}
                 className={`flex min-h-[44px] w-full items-center gap-3 rounded-2xl border px-3 py-2 text-left transition-colors duration-300 disabled:opacity-50 ${
-                  isWatched
+                  isSeasonWatched
                     ? "border-emerald-400/30 bg-emerald-400/10"
                     : "border-white/10 bg-white/[0.02] hover:border-white/25"
                 }`}
@@ -135,12 +158,16 @@ const SeasonChecklist: React.FC<SeasonChecklistProps> = ({
                 </span>
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border ${
-                    isWatched
+                    isSeasonWatched
                       ? "border-emerald-400/40 bg-emerald-400/20 text-emerald-200"
                       : "border-white/15 text-white/35"
                   }`}
                 >
-                  {isWatched ? <FaCheck size={11} /> : <FaPlus size={10} />}
+                  {isSeasonWatched ? (
+                    <FaCheck size={11} />
+                  ) : (
+                    <FaPlus size={10} />
+                  )}
                 </span>
               </button>
             </li>
