@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev && services:up",
+    "dev": "next dev",
     "build": "next build",
+    "start": "next start",
     "services:up": "docker compose up -d",
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write ."

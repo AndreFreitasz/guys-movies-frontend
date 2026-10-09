@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+build
+coverage
+.git
+.gitignore
+.env
+.env.*
+.vercel
+.vscode
+.idea
+*.log
+*.tsbuildinfo
+README.md
+Dockerfile
+docker-compose.yml
