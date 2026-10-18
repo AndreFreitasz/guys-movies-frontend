@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { format } from "date-fns";
-import { toast } from "react-toastify";
 import DatePicker from "../_ui/form/datePicker";
 import WatchSourceSelect, { WatchSourceValueState } from "./watchSourceSelect";
 import CompanionPicker from "./companionPicker";
-import { authFetch } from "../../utils/authFetch";
+import { CompanionTarget, tagCompanions } from "../../utils/tagCompanions";
 import { UserSummary } from "../../interfaces/profile/types";
 import {
   WatchProviderOption,
@@ -13,11 +12,7 @@ import {
 
 export type WatchedDateFormMode = "create" | "edit";
 
-export interface CompanionTarget {
-  type: "movie" | "serie";
-  idTmdb: number;
-  seasonNumber?: number | null;
-}
+export type { CompanionTarget };
 
 interface WatchedDateFormProps {
   initialDate: string | null;
@@ -75,36 +70,8 @@ const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
 
         if (!companionTarget || companions.length === 0) return;
 
-        const failed: string[] = [];
-
-        for (const person of companions) {
-          try {
-            const response = await authFetch(
-              `${process.env.NEXT_PUBLIC_URL_API}/me/watch-together`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  type: companionTarget.type,
-                  idTmdb: companionTarget.idTmdb,
-                  seasonNumber: companionTarget.seasonNumber ?? undefined,
-                  companionUsername: person.username,
-                }),
-              },
-            );
-            if (!response.ok) throw new Error("falhou");
-          } catch {
-            failed.push(person.name || person.username);
-          }
-        }
-
+        await tagCompanions(companionTarget, companions);
         setCompanions([]);
-
-        if (failed.length > 0) {
-          toast.error(`Não foi possível marcar ${failed.join(", ")}.`);
-        } else {
-          toast.success("Enviamos a confirmação para quem você marcou.");
-        }
       }}
       className="flex flex-col gap-5"
     >

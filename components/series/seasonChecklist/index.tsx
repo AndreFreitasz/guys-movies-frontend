@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaCheck, FaPlus } from "react-icons/fa";
+import { FaCheck, FaPlus, FaUserPlus } from "react-icons/fa";
 
 export interface SeasonOption {
   seasonNumber: number;
@@ -27,6 +27,7 @@ interface SeasonChecklistProps {
   ) => void;
   onCompleteAll: () => void;
   onUnmarkAll?: () => void;
+  onTagCompanions?: () => void;
 }
 
 const VISIBLE_LIMIT = 8;
@@ -56,6 +57,7 @@ const SeasonChecklist: React.FC<SeasonChecklistProps> = ({
   onToggle,
   onCompleteAll,
   onUnmarkAll,
+  onTagCompanions,
 }) => {
   const [showAll, setShowAll] = useState(false);
 
@@ -99,6 +101,18 @@ const SeasonChecklist: React.FC<SeasonChecklistProps> = ({
                 className="h-10 rounded-full bg-white px-5 text-xs font-bold tracking-tight text-[#05050c] transition-all duration-300 ease-ios hover:-translate-y-0.5 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40"
               >
                 Assisti a série inteira
+              </button>
+            )}
+
+            {onTagCompanions && watchedSeasons.length > 0 && (
+              <button
+                type="button"
+                onClick={onTagCompanions}
+                disabled={isBusy}
+                className="flex h-10 items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-500/10 px-4 text-xs font-bold tracking-tight text-indigo-100 transition-all duration-300 ease-ios hover:bg-indigo-500/20 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40"
+              >
+                <FaUserPlus size={11} />
+                Assisti com alguém
               </button>
             )}
 

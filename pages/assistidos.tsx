@@ -156,6 +156,12 @@ const collectDecades = (dates: (string | null)[]): number[] => {
   return Array.from(decades).sort((a, b) => b - a);
 };
 
+const averageOf = (values: (number | null)[]): number | null => {
+  const rated = values.filter((value): value is number => value !== null);
+  if (rated.length === 0) return null;
+  return rated.reduce((total, value) => total + value, 0) / rated.length;
+};
+
 const formatRuntime = (minutes: number): string => {
   if (!minutes) return "—";
   const days = Math.floor(minutes / 1440);
@@ -228,6 +234,7 @@ const WatchedPage = () => {
     activeTab === "movies" ? rawActiveCount : rawActiveCount - directors.length;
 
   const hasProviderFilter = providers.length > 0;
+  const hasSharedFilters = rawActiveCount - directors.length > 0;
 
   const movieCompanionOptions = useMemo(
     () => collectCompanions(data?.items ?? []),
@@ -310,7 +317,7 @@ const WatchedPage = () => {
 
   useEffect(() => {
     if (authLoading || !user) return;
-    if (activeTab !== "series" || isSerieLoading) return;
+    if ((activeTab !== "series" && !hasSharedFilters) || isSerieLoading) return;
     if (serieData && fetchedSerieProviderQueryRef.current === providerQuery)
       return;
 
@@ -320,6 +327,7 @@ const WatchedPage = () => {
     activeTab,
     authLoading,
     fetchWatchedSeries,
+    hasSharedFilters,
     isSerieLoading,
     providerQuery,
     serieData,
@@ -408,6 +416,49 @@ const WatchedPage = () => {
 
     return sortSeries(filtered, serieSortKey);
   }, [companions, decade, rating, serieData, serieQuery, serieSortKey]);
+
+  const isFilteringMovies = rawActiveCount > 0 || query.trim().length > 0;
+  const isFilteringSeries = hasSharedFilters || serieQuery.trim().length > 0;
+
+  const movieStats = useMemo(() => {
+    if (!data) return null;
+    const ratings = visibleMovies.map((item) => item.rating);
+    return {
+      total: visibleMovies.length,
+      rated: ratings.filter((value) => value !== null).length,
+      averageRating: averageOf(ratings),
+    };
+  }, [data, visibleMovies]);
+
+  const serieStats = useMemo(() => {
+    if (!serieData) return null;
+    return {
+      total: visibleSeries.length,
+      completed: visibleSeries.filter((item) => item.completedAt).length,
+      inProgress: visibleSeries.filter(
+        (item) => !item.completedAt && item.watchedSeasons > 0,
+      ).length,
+      episodes: visibleSeries.reduce(
+        (total, item) => total + item.watchedEpisodes,
+        0,
+      ),
+      runtimeMinutes: visibleSeries.reduce(
+        (total, item) => total + item.runtimeMinutes,
+        0,
+      ),
+      averageRating: averageOf(visibleSeries.map((item) => item.rating)),
+    };
+  }, [serieData, visibleSeries]);
+
+  const filteredSummary = useMemo(() => {
+    if (!isFilteringMovies && !isFilteringSeries) return null;
+    return {
+      movies: movieStats?.total ?? null,
+      series: serieStats?.total ?? null,
+      episodes: serieStats?.episodes ?? null,
+      serieRuntimeMinutes: serieStats?.runtimeMinutes ?? null,
+    };
+  }, [isFilteringMovies, isFilteringSeries, movieStats, serieStats]);
 
   const showSerieRuntimeCard = !serieData || serieData.stats.runtimeMinutes > 0;
   const serieStatsGridClass = showSerieRuntimeCard
@@ -575,7 +626,10 @@ const WatchedPage = () => {
             : "Tudo o que você já assistiu fica aqui, temporada por temporada. Toque em qualquer pôster para ver o progresso, marcar temporadas e acompanhar quando completou."}
         </p>
 
-        <LibrarySummary enabled={Boolean(user) && !authLoading} />
+        <LibrarySummary
+          enabled={Boolean(user) && !authLoading}
+          filtered={filteredSummary}
+        />
 
         <div
           role="tablist"
@@ -616,18 +670,22 @@ const WatchedPage = () => {
           <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatCard
               label="Assistidos"
-              value={data?.stats.total ?? null}
-              hint="Total de filmes na sua estante"
+              value={movieStats?.total ?? null}
+              hint={
+                isFilteringMovies
+                  ? "Filmes que batem com os filtros"
+                  : "Total de filmes na sua estante"
+              }
               accent="indigo"
               delay={0.05}
             />
             <StatCard
               label="Nota média"
-              value={data?.stats.averageRating ?? null}
+              value={movieStats?.averageRating ?? null}
               hint={
-                data?.stats.rated
-                  ? `Baseada em ${data.stats.rated} ${
-                      data.stats.rated === 1 ? "avaliação" : "avaliações"
+                movieStats?.rated
+                  ? `Baseada em ${movieStats.rated} ${
+                      movieStats.rated === 1 ? "avaliação" : "avaliações"
                     }`
                   : "Avalie um filme para ver sua média"
               }
@@ -638,7 +696,7 @@ const WatchedPage = () => {
             />
             <StatCard
               label="Avaliados"
-              value={data?.stats.rated ?? null}
+              value={movieStats?.rated ?? null}
               hint="Filmes em que você deixou uma nota"
               accent="emerald"
               delay={0.19}
@@ -824,10 +882,10 @@ const WatchedPage = () => {
           <section className={serieStatsGridClass}>
             <StatCard
               label="Séries"
-              value={serieData?.stats.total ?? null}
+              value={serieStats?.total ?? null}
               hint={
-                serieData
-                  ? `${serieData.stats.completed} completas · ${serieData.stats.inProgress} em andamento`
+                serieStats
+                  ? `${serieStats.completed} completas · ${serieStats.inProgress} em andamento`
                   : "Total de séries na sua estante"
               }
               accent="indigo"
@@ -835,15 +893,19 @@ const WatchedPage = () => {
             />
             <StatCard
               label="Episódios"
-              value={serieData?.stats.episodes ?? null}
-              hint="Episódios assistidos ao todo"
+              value={serieStats?.episodes ?? null}
+              hint={
+                isFilteringSeries
+                  ? "Episódios das séries filtradas"
+                  : "Episódios assistidos ao todo"
+              }
               accent="emerald"
               delay={0.1}
             />
             {showSerieRuntimeCard && (
               <StatCard
                 label="Tempo assistido"
-                value={serieData?.stats.runtimeMinutes ?? null}
+                value={serieStats?.runtimeMinutes ?? null}
                 formatValue={formatRuntime}
                 hint="Somado pela duração real dos episódios de cada temporada"
                 accent="indigo"
@@ -852,7 +914,7 @@ const WatchedPage = () => {
             )}
             <StatCard
               label="Nota média"
-              value={serieData?.stats.averageRating ?? null}
+              value={serieStats?.averageRating ?? null}
               hint="Baseada nas séries que você avaliou"
               suffix=" / 5"
               decimals={1}

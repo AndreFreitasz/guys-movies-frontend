@@ -15,6 +15,7 @@ import {
 import RatingStars from "./ratingStars";
 import CompanionStrip from "./companionStrip";
 import WatchedDateForm from "./watchedDateForm";
+import CompanionTagForm from "./companionTagForm";
 
 interface WatchedSerieSheetProps {
   serie: WatchedSerieItem | null;
@@ -54,6 +55,7 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
   const { user, authLoading } = useAuth();
   const [isEditingDate, setIsEditingDate] = useState(false);
   const [isUpdatingDate, setIsUpdatingDate] = useState(false);
+  const [isTaggingCompanions, setIsTaggingCompanions] = useState(false);
   const [seasonOptions, setSeasonOptions] = useState<SeasonOption[]>([]);
   const [seasonsStatus, setSeasonsStatus] = useState<
     "loading" | "error" | "ready"
@@ -301,6 +303,16 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
           </div>
         )}
 
+        {isTaggingCompanions && (
+          <div className="mb-4 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+            <CompanionTagForm
+              target={{ type: "serie", idTmdb: serie.idTmdb }}
+              description="A pessoa recebe um pedido de confirmação para as temporadas que você marcou."
+              onDone={() => setIsTaggingCompanions(false)}
+            />
+          </div>
+        )}
+
         {seasonsStatus === "ready" && (
           <SeasonChecklist
             seasons={seasonOptions}
@@ -308,6 +320,9 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
             isBusy={isBusy || isUpdatingDate}
             completedAt={completedAt}
             onToggle={toggleSeason}
+            onTagCompanions={() =>
+              setIsTaggingCompanions((previous) => !previous)
+            }
             onCompleteAll={() =>
               completeAll(
                 seasonOptions.map((season) => ({

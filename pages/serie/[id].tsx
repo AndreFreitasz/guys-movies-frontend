@@ -9,6 +9,7 @@ import LoadingSpinner from "../../components/_ui/loadingSpinner";
 import WatchedDateForm, {
   WatchedDateFormMode,
 } from "../../components/watched/watchedDateForm";
+import CompanionTagForm from "../../components/watched/companionTagForm";
 import Modal from "../../components/_ui/modal";
 import {
   MediaCastSection,
@@ -40,6 +41,7 @@ interface SerieProps {
 
 const SeriePage: NextPage<SerieProps> = ({ serie }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCompanionModalOpen, setIsCompanionModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [loading] = useState(false);
   const [dateMode, setDateMode] = useState<WatchedDateFormMode>("create");
@@ -116,6 +118,9 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     resetProgress,
   } = useWatchedSeasons({ idTmdb: serie.id, buildPayload: buildSeriePayload });
 
+  const hasWatchedSeasons = watchedSeasons.length > 0;
+  const isSerieWatched = isWatched || hasWatchedSeasons;
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -133,6 +138,11 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     setDateMode("create");
     openModal();
   }, [openModal, requireUser]);
+
+  const handleTagCompanionsClick = useCallback(() => {
+    if (!requireUser()) return;
+    setIsCompanionModalOpen(true);
+  }, [requireUser]);
 
   const handleUnmarkAllClick = useCallback(async () => {
     if (!requireUser()) return;
@@ -274,7 +284,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
                 isClient,
               }}
               watchedDateConfig={{
-                isActive: isWatched,
+                isActive: isSerieWatched,
                 watchedAt,
                 companions,
                 onEdit: openDateEditor,
@@ -289,11 +299,12 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
             seasons={seasonOptions}
             watchedSeasons={watchedSeasons}
             isBusy={isSeasonBusy || watchedLoading}
-            isWatched={isWatched}
+            isWatched={isSerieWatched}
             completedAt={completedAt}
             onToggle={toggleSeason}
             onCompleteAll={handleCompleteAllClick}
             onUnmarkAll={handleUnmarkAllClick}
+            onTagCompanions={handleTagCompanionsClick}
           />
 
           <MediaSynopsis title="Sinopse" overview={serie.overview ?? ""} />
@@ -329,7 +340,7 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
               return;
             }
 
-            if (isWatched) {
+            if (isSerieWatched) {
               await updateWatchedDate(isoDate);
               if (watchSource !== undefined) {
                 await saveWatchSource(watchSource, providerId);
@@ -349,6 +360,17 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
             setIsModalOpen(false);
             updateWatchedDate(null);
           }}
+        />
+      </Modal>
+      <Modal
+        isOpen={isCompanionModalOpen}
+        onClose={() => setIsCompanionModalOpen(false)}
+        title="Com quem você assistiu?"
+      >
+        <CompanionTagForm
+          target={{ type: "serie", idTmdb: serie.id }}
+          description="A pessoa recebe um pedido de confirmação para as temporadas que você marcou."
+          onDone={() => setIsCompanionModalOpen(false)}
         />
       </Modal>
     </>
