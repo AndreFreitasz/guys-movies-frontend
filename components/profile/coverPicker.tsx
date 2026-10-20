@@ -62,7 +62,7 @@ const CoverPicker: React.FC<CoverPickerProps> = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.22 }}
           onClick={onClose}
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/65 backdrop-blur-xl"
+          className="fixed inset-0 z-60 flex items-end justify-center bg-black/65 backdrop-blur-xl"
         >
           <motion.div
             initial={{ y: "100%" }}
@@ -73,7 +73,7 @@ const CoverPicker: React.FC<CoverPickerProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Escolher capa"
-            className="max-h-[88vh] w-full max-w-[760px] overflow-y-auto rounded-t-[1.75rem] border border-b-0 border-white/12 bg-gradient-to-b from-ink-800/95 to-ink-900/[0.98]"
+            className="max-h-[88vh] w-full max-w-[760px] overflow-y-auto rounded-t-[1.75rem] border border-b-0 border-white/12 bg-linear-to-b from-ink-800/95 to-ink-900/98"
           >
             <div className="sticky top-0 z-10 bg-ink-800/95 px-5 pb-4 pt-3 backdrop-blur-xl">
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/25" />
@@ -103,7 +103,7 @@ const CoverPicker: React.FC<CoverPickerProps> = ({
                 onChange={(event) => setTerm(event.target.value)}
                 placeholder="Buscar na sua biblioteca..."
                 aria-label="Buscar na sua biblioteca"
-                className="mt-3 w-full rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-medium text-white placeholder:text-white/35 focus:border-brand-400/60 focus:outline-none"
+                className="mt-3 w-full rounded-full border border-white/10 bg-white/6 px-5 py-3 text-sm font-medium text-white placeholder:text-white/35 focus:border-brand-400/60 focus:outline-hidden"
               />
 
               <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1">
@@ -115,7 +115,7 @@ const CoverPicker: React.FC<CoverPickerProps> = ({
                     className={`min-h-[36px] shrink-0 rounded-full border px-4 text-xs font-bold transition-colors duration-300 ${
                       filter === option.value
                         ? "border-brand-400/60 bg-brand-500/25 text-brand-100"
-                        : "border-white/12 bg-white/[0.05] text-white/55 hover:text-white/80"
+                        : "border-white/12 bg-white/5 text-white/55 hover:text-white/80"
                     }`}
                   >
                     {option.label}
@@ -139,7 +139,7 @@ const CoverPicker: React.FC<CoverPickerProps> = ({
                   {Array.from({ length: 4 }).map((_, index) => (
                     <div
                       key={index}
-                      className="skeleton aspect-[16/10] w-full rounded-2xl"
+                      className="skeleton aspect-16/10 w-full rounded-2xl"
                     />
                   ))}
                 </div>
@@ -169,7 +169,7 @@ const CoverPicker: React.FC<CoverPickerProps> = ({
                         key={key}
                         type="button"
                         onClick={() => onSelect(option)}
-                        className={`relative aspect-[16/10] overflow-hidden rounded-2xl border text-left transition-transform duration-300 ease-ios hover:scale-[1.02] ${
+                        className={`relative aspect-16/10 overflow-hidden rounded-2xl border text-left transition-transform duration-300 ease-ios hover:scale-[1.02] ${
                           isActive
                             ? "border-brand-400 ring-2 ring-brand-500/35"
                             : "border-white/12"
@@ -184,7 +184,7 @@ const CoverPicker: React.FC<CoverPickerProps> = ({
                           loading="lazy"
                           className="absolute inset-0 h-full w-full object-cover"
                         />
-                        <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
+                        <span className="absolute inset-0 bg-linear-to-t from-black/85 via-transparent to-transparent" />
                         <span className="absolute inset-x-3 bottom-2.5">
                           <span className="block truncate text-sm font-bold text-white">
                             {option.title}

@@ -203,7 +203,7 @@ const ProfileEditor = forwardRef<ProfileEditorHandle, ProfileEditorProps>(
     useImperativeHandle(ref, () => ({ save }));
 
     return (
-      <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+      <div className="mt-6 rounded-3xl border border-white/10 bg-white/3 p-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label
@@ -221,7 +221,7 @@ const ProfileEditor = forwardRef<ProfileEditorHandle, ProfileEditorProps>(
               placeholder="Como você quer ser chamado"
               aria-invalid={nameError !== null}
               aria-describedby={nameError ? "profile-name-error" : undefined}
-              className={`mt-2 w-full rounded-2xl border bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none ${
+              className={`mt-2 w-full rounded-2xl border bg-white/4 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-hidden ${
                 nameError
                   ? "border-rose-400/70"
                   : "border-white/10 focus:border-brand-400/60"
@@ -267,7 +267,7 @@ const ProfileEditor = forwardRef<ProfileEditorHandle, ProfileEditorProps>(
                     ? "profile-username-error"
                     : "profile-username-help"
                 }
-                className={`w-full rounded-2xl border bg-white/[0.04] py-3 pl-7 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none ${
+                className={`w-full rounded-2xl border bg-white/4 py-3 pl-7 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-hidden ${
                   usernameError
                     ? "border-rose-400/70"
                     : "border-white/10 focus:border-brand-400/60"
@@ -316,7 +316,7 @@ const ProfileEditor = forwardRef<ProfileEditorHandle, ProfileEditorProps>(
           rows={3}
           onChange={(event) => setDraftBio(event.target.value)}
           placeholder="Conte em poucas linhas o que você gosta de assistir."
-          className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-brand-400/60 focus:outline-none"
+          className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-brand-400/60 focus:outline-hidden"
         />
         <p className="mt-1 text-right text-xs tabular-nums text-white/35">
           {remaining}
@@ -338,7 +338,7 @@ const ProfileEditor = forwardRef<ProfileEditorHandle, ProfileEditorProps>(
                     key={`${type}-empty-${index}`}
                     type="button"
                     onClick={() => setPickerType(type)}
-                    className="flex aspect-[2/3] w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/15 px-2 text-center text-xs font-semibold text-white/40 hover:border-brand-400/50"
+                    className="flex aspect-2/3 w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/15 px-2 text-center text-xs font-semibold text-white/40 hover:border-brand-400/50"
                   >
                     {type === "movie" ? "Filme" : "Série"}
                   </button>
@@ -350,7 +350,7 @@ const ProfileEditor = forwardRef<ProfileEditorHandle, ProfileEditorProps>(
                   <img
                     src={resolvePosterUrl(item.posterPath)}
                     alt={item.title}
-                    className="aspect-[2/3] w-full rounded-2xl border border-white/10 object-cover"
+                    className="aspect-2/3 w-full rounded-2xl border border-white/10 object-cover"
                   />
                   <button
                     type="button"
@@ -381,7 +381,7 @@ const ProfileEditor = forwardRef<ProfileEditorHandle, ProfileEditorProps>(
             type="button"
             onClick={save}
             disabled={isSaving}
-            className="min-h-[44px] flex-1 rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 text-sm font-bold text-white disabled:opacity-60"
+            className="min-h-[44px] flex-1 rounded-full bg-linear-to-r from-violet-500 to-indigo-600 text-sm font-bold text-white disabled:opacity-60"
           >
             {isSaving ? "Salvando..." : "Salvar"}
           </button>

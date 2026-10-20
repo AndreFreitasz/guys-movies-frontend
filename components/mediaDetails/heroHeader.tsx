@@ -15,10 +15,10 @@ const MediaHeroHeader = memo(
         <p className="text-[0.6rem] font-bold uppercase tracking-[0.3em] text-indigo-300 sm:text-[0.65rem]">
           {badgeLabel}
         </p>
-        <h1 className="break-words text-2xl font-black leading-[1.08] tracking-tight sm:text-4xl lg:text-5xl xl:text-6xl">
+        <h1 className="wrap-break-word text-2xl font-black leading-[1.08] tracking-tight sm:text-4xl lg:text-5xl xl:text-6xl">
           {title}
         </h1>
-        <div className="flex w-fit items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-2 backdrop-blur sm:gap-4 sm:px-4 sm:py-3">
+        <div className="flex w-fit items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-sm sm:gap-4 sm:px-4 sm:py-3">
           <CircularVoteAverage
             key={mediaId}
             vote_average={voteAverage}

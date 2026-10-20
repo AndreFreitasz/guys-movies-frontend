@@ -63,7 +63,7 @@ function RouteProgressBar() {
           exit={{ opacity: 0 }}
           role="progressbar"
           aria-label="Carregando página"
-          className="fixed inset-x-0 top-0 z-[100] h-0.5 overflow-hidden bg-transparent"
+          className="fixed inset-x-0 top-0 z-100 h-0.5 overflow-hidden bg-transparent"
         >
           <div className="h-full w-1/3 animate-[routeProgress_1s_ease-in-out_infinite] bg-white shadow-[0_0_18px_rgba(255,255,255,0.75)]" />
         </motion.div>

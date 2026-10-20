@@ -90,7 +90,7 @@ const MediaHero: React.FC<MediaHeroProps> = ({ items }) => {
 
   return (
     <section
-      className="relative -mt-[4.25rem] mb-4 h-[78vh] min-h-[520px] w-full overflow-hidden lg:-mt-20 lg:h-[86vh] lg:min-h-[620px]"
+      className="relative -mt-17 mb-4 h-[78vh] min-h-[520px] w-full overflow-hidden lg:-mt-20 lg:h-[86vh] lg:min-h-[620px]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onPointerDown={() => setIsInteracting(true)}
@@ -135,9 +135,9 @@ const MediaHero: React.FC<MediaHeroProps> = ({ items }) => {
         ))}
       </div>
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05050c] via-[#05050c]/35 to-[#05050c]/10" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#05050c]/85 via-[#05050c]/15 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#05050c] to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-[#05050c] via-[#05050c]/35 to-[#05050c]/10" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-[#05050c]/85 via-[#05050c]/15 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-[#05050c] to-transparent" />
 
       <div className="pointer-events-none relative z-10 mx-auto flex h-full w-full max-w-[1600px] flex-col justify-end px-4 pb-10 pt-24 sm:px-6 lg:px-10 lg:pb-16 xl:px-14">
         <motion.div
@@ -184,7 +184,7 @@ const MediaHero: React.FC<MediaHeroProps> = ({ items }) => {
             </Link>
             <a
               href="#catalogo"
-              className="group flex h-12 items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-6 text-sm font-bold tracking-tight text-white transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.11] active:translate-y-0 active:scale-[0.96]"
+              className="group flex h-12 items-center gap-2 rounded-full border border-white/12 bg-white/6 px-6 text-sm font-bold tracking-tight text-white transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/11 active:translate-y-0 active:scale-[0.96]"
             >
               Explorar catálogo
               <FaChevronRight

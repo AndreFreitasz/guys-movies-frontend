@@ -570,7 +570,7 @@ const WatchedPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-auto mt-16 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl"
+          className="mx-auto mt-16 max-w-lg rounded-4xl border border-white/10 bg-white/3 p-10 text-center backdrop-blur-xl"
         >
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-300">
             <svg viewBox="0 0 20 20" className="h-7 w-7">
@@ -766,11 +766,11 @@ const WatchedPage = () => {
                   type="button"
                   tabIndex={filtersReady ? 0 : -1}
                   onClick={openFilterDrawer}
-                  className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 text-sm text-white/70 transition hover:text-white lg:hidden"
+                  className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/3 px-4 text-sm text-white/70 transition hover:text-white lg:hidden"
                 >
                   Filtros
                   {activeCount > 0 && (
-                    <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
                       {activeCount}
                     </span>
                   )}
@@ -784,9 +784,9 @@ const WatchedPage = () => {
               {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
                 <div
                   key={index}
-                  className="animate-pulse overflow-hidden rounded-[1.75rem] border border-white/5 bg-white/[0.03]"
+                  className="animate-pulse overflow-hidden rounded-[1.75rem] border border-white/5 bg-white/3"
                 >
-                  <div className="aspect-[2/3] w-full bg-white/5" />
+                  <div className="aspect-2/3 w-full bg-white/5" />
                   <div className="space-y-2 p-4">
                     <div className="h-3.5 w-4/5 rounded-full bg-white/10" />
                     <div className="h-3 w-1/2 rounded-full bg-white/5" />
@@ -804,7 +804,7 @@ const WatchedPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="mx-auto mt-6 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl"
+                className="mx-auto mt-6 max-w-lg rounded-4xl border border-white/10 bg-white/3 p-10 text-center backdrop-blur-xl"
               >
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/40">
                   <svg viewBox="0 0 20 20" className="h-7 w-7">
@@ -837,7 +837,7 @@ const WatchedPage = () => {
           !error &&
           visibleMovies.length === 0 &&
           (data?.items.length || (data && hasProviderFilter)) ? (
-            <div className="rounded-3xl border border-white/10 bg-white/[0.02] py-16 text-center">
+            <div className="rounded-3xl border border-white/10 bg-white/2 py-16 text-center">
               <p className="text-sm text-white/50">
                 Nenhum filme corresponde à sua busca.
               </p>
@@ -988,11 +988,11 @@ const WatchedPage = () => {
                     type="button"
                     tabIndex={filtersReady ? 0 : -1}
                     onClick={openFilterDrawer}
-                    className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 text-sm text-white/70 transition hover:text-white lg:hidden"
+                    className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/3 px-4 text-sm text-white/70 transition hover:text-white lg:hidden"
                   >
                     Filtros
                     {activeCount > 0 && (
-                      <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
                         {activeCount}
                       </span>
                     )}
@@ -1006,9 +1006,9 @@ const WatchedPage = () => {
               {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
                 <div
                   key={index}
-                  className="animate-pulse overflow-hidden rounded-[1.75rem] border border-white/5 bg-white/[0.03]"
+                  className="animate-pulse overflow-hidden rounded-[1.75rem] border border-white/5 bg-white/3"
                 >
-                  <div className="aspect-[2/3] w-full bg-white/5" />
+                  <div className="aspect-2/3 w-full bg-white/5" />
                   <div className="space-y-2 p-4">
                     <div className="h-3.5 w-4/5 rounded-full bg-white/10" />
                     <div className="h-3 w-1/2 rounded-full bg-white/5" />
@@ -1026,7 +1026,7 @@ const WatchedPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="mx-auto mt-6 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl"
+                className="mx-auto mt-6 max-w-lg rounded-4xl border border-white/10 bg-white/3 p-10 text-center backdrop-blur-xl"
               >
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/40">
                   <svg viewBox="0 0 20 20" className="h-7 w-7">
@@ -1058,7 +1058,7 @@ const WatchedPage = () => {
           !serieError &&
           visibleSeries.length === 0 &&
           (serieData?.items.length || (serieData && hasProviderFilter)) ? (
-            <div className="rounded-3xl border border-white/10 bg-white/[0.02] py-16 text-center">
+            <div className="rounded-3xl border border-white/10 bg-white/2 py-16 text-center">
               <p className="text-sm text-white/50">
                 Nenhuma série corresponde à sua busca.
               </p>

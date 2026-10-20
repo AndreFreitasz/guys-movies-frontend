@@ -16,7 +16,7 @@ const MediaCastSection = memo(
     const visibleCast = cast.slice(0, maxItems);
 
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 xl:p-7 backdrop-blur-sm">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 xl:p-7 backdrop-blur-xs">
         <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
           {title}
         </h2>
@@ -26,7 +26,7 @@ const MediaCastSection = memo(
               key={`${member.name}-${member.character}`}
               className="flex items-start gap-3 rounded-2xl bg-white/5 p-3"
             >
-              <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-white/10 bg-black/40">
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/10 bg-black/40">
                 {member.profile_path ? (
                   <img
                     src={`https://image.tmdb.org/t/p/w185${member.profile_path}`}
@@ -41,7 +41,7 @@ const MediaCastSection = memo(
                 )}
               </div>
               <div className="space-y-1">
-                <p className="break-words text-sm font-semibold leading-snug text-white">
+                <p className="wrap-break-word text-sm font-semibold leading-snug text-white">
                   {member.name}
                 </p>
                 <p className="text-xs uppercase tracking-[0.2em] text-white/50">

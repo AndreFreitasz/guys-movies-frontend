@@ -67,7 +67,7 @@ const Modal: React.FC<ModalProps> = ({
     <AnimatePresence onExitComplete={restoreScroll}>
       {isOpen && (
         <div
-          className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
+          className="fixed inset-0 z-70 flex items-end justify-center sm:items-center"
           role="dialog"
           aria-modal="true"
         >
@@ -95,7 +95,7 @@ const Modal: React.FC<ModalProps> = ({
             }}
             className="relative z-10 w-full sm:max-w-lg"
           >
-            <div className="glass-strong max-h-[92vh] overflow-hidden rounded-t-[2rem] shadow-lift sm:rounded-[2rem]">
+            <div className="glass-strong max-h-[92vh] overflow-hidden rounded-t-4xl shadow-lift sm:rounded-4xl">
               <div className="mx-auto mt-3 h-1.5 w-10 rounded-full bg-white/20 sm:hidden" />
 
               <div className="flex items-center justify-between px-6 pb-4 pt-5">
@@ -111,7 +111,7 @@ const Modal: React.FC<ModalProps> = ({
                   type="button"
                   onClick={onClose}
                   aria-label="Fechar"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white/60 transition-all duration-300 ease-ios hover:bg-white/[0.12] hover:text-white active:scale-90"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white/60 transition-all duration-300 ease-ios hover:bg-white/12 hover:text-white active:scale-90"
                 >
                   <FaTimes size={13} />
                 </button>
@@ -126,7 +126,7 @@ const Modal: React.FC<ModalProps> = ({
                     {subtitle && (
                       <p className="mt-1.5 text-sm text-white/45">{subtitle}</p>
                     )}
-                    <div className="mt-4 h-px w-full bg-gradient-to-r from-indigo-500/60 via-purple-500/25 to-transparent" />
+                    <div className="mt-4 h-px w-full bg-linear-to-r from-indigo-500/60 via-purple-500/25 to-transparent" />
                   </div>
                 )}
                 {children}

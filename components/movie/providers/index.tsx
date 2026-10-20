@@ -22,7 +22,7 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
 
   if (sections.length === 0) {
     return (
-      <p className="rounded-2xl border border-white/10 bg-black/40 px-4 py-6 text-sm text-white/60 backdrop-blur">
+      <p className="rounded-2xl border border-white/10 bg-black/40 px-4 py-6 text-sm text-white/60 backdrop-blur-sm">
         Ainda não temos informações sobre onde este título está disponível.
       </p>
     );
@@ -33,11 +33,11 @@ const ProvidersMovie: React.FC<Providers> = ({ flatrate, buy, rent }) => {
       {sections.map(({ key, providers }) => (
         <div
           key={key}
-          className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/30 p-4 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between"
+          className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/30 p-4 backdrop-blur-xs sm:flex-row sm:items-center sm:justify-between"
         >
           <div>
             <span
-              className={`inline-flex items-center rounded-full bg-gradient-to-r px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] ${labelStyles[key]}`}
+              className={`inline-flex items-center rounded-full bg-linear-to-r px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] ${labelStyles[key]}`}
             >
               {readableLabel[key]}
             </span>

@@ -36,7 +36,7 @@ const optionRowClass = (active: boolean) =>
   `flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-sm transition ${
     active
       ? "bg-indigo-500/20 text-indigo-100"
-      : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+      : "text-white/70 hover:bg-white/6 hover:text-white"
   }`;
 
 const DIRECTOR_SEARCH_THRESHOLD = 15;
@@ -223,7 +223,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                   onChange={(event) => setDirectorSearch(event.target.value)}
                   placeholder="Buscar diretor..."
                   aria-label="Buscar diretor"
-                  className="mb-2 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/60 focus:outline-none"
+                  className="mb-2 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/60 focus:outline-hidden"
                 />
               )}
               <div className="max-h-72 space-y-1 overflow-y-auto">
@@ -277,7 +277,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                   onChange={(event) => setCompanionSearch(event.target.value)}
                   placeholder="Buscar pessoa..."
                   aria-label="Buscar pessoa"
-                  className="mb-2 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/60 focus:outline-none"
+                  className="mb-2 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/60 focus:outline-hidden"
                 />
               )}
               <div className="max-h-72 space-y-1 overflow-y-auto">

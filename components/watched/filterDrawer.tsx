@@ -107,8 +107,8 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
             transition={{ type: "spring", stiffness: 420, damping: 38 }}
             className="relative w-full max-w-lg"
           >
-            <div className="max-h-[85vh] overflow-y-auto rounded-t-[2rem] border border-white/10 bg-[#0a0a16]/95 shadow-lift">
-              <div className="sticky top-0 z-10 flex justify-center bg-gradient-to-b from-[#0a0a16] to-transparent pb-4 pt-3">
+            <div className="max-h-[85vh] overflow-y-auto rounded-t-4xl border border-white/10 bg-ink-900/95 shadow-lift">
+              <div className="sticky top-0 z-10 flex justify-center bg-linear-to-b from-ink-900 to-transparent pb-4 pt-3">
                 <span className="h-1.5 w-12 rounded-full bg-white/25" />
               </div>
 

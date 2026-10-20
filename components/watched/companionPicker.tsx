@@ -31,7 +31,7 @@ const CompanionPicker: React.FC<CompanionPickerProps> = ({
           {value.map((person) => (
             <span
               key={person.username}
-              className="flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] py-1 pl-1 pr-2"
+              className="flex items-center gap-2 rounded-full border border-white/12 bg-white/6 py-1 pl-1 pr-2"
             >
               <Avatar
                 name={person.name}
@@ -42,7 +42,7 @@ const CompanionPicker: React.FC<CompanionPickerProps> = ({
                   person.avatarUpdatedAt,
                 )}
               />
-              <span className="max-w-[9rem] truncate text-xs font-bold text-white">
+              <span className="max-w-36 truncate text-xs font-bold text-white">
                 {person.name || person.username}
               </span>
               <button
@@ -68,7 +68,7 @@ const CompanionPicker: React.FC<CompanionPickerProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-4 text-sm font-semibold text-white/70 transition-colors duration-300 hover:text-white"
+          className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/12 bg-white/4 px-4 text-sm font-semibold text-white/70 transition-colors duration-300 hover:text-white"
         >
           <FaUserPlus size={12} />
           {value.length > 0 ? "Adicionar outra pessoa" : "Marcar alguém"}
@@ -82,7 +82,7 @@ const CompanionPicker: React.FC<CompanionPickerProps> = ({
             onChange={(event) => setTerm(event.target.value)}
             placeholder="Buscar por nome ou @usuario..."
             aria-label="Buscar pessoas"
-            className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-brand-400/60 focus:outline-none"
+            className="w-full rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-brand-400/60 focus:outline-hidden"
           />
 
           {status === "ready" && available.length > 0 && (
@@ -96,7 +96,7 @@ const CompanionPicker: React.FC<CompanionPickerProps> = ({
                     setTerm("");
                     setIsOpen(false);
                   }}
-                  className="flex w-full items-center gap-3 rounded-2xl px-2 py-2 text-left transition-colors duration-200 hover:bg-white/[0.05]"
+                  className="flex w-full items-center gap-3 rounded-2xl px-2 py-2 text-left transition-colors duration-200 hover:bg-white/5"
                 >
                   <Avatar
                     name={person.name}

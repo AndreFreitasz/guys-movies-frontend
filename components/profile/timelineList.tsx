@@ -61,7 +61,7 @@ const TimelineList: React.FC<TimelineListProps> = ({
 
   if (status === "failed") {
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/[0.02] py-10 text-center">
+      <div className="rounded-3xl border border-white/10 bg-white/2 py-10 text-center">
         <p className="text-sm text-white/60">
           Não foi possível carregar o histórico.
         </p>
@@ -78,7 +78,7 @@ const TimelineList: React.FC<TimelineListProps> = ({
 
   if (events.length === 0) {
     return (
-      <p className="rounded-3xl border border-white/10 bg-white/[0.02] py-10 text-center text-sm leading-relaxed text-white/50">
+      <p className="rounded-3xl border border-white/10 bg-white/2 py-10 text-center text-sm leading-relaxed text-white/50">
         {emptyMessage}
       </p>
     );
@@ -110,13 +110,13 @@ const TimelineList: React.FC<TimelineListProps> = ({
                       ? `/movie/${event.idTmdb}`
                       : `/serie/${event.idTmdb}`
                   }
-                  className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-3 transition-colors duration-300 hover:bg-white/[0.05]"
+                  className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/2 p-3 transition-colors duration-300 hover:bg-white/5"
                 >
                   <img
                     src={resolvePosterUrl(event.posterPath)}
                     alt={event.title}
                     loading="lazy"
-                    className="h-[4.5rem] w-12 shrink-0 rounded-lg object-cover"
+                    className="h-18 w-12 shrink-0 rounded-lg object-cover"
                   />
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm leading-snug text-white/70">
@@ -193,7 +193,7 @@ const TimelineList: React.FC<TimelineListProps> = ({
           type="button"
           onClick={onLoadMore}
           disabled={isLoadingMore}
-          className="min-h-[48px] w-full rounded-2xl border border-white/10 bg-white/[0.03] text-sm font-bold text-white/75 transition-colors duration-300 hover:bg-white/[0.06] disabled:opacity-60"
+          className="min-h-[48px] w-full rounded-2xl border border-white/10 bg-white/3 text-sm font-bold text-white/75 transition-colors duration-300 hover:bg-white/6 disabled:opacity-60"
         >
           {isLoadingMore ? "Carregando..." : "Carregar mais"}
         </button>

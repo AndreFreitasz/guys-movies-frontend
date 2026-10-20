@@ -60,7 +60,7 @@ const PendingCompanions: React.FC<PendingCompanionsProps> = ({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col gap-5 rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:flex-row sm:items-center"
+          className="flex flex-col gap-5 rounded-3xl border border-white/10 bg-white/3 p-5 sm:flex-row sm:items-center"
         >
           <img
             src={resolvePosterUrl(rating.posterPath)}
@@ -113,7 +113,7 @@ const PendingCompanions: React.FC<PendingCompanionsProps> = ({
         {pending.map((item) => (
           <div
             key={item.id}
-            className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3"
+            className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-white/3 p-3"
           >
             <img
               src={resolvePosterUrl(item.posterPath)}
@@ -147,7 +147,7 @@ const PendingCompanions: React.FC<PendingCompanionsProps> = ({
                 type="button"
                 disabled={busyId === item.id}
                 onClick={() => setRating(item)}
-                className="min-h-[44px] rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 px-5 text-sm font-bold text-white disabled:opacity-60"
+                className="min-h-[44px] rounded-full bg-linear-to-r from-violet-500 to-indigo-600 px-5 text-sm font-bold text-white disabled:opacity-60"
               >
                 Confirmar
               </button>

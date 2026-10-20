@@ -33,7 +33,7 @@ const ConfirmLogoutModal: React.FC<ModalLogoutProps> = ({
     <AnimatePresence>
       {isOpen && (
         <div
-          className="fixed inset-0 z-[80] flex items-end justify-center px-4 pb-6 sm:items-center sm:pb-0"
+          className="fixed inset-0 z-80 flex items-end justify-center px-4 pb-6 sm:items-center sm:pb-0"
           role="alertdialog"
           aria-modal="true"
         >
@@ -51,7 +51,7 @@ const ConfirmLogoutModal: React.FC<ModalLogoutProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 24 }}
             transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-            className="glass-strong relative z-10 w-full max-w-sm overflow-hidden rounded-[2rem] p-6 text-center shadow-lift"
+            className="glass-strong relative z-10 w-full max-w-sm overflow-hidden rounded-4xl p-6 text-center shadow-lift"
           >
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/15 text-red-300">
               <FaSignOutAlt size={22} />
@@ -76,7 +76,7 @@ const ConfirmLogoutModal: React.FC<ModalLogoutProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-3.5 text-sm font-bold text-white transition-all duration-300 ease-ios hover:bg-white/[0.12] active:scale-[0.97]"
+                className="w-full rounded-2xl border border-white/10 bg-white/6 px-5 py-3.5 text-sm font-bold text-white transition-all duration-300 ease-ios hover:bg-white/12 active:scale-[0.97]"
               >
                 Cancelar
               </button>

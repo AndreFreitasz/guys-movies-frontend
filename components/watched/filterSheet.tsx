@@ -32,7 +32,7 @@ const pillClass = (active: boolean) =>
   `min-h-[44px] shrink-0 rounded-full border px-4 text-sm font-medium transition ${
     active
       ? "border-indigo-400/60 bg-indigo-500/20 text-indigo-100"
-      : "border-white/10 bg-white/[0.03] text-white/60 active:bg-white/10"
+      : "border-white/10 bg-white/3 text-white/60 active:bg-white/10"
   }`;
 
 const Section: React.FC<{
@@ -108,7 +108,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
           </button>
         </div>
 
-        <div className="mt-4 flex flex-col items-center gap-2 rounded-2xl bg-white/[0.03] px-4 py-5">
+        <div className="mt-4 flex flex-col items-center gap-2 rounded-2xl bg-white/3 px-4 py-5">
           <RatingRangeSlider
             value={rating === "none" ? null : rating}
             onChange={onRatingChange}
@@ -174,7 +174,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
               onChange={(event) => setDirectorSearch(event.target.value)}
               placeholder="Buscar diretor"
               aria-label="Buscar diretor"
-              className="mb-3 min-h-[44px] w-full rounded-xl border border-white/10 bg-black/30 px-3 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/50 focus:outline-none"
+              className="mb-3 min-h-[44px] w-full rounded-xl border border-white/10 bg-black/30 px-3 text-sm text-white placeholder:text-white/30 focus:border-indigo-400/50 focus:outline-hidden"
             />
           )}
           <div className="hide-scrollbar flex max-h-56 flex-wrap gap-2 overflow-y-auto">

@@ -38,7 +38,7 @@ const SKELETON_TILE_COUNT = 12;
 const SearchSkeletonGrid: React.FC = () => (
   <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
     {Array.from({ length: SKELETON_TILE_COUNT }).map((_, index) => (
-      <div key={index} className="skeleton aspect-[2/3] w-full rounded-2xl" />
+      <div key={index} className="skeleton aspect-2/3 w-full rounded-2xl" />
     ))}
   </div>
 );
@@ -206,7 +206,7 @@ const Busca: React.FC = () => {
             onBlur={() => submitSearch(term)}
             placeholder="Buscar filmes, séries..."
             aria-label="Buscar filmes e séries"
-            className="w-full rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-medium text-white placeholder:text-white/35 backdrop-blur-xl focus:border-indigo-400/60 focus:outline-none"
+            className="w-full rounded-full border border-white/10 bg-white/6 px-5 py-3 text-sm font-medium text-white placeholder:text-white/35 backdrop-blur-xl focus:border-indigo-400/60 focus:outline-hidden"
           />
         </form>
 

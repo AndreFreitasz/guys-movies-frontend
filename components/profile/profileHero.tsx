@@ -59,7 +59,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
               {profile.name || profile.username}
             </h1>
             {profile.followsYou && !profile.isSelf && (
-              <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 text-[0.65rem] font-bold text-white/60">
+              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[0.65rem] font-bold text-white/60">
                 Segue você
               </span>
             )}
@@ -78,7 +78,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                   type="button"
                   onClick={onSaveEditing}
                   disabled={isSaving}
-                  className="min-h-[44px] rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 px-6 text-sm font-bold text-white transition-opacity duration-300 disabled:opacity-60"
+                  className="min-h-[44px] rounded-full bg-linear-to-r from-violet-500 to-indigo-600 px-6 text-sm font-bold text-white transition-opacity duration-300 disabled:opacity-60"
                 >
                   {isSaving ? "Salvando..." : "Salvar"}
                 </button>

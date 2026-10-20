@@ -28,7 +28,7 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({
   return (
     <div className="group relative">
       <Link href={href} className="block">
-        <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-white/[0.04]">
+        <div className="relative aspect-2/3 overflow-hidden rounded-2xl bg-white/4">
           <img
             src={resolvePosterUrl(item.posterPath)}
             alt={item.title}
@@ -68,7 +68,7 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({
 
       <div className="mt-2 flex h-6 items-center gap-1.5">
         {providersState.kind === "pending" && (
-          <span className="h-6 w-6 animate-pulse rounded-md bg-white/[0.08]" />
+          <span className="h-6 w-6 animate-pulse rounded-md bg-white/8" />
         )}
         {providersState.kind === "available" &&
           providersState.providers.map((provider) =>

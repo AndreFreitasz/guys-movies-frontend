@@ -40,7 +40,7 @@ const SectionRow = <T,>({
 }: SectionRowProps<T>) => {
   const header = (
     <div className="flex items-center gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.05] p-1.5">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/8 bg-white/5 p-1.5">
         <Image
           src={iconSrc}
           alt={iconAlt}

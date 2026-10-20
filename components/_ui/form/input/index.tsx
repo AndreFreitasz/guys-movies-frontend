@@ -24,9 +24,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {label}
         </label>
         <div
-          className={`flex items-center gap-3 rounded-2xl border bg-white/[0.04] px-4 transition-all duration-300 ease-ios ${
+          className={`flex items-center gap-3 rounded-2xl border bg-white/4 px-4 transition-all duration-300 ease-ios ${
             error
-              ? "border-red-400/50 bg-red-500/[0.04]"
+              ? "border-red-400/50 bg-red-500/4"
               : isFocused
                 ? "border-indigo-400/60 bg-white/[0.07] shadow-glow-sm"
                 : "border-white/10"
@@ -45,7 +45,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={resolvedType}
             placeholder={placeholder}
-            className={`w-full bg-transparent py-3.5 text-sm font-medium text-white placeholder:text-white/25 focus:outline-none ${className ?? ""}`}
+            className={`w-full bg-transparent py-3.5 text-sm font-medium text-white placeholder:text-white/25 focus:outline-hidden ${className ?? ""}`}
             {...rest}
             onFocus={(event) => {
               setIsFocused(true);

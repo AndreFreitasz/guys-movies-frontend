@@ -33,7 +33,7 @@ const WatchedToolbar = <T extends string>({
   resultLabelSingular,
   resultLabelPlural,
 }: WatchedToolbarProps<T>) => (
-  <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
+  <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/3 p-4 backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
     <div className="relative w-full lg:max-w-xs">
       <svg
         viewBox="0 0 20 20"
@@ -50,7 +50,7 @@ const WatchedToolbar = <T extends string>({
         onChange={(event) => onQueryChange(event.target.value)}
         placeholder={searchPlaceholder}
         aria-label={searchAriaLabel}
-        className="w-full rounded-2xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 transition-all duration-300 ease-ios focus:border-indigo-400/60 focus:bg-black/40 focus:outline-none"
+        className="w-full rounded-2xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 transition-all duration-300 ease-ios focus:border-indigo-400/60 focus:bg-black/40 focus:outline-hidden"
       />
     </div>
 

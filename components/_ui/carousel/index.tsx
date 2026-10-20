@@ -47,7 +47,7 @@ const CarouselSkeleton = ({ variant }: { variant: SkeletonVariant }) => (
       <div
         key={index}
         className={`skeleton rounded-2xl ${
-          variant === "poster" ? "aspect-[2/3]" : "h-[26rem]"
+          variant === "poster" ? "aspect-2/3" : "h-104"
         }`}
       />
     ))}
@@ -193,7 +193,7 @@ const CarouselComponent = <T,>({
     !infinite && currentSlide >= Math.max(total - visibleSlides, 0);
 
   const controlClass =
-    "flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-white transition-all duration-300 ease-ios hover:border-white/25 hover:bg-white/[0.11] active:scale-90 disabled:pointer-events-none disabled:opacity-25";
+    "flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-white/6 text-white transition-all duration-300 ease-ios hover:border-white/25 hover:bg-white/11 active:scale-90 disabled:pointer-events-none disabled:opacity-25";
 
   const controls = hasOverflow && (
     <div className="flex shrink-0 items-center gap-2">
@@ -239,7 +239,7 @@ const CarouselComponent = <T,>({
     return (
       <>
         {header && <div className="mb-4 px-1">{header}</div>}
-        <div className="rounded-3xl border border-white/[0.07] bg-white/[0.02] px-6 py-14 text-center">
+        <div className="rounded-3xl border border-white/[0.07] bg-white/2 px-6 py-14 text-center">
           <p className="text-sm font-semibold text-white/45">
             Nenhum título encontrado por aqui. Tente novamente mais tarde.
           </p>
@@ -301,13 +301,13 @@ const CarouselComponent = <T,>({
           <>
             <div
               aria-hidden
-              className={`pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[#05050c] to-transparent transition-opacity duration-500 sm:w-14 ${
+              className={`pointer-events-none absolute inset-y-0 left-0 w-10 bg-linear-to-r from-[#05050c] to-transparent transition-opacity duration-500 sm:w-14 ${
                 isAtStart ? "opacity-0" : "opacity-100"
               }`}
             />
             <div
               aria-hidden
-              className={`pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#05050c] to-transparent transition-opacity duration-500 sm:w-14 ${
+              className={`pointer-events-none absolute inset-y-0 right-0 w-10 bg-linear-to-l from-[#05050c] to-transparent transition-opacity duration-500 sm:w-14 ${
                 isAtEnd ? "opacity-0" : "opacity-100"
               }`}
             />

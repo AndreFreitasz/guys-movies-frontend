@@ -58,12 +58,12 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         className={`flex min-h-[44px] items-center gap-1.5 rounded-full border px-4 text-sm transition ${
           hasSelection
             ? "border-indigo-400/60 bg-indigo-500/20 text-indigo-100"
-            : "border-white/10 bg-white/[0.03] text-white/60 hover:text-white"
+            : "border-white/10 bg-white/3 text-white/60 hover:text-white"
         }`}
       >
         {label}
         {Boolean(badge) && (
-          <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-500/30 px-1.5 text-xs font-bold text-indigo-100">
             {badge}
           </span>
         )}

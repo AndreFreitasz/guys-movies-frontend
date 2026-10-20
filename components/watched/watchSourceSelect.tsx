@@ -20,7 +20,7 @@ const optionClass = (active: boolean) =>
   `min-h-[44px] rounded-2xl border px-4 text-left text-sm transition ${
     active
       ? "border-indigo-400/60 bg-indigo-500/20 text-indigo-100"
-      : "border-white/10 bg-white/[0.03] text-white/60 hover:text-white"
+      : "border-white/10 bg-white/3 text-white/60 hover:text-white"
   }`;
 
 const WatchSourceSelect: React.FC<WatchSourceSelectProps> = ({

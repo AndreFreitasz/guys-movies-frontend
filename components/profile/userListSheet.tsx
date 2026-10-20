@@ -112,7 +112,7 @@ const UserListSheet: React.FC<UserListSheetProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={TITLES[mode]}>
-      <div className="max-h-[60vh] space-y-1 overflow-y-auto">
+      <div className="max-h-screen-60 space-y-1 overflow-y-auto">
         {hasFailed && (
           <div className="py-8 text-center">
             <p className="text-sm text-white/60">Não foi possível carregar.</p>

@@ -71,10 +71,10 @@ const StatCard: React.FC<StatCardProps> = ({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl"
+      className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/3 p-5 backdrop-blur-xl"
     >
       <div
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${accentStyles[accent]}`}
+        className={`pointer-events-none absolute inset-0 bg-linear-to-br ${accentStyles[accent]}`}
       />
       <div className="relative">
         <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/45">

@@ -14,7 +14,7 @@ interface MediaQuickDetailsProps {
 const MediaQuickDetails = memo(
   ({ title, items, extra }: MediaQuickDetailsProps) => {
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xs">
         <h3 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-200">
           {title}
         </h3>

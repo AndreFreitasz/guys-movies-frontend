@@ -43,7 +43,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               : "0 0 0 1px rgba(255,255,255,0.08), 0 0 0 0 rgba(124,77,255,0)",
           }}
           transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-          className="flex w-full items-center rounded-full bg-white/[0.06] backdrop-blur-xl"
+          className="flex w-full items-center rounded-full bg-white/6 backdrop-blur-xl"
         >
           <button
             type="button"
@@ -65,7 +65,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Buscar filmes, séries, elenco..."
             aria-label="Buscar filmes e séries"
-            className="w-full bg-transparent px-3 py-3 text-sm font-medium text-white placeholder:text-white/35 focus:outline-none"
+            className="w-full bg-transparent px-3 py-3 text-sm font-medium text-white placeholder:text-white/35 focus:outline-hidden"
             onFocus={onFocus}
             onBlur={onBlur}
           />

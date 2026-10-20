@@ -90,7 +90,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
           onClick={() => (isOpen ? close() : setIsOpen(true))}
           aria-haspopup="dialog"
           aria-expanded={isOpen}
-          className={`flex min-h-[44px] flex-1 items-center gap-3 rounded-2xl border bg-white/[0.04] px-4 text-left text-sm transition-colors duration-300 focus:outline-none ${
+          className={`flex min-h-[44px] flex-1 items-center gap-3 rounded-2xl border bg-white/4 px-4 text-left text-sm transition-colors duration-300 focus:outline-hidden ${
             isOpen
               ? "border-brand-400/60"
               : "border-white/10 hover:border-white/20"

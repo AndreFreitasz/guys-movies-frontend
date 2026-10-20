@@ -52,8 +52,8 @@ const ProfileCounters: React.FC<ProfileCountersProps> = ({
   onOpenFollowing,
 }) => {
   const cardClass =
-    "rounded-2xl border border-white/[0.09] bg-gradient-to-br from-white/[0.07] to-white/[0.02] px-4 py-3.5 text-left backdrop-blur-xl";
-  const actionClass = `${cardClass} min-h-[44px] transition-colors duration-300 hover:border-white/20 hover:from-white/[0.11] active:scale-[0.97]`;
+    "rounded-2xl border border-white/9 bg-linear-to-br from-white/[0.07] to-white/2 px-4 py-3.5 text-left backdrop-blur-xl";
+  const actionClass = `${cardClass} min-h-[44px] transition-colors duration-300 hover:border-white/20 hover:from-white/11 active:scale-[0.97]`;
   const valueClass = "block text-xl font-black tracking-tight text-white";
   const labelClass =
     "mt-1.5 block text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/45";
@@ -73,7 +73,7 @@ const ProfileCounters: React.FC<ProfileCountersProps> = ({
         <span className={labelClass}>Seguindo</span>
       </button>
       <div
-        className={`${cardClass} border-brand-400/20 from-brand-500/15 to-brand-500/[0.04]`}
+        className={`${cardClass} border-brand-400/20 from-brand-500/15 to-brand-500/4`}
       >
         <span className={valueClass}>
           <AnimatedNumber value={counts.movies} />

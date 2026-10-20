@@ -40,8 +40,8 @@ const CircularVoteAverage: React.FC<CircularVoteAverageProps> = ({
     <div
       className={`relative shrink-0 [&_.CircularProgressbar]:h-full [&_.CircularProgressbar]:w-full ${
         compact
-          ? `h-11 w-11 sm:h-[3.75rem] sm:w-[3.75rem] ${styles.circularProgressbarContainerCompact}`
-          : `h-[3.75rem] w-[3.75rem] ${styles.circularProgressbarContainer}`
+          ? `h-11 w-11 sm:h-15 sm:w-15 ${styles.circularProgressbarContainerCompact}`
+          : `h-15 w-15 ${styles.circularProgressbarContainer}`
       }`}
     >
       <svg aria-hidden style={{ position: "absolute", width: 0, height: 0 }}>

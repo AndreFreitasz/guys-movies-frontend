@@ -85,7 +85,7 @@ const EditableAvatar: React.FC<EditableAvatarProps> = ({
         disabled={isUploading}
         onClick={() => fileInputRef.current?.click()}
         aria-label="Trocar foto do perfil"
-        className="group relative block rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05050c]"
+        className="group relative block rounded-full focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05050c]"
       >
         <span
           className={`block overflow-hidden rounded-full transition-opacity duration-300 ease-ios group-hover:opacity-40 group-focus-visible:opacity-40 ${
@@ -101,7 +101,7 @@ const EditableAvatar: React.FC<EditableAvatarProps> = ({
         </span>
 
         <span className="pointer-events-none absolute inset-0 hidden items-center justify-center opacity-0 transition-opacity duration-300 ease-ios group-hover:opacity-100 group-focus-visible:opacity-100 sm:flex">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-xs">
             <FaPen size={16} />
           </span>
         </span>

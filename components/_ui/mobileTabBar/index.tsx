@@ -88,7 +88,7 @@ const MobileTabBar = ({
                 <motion.span
                   layoutId="tab-bar-indicator"
                   transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                  className="absolute inset-0 rounded-2xl bg-white/[0.1] ring-1 ring-white/10"
+                  className="absolute inset-0 rounded-2xl bg-white/10 ring-1 ring-white/10"
                 />
               )}
               <span className="relative z-10 flex flex-col items-center gap-1">

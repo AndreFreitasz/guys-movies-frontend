@@ -107,7 +107,7 @@ const FavoritePicker: React.FC<FavoritePickerProps> = ({
           type === "movie" ? "Buscar um filme..." : "Buscar uma série..."
         }
         aria-label="Buscar na sua biblioteca"
-        className="mb-4 w-full rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-medium text-white placeholder:text-white/35 focus:border-indigo-400/60 focus:outline-none"
+        className="mb-4 w-full rounded-full border border-white/10 bg-white/6 px-5 py-3 text-sm font-medium text-white placeholder:text-white/35 focus:border-indigo-400/60 focus:outline-hidden"
       />
 
       <div className="max-h-[55vh] overflow-y-auto">
@@ -122,7 +122,7 @@ const FavoritePicker: React.FC<FavoritePickerProps> = ({
             {Array.from({ length: 8 }).map((_, index) => (
               <div
                 key={index}
-                className="skeleton aspect-[2/3] w-full rounded-xl"
+                className="skeleton aspect-2/3 w-full rounded-xl"
               />
             ))}
           </div>
@@ -149,7 +149,7 @@ const FavoritePicker: React.FC<FavoritePickerProps> = ({
                   src={resolvePosterUrl(option.posterPath)}
                   alt={option.title}
                   loading="lazy"
-                  className="aspect-[2/3] w-full rounded-xl border border-white/10 object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="aspect-2/3 w-full rounded-xl border border-white/10 object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <span className="mt-1.5 block truncate text-[0.7rem] font-semibold text-white/70">
                   {option.title}

@@ -30,7 +30,7 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
     <>
       <div
         aria-hidden={!cover}
-        className="pointer-events-none absolute inset-x-0 top-0 h-[26rem] sm:h-[35rem] lg:h-[43rem]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-104 sm:h-140 lg:h-172"
       >
         {narrow ? (
           <picture className="block h-full w-full">
@@ -45,13 +45,13 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
           </picture>
         ) : (
           <div
-            className="h-full w-full bg-gradient-to-br from-ink-700 via-ink-800 to-ink-950"
+            className="h-full w-full bg-linear-to-br from-ink-700 via-ink-800 to-ink-950"
             style={FADE_MASK}
           />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/28 to-[#05050c]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/52 via-transparent to-[#05050c]/80" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/50 via-black/28 to-[#05050c]" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/52 via-transparent to-[#05050c]/80" />
         <div className="absolute inset-0 backdrop-blur-[2px]" />
         <div className="absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(124,77,255,0.14),transparent_62%)]" />
         <div
@@ -64,7 +64,7 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
         <button
           type="button"
           onClick={onChangeCover}
-          className="absolute right-4 top-[5.5rem] z-20 flex min-h-[44px] items-center gap-2 rounded-full border border-white/25 bg-black/40 px-5 text-sm font-semibold text-white backdrop-blur-xl transition-all duration-300 ease-ios hover:border-white/40 hover:bg-brand-500/30 active:scale-95 sm:right-6 lg:right-10 lg:top-24"
+          className="absolute right-4 top-22 z-20 flex min-h-[44px] items-center gap-2 rounded-full border border-white/25 bg-black/40 px-5 text-sm font-semibold text-white backdrop-blur-xl transition-all duration-300 ease-ios hover:border-white/40 hover:bg-brand-500/30 active:scale-95 sm:right-6 lg:right-10 lg:top-24"
         >
           <FaImage size={13} />
           {cover ? "Alterar capa" : "Adicionar capa"}

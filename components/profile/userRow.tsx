@@ -16,7 +16,7 @@ const UserRow: React.FC<UserRowProps> = ({
   onToggleFollow,
   onNavigate,
 }) => (
-  <div className="flex items-center gap-3 rounded-2xl px-2 py-2 transition-colors duration-200 hover:bg-white/[0.04]">
+  <div className="flex items-center gap-3 rounded-2xl px-2 py-2 transition-colors duration-200 hover:bg-white/4">
     <Link
       href={`/perfil/${user.username}`}
       onClick={onNavigate}
@@ -46,7 +46,7 @@ const UserRow: React.FC<UserRowProps> = ({
         className={`min-h-[36px] shrink-0 rounded-full px-4 text-xs font-bold transition-colors duration-300 disabled:opacity-60 ${
           user.isFollowing
             ? "border border-white/15 bg-white/[0.07] text-white"
-            : "bg-gradient-to-r from-violet-500 to-indigo-600 text-white"
+            : "bg-linear-to-r from-violet-500 to-indigo-600 text-white"
         }`}
       >
         {user.isFollowing ? "Seguindo" : "Seguir"}

@@ -33,8 +33,8 @@ const MediaDetailLayout = memo(
               maskImage: "linear-gradient(to top, transparent 0%, black 100%)",
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-[#05050c]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-[#05050c]" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/45 via-black/25 to-[#05050c]" />
+          <div className="absolute inset-0 bg-linear-to-r from-black/50 via-transparent to-[#05050c]" />
           <div className="absolute inset-0 backdrop-blur-[2px]" />
         </div>
 

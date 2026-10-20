@@ -48,7 +48,7 @@ const LibrarySummary: React.FC<LibrarySummaryProps> = ({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="relative mt-6 mb-6 grid grid-cols-2 gap-3 rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-4"
+      className="relative mt-6 mb-6 grid grid-cols-2 gap-3 rounded-3xl border border-white/10 bg-white/3 p-4 sm:grid-cols-4"
     >
       {filtered && (
         <span className="absolute right-4 top-3 rounded-full bg-indigo-500/20 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-indigo-200">

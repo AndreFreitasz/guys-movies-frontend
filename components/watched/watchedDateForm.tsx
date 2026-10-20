@@ -116,7 +116,7 @@ const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
           type="button"
           onClick={onClear}
           disabled={loading}
-          className="flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-sm font-semibold text-white/70 transition-all duration-300 ease-ios hover:bg-white/[0.09] hover:text-white active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50"
+          className="flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/4 text-sm font-semibold text-white/70 transition-all duration-300 ease-ios hover:bg-white/9 hover:text-white active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50"
         >
           Limpar data
         </button>

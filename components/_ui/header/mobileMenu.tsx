@@ -88,13 +88,13 @@ const MobileMenu = ({
   const rowClass = (isActive: boolean) =>
     `flex items-center gap-3.5 rounded-2xl border px-4 py-3.5 transition-all duration-300 ease-ios active:scale-[0.98] ${
       isActive
-        ? "border-white/15 bg-white/[0.09]"
-        : "border-transparent bg-white/[0.03] hover:bg-white/[0.06]"
+        ? "border-white/15 bg-white/9"
+        : "border-transparent bg-white/3 hover:bg-white/6"
     }`;
 
   const iconClass = (isActive: boolean) =>
     `flex h-10 w-10 items-center justify-center rounded-xl ${
-      isActive ? "bg-white text-[#05050c]" : "bg-white/[0.06] text-white/55"
+      isActive ? "bg-white text-[#05050c]" : "bg-white/6 text-white/55"
     }`;
 
   return (
@@ -103,7 +103,7 @@ const MobileMenu = ({
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="fixed inset-x-0 bottom-0 top-[4.25rem] z-40 overflow-y-auto overscroll-contain px-4 pb-32 pt-3 lg:hidden"
+      className="fixed inset-x-0 bottom-0 top-17 z-40 overflow-y-auto overscroll-contain px-4 pb-32 pt-3 lg:hidden"
     >
       <div className="glass-strong rounded-4xl p-4 shadow-lift">
         <motion.div
@@ -117,7 +117,7 @@ const MobileMenu = ({
             type="button"
             onClick={onClose}
             aria-label="Fechar menu"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white/60 transition-all duration-300 ease-ios active:scale-90"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white/60 transition-all duration-300 ease-ios active:scale-90"
           >
             <FaTimes size={13} />
           </button>
@@ -125,8 +125,8 @@ const MobileMenu = ({
 
         <motion.div variants={itemVariants}>
           {user ? (
-            <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-white/[0.05] p-[1px]">
-              <div className="flex items-center gap-3 rounded-[calc(1.5rem-1px)] bg-[#0a0a16]/85 p-4 backdrop-blur-xl">
+            <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-white/5 p-px">
+              <div className="flex items-center gap-3 rounded-[calc(1.5rem-1px)] bg-ink-900/85 p-4 backdrop-blur-xl">
                 <Avatar
                   name={user.name}
                   username={user.username}
@@ -153,8 +153,8 @@ const MobileMenu = ({
               </div>
             </div>
           ) : (
-            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 text-center">
-              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.06] text-white/40">
+            <div className="rounded-3xl border border-white/10 bg-white/4 p-5 text-center">
+              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white/6 text-white/40">
                 <FaEye size={20} />
               </span>
               <p className="mt-3 text-base font-bold text-white">
@@ -175,7 +175,7 @@ const MobileMenu = ({
                 <button
                   type="button"
                   onClick={onRegister}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/[0.06] px-4 py-3 text-sm font-bold tracking-tight text-white transition-all duration-300 ease-ios hover:border-white/25 hover:bg-white/[0.11] active:scale-[0.96]"
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/6 px-4 py-3 text-sm font-bold tracking-tight text-white transition-all duration-300 ease-ios hover:border-white/25 hover:bg-white/11 active:scale-[0.96]"
                 >
                   <FaUserPlus size={13} />
                   Criar conta
@@ -289,7 +289,7 @@ const MobileMenu = ({
                 <button
                   type="button"
                   onClick={onLogout}
-                  className="flex w-full items-center gap-3.5 rounded-2xl border border-transparent bg-white/[0.03] px-4 py-3.5 text-left transition-all duration-300 ease-ios hover:bg-red-500/10 active:scale-[0.98]"
+                  className="flex w-full items-center gap-3.5 rounded-2xl border border-transparent bg-white/3 px-4 py-3.5 text-left transition-all duration-300 ease-ios hover:bg-red-500/10 active:scale-[0.98]"
                 >
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/15 text-red-300">
                     <FaSignOutAlt size={15} />

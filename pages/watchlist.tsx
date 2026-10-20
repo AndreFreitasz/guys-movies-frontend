@@ -234,7 +234,7 @@ const WatchlistPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-auto mt-16 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl"
+          className="mx-auto mt-16 max-w-lg rounded-4xl border border-white/10 bg-white/3 p-10 text-center backdrop-blur-xl"
         >
           <h1 className="text-2xl font-bold text-white">Sua watchlist</h1>
           <p className="mt-3 text-sm leading-relaxed text-white/55">
@@ -277,7 +277,7 @@ const WatchlistPage = () => {
   if (items.length === 0) {
     return (
       <PageShell>
-        <div className="mx-auto mt-16 max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl">
+        <div className="mx-auto mt-16 max-w-lg rounded-4xl border border-white/10 bg-white/3 p-10 text-center backdrop-blur-xl">
           <h1 className="text-2xl font-bold text-white">
             Sua watchlist está vazia
           </h1>

@@ -71,7 +71,7 @@ const SeasonChecklist: React.FC<SeasonChecklistProps> = ({
   );
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 md:p-6">
+    <section className="rounded-3xl border border-white/10 bg-white/3 p-5 md:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-indigo-300">
@@ -121,7 +121,7 @@ const SeasonChecklist: React.FC<SeasonChecklistProps> = ({
                 type="button"
                 onClick={onUnmarkAll}
                 disabled={isBusy}
-                className="h-10 rounded-full border border-white/12 bg-white/[0.04] px-5 text-xs font-bold tracking-tight text-white/70 transition-all duration-300 ease-ios hover:bg-white/[0.09] hover:text-white active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40"
+                className="h-10 rounded-full border border-white/12 bg-white/4 px-5 text-xs font-bold tracking-tight text-white/70 transition-all duration-300 ease-ios hover:bg-white/9 hover:text-white active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40"
               >
                 Remover dos assistidos
               </button>
@@ -150,7 +150,7 @@ const SeasonChecklist: React.FC<SeasonChecklistProps> = ({
                 className={`flex min-h-[44px] w-full items-center gap-3 rounded-2xl border px-3 py-2 text-left transition-colors duration-300 disabled:opacity-50 ${
                   isSeasonWatched
                     ? "border-emerald-400/30 bg-emerald-400/10"
-                    : "border-white/10 bg-white/[0.02] hover:border-white/25"
+                    : "border-white/10 bg-white/2 hover:border-white/25"
                 }`}
               >
                 <img

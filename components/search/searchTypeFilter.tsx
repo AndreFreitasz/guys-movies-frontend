@@ -30,7 +30,7 @@ const SearchTypeFilter: React.FC<SearchTypeFilterProps> = ({
         className={`min-h-[44px] shrink-0 rounded-full border px-4 text-sm font-medium transition ${
           value === option.value
             ? "border-indigo-400/60 bg-indigo-500/20 text-indigo-100"
-            : "border-white/10 bg-white/[0.03] text-white/60 hover:text-white"
+            : "border-white/10 bg-white/3 text-white/60 hover:text-white"
         }`}
       >
         {option.label}

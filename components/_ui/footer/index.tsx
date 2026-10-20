@@ -55,7 +55,7 @@ const Footer = () => {
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/50 transition-all duration-300 ease-ios hover:border-white/25 hover:text-white active:scale-90"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/50 transition-all duration-300 ease-ios hover:border-white/25 hover:text-white active:scale-90"
           >
             <FaGithub size={16} />
           </a>
@@ -64,14 +64,14 @@ const Footer = () => {
             target="_blank"
             rel="noreferrer"
             aria-label="LinkedIn"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/50 transition-all duration-300 ease-ios hover:border-white/25 hover:text-white active:scale-90"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/50 transition-all duration-300 ease-ios hover:border-white/25 hover:text-white active:scale-90"
           >
             <FaLinkedin size={16} />
           </a>
         </div>
       </div>
 
-      <div className="relative border-t border-white/[0.05] px-4 py-5 sm:px-6 lg:px-10 xl:px-14">
+      <div className="relative border-t border-white/5 px-4 py-5 sm:px-6 lg:px-10 xl:px-14">
         <p className="text-center text-xs font-medium text-white/30">
           Desenvolvido por{" "}
           <span className="font-bold text-white/60">André Freitas</span>

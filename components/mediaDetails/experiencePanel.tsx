@@ -100,7 +100,7 @@ const MediaExperiencePanel = memo(
     };
 
     return (
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-indigo-400/10 to-transparent p-5 md:p-6 xl:p-7 backdrop-blur">
+      <div className="rounded-3xl border border-white/10 bg-linear-to-br from-indigo-500/20 via-indigo-400/10 to-transparent p-5 md:p-6 xl:p-7 backdrop-blur-sm">
         <div className="flex flex-col gap-5 md:gap-6">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
@@ -151,7 +151,7 @@ const MediaExperiencePanel = memo(
               </div>
             )}
 
-          <div className="rounded-2xl border border-white/5 bg-black/30 p-4 md:p-5 backdrop-blur">
+          <div className="rounded-2xl border border-white/5 bg-black/30 p-4 md:p-5 backdrop-blur-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-white">

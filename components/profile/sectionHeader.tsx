@@ -13,7 +13,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title, aside }) => (
         <span className="text-xs font-semibold text-white/45">{aside}</span>
       )}
     </div>
-    <div className="mt-3 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+    <div className="mt-3 h-px bg-linear-to-r from-transparent via-white/12 to-transparent" />
   </div>
 );
 

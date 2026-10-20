@@ -184,7 +184,7 @@ const RatingRangeSlider: React.FC<RatingRangeSliderProps> = ({
       onPointerCancel={finishPointerInteraction}
       onLostPointerCapture={settlePointerInteraction}
       onKeyDown={handleKeyDown}
-      className="relative inline-block w-max cursor-pointer touch-none select-none leading-none outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a16]"
+      className="relative inline-block w-max cursor-pointer touch-none select-none leading-none outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900"
     >
       <StarRow dimension={starClass} tone="text-white/15" />
       {displayValue && (

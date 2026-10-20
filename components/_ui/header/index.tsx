@@ -141,10 +141,10 @@ const Header = () => {
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-ios ${
           isScrolled || isMenuOpen
             ? "border-b border-white/[0.07] bg-[#05050c]/80 backdrop-blur-2xl backdrop-saturate-150"
-            : "border-b border-transparent bg-gradient-to-b from-[#05050c]/90 to-transparent"
+            : "border-b border-transparent bg-linear-to-b from-[#05050c]/90 to-transparent"
         }`}
       >
-        <div className="mx-auto flex h-[4.25rem] w-full max-w-[1600px] items-center gap-3 px-4 sm:px-6 lg:h-20 lg:gap-6 lg:px-10 xl:px-14">
+        <div className="mx-auto flex h-17 w-full max-w-[1600px] items-center gap-3 px-4 sm:px-6 lg:h-20 lg:gap-6 lg:px-10 xl:px-14">
           <Link
             href="/"
             className="flex shrink-0 items-center gap-0.5"
@@ -185,7 +185,7 @@ const Header = () => {
 
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
             {authLoading ? (
-              <div className="h-10 w-10 animate-pulse rounded-full bg-white/[0.06] lg:w-32" />
+              <div className="h-10 w-10 animate-pulse rounded-full bg-white/6 lg:w-32" />
             ) : isAuthenticated && user ? (
               <>
                 <div className="relative hidden lg:block" ref={dropdownRef}>
@@ -213,7 +213,7 @@ const Header = () => {
                         }}
                         className="glass-strong absolute right-0 mt-3 w-64 origin-top-right overflow-hidden rounded-3xl p-2 shadow-lift"
                       >
-                        <div className="rounded-2xl bg-white/[0.04] px-4 py-3">
+                        <div className="rounded-2xl bg-white/4 px-4 py-3">
                           <p className="truncate text-sm font-bold text-white">
                             {user.name || user.username}
                           </p>
@@ -277,11 +277,11 @@ const Header = () => {
                   aria-label={`Conta de ${user.username}`}
                   className="relative flex h-10 items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 pl-1 pr-3 transition-all duration-300 ease-ios active:scale-95 lg:hidden"
                 >
-                  <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.1] text-[0.65rem] font-black text-white">
+                  <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[0.65rem] font-black text-white">
                     {user.username.slice(0, 2).toUpperCase()}
                     <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#05050c] bg-emerald-400" />
                   </span>
-                  <span className="hidden max-w-[7rem] truncate text-xs font-bold text-emerald-100 min-[380px]:inline">
+                  <span className="hidden max-w-28 truncate text-xs font-bold text-emerald-100 min-[380px]:inline">
                     @{user.username}
                   </span>
                 </button>
@@ -291,7 +291,7 @@ const Header = () => {
                 <button
                   type="button"
                   onClick={openLogin}
-                  className="hidden h-10 items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-5 text-sm font-bold tracking-tight text-white transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.11] active:translate-y-0 active:scale-[0.96] lg:flex"
+                  className="hidden h-10 items-center gap-2 rounded-full border border-white/12 bg-white/6 px-5 text-sm font-bold tracking-tight text-white transition-all duration-300 ease-ios hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/11 active:translate-y-0 active:scale-[0.96] lg:flex"
                 >
                   <FaSignInAlt size={13} />
                   Entrar
@@ -308,7 +308,7 @@ const Header = () => {
                 <button
                   type="button"
                   onClick={openLogin}
-                  className="flex h-10 shrink-0 items-center whitespace-nowrap rounded-full border border-white/12 bg-white/[0.06] px-3.5 text-xs font-bold tracking-tight text-white transition-all duration-300 ease-ios active:scale-[0.94] lg:hidden"
+                  className="flex h-10 shrink-0 items-center whitespace-nowrap rounded-full border border-white/12 bg-white/6 px-3.5 text-xs font-bold tracking-tight text-white transition-all duration-300 ease-ios active:scale-[0.94] lg:hidden"
                 >
                   Entrar
                 </button>
@@ -334,7 +334,7 @@ const Header = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-30 bg-black/60 backdrop-blur-xs lg:hidden"
             />
             <MobileMenu
               user={user}
@@ -347,7 +347,7 @@ const Header = () => {
         )}
       </AnimatePresence>
 
-      <div className="h-[4.25rem] lg:h-20" />
+      <div className="h-17 lg:h-20" />
 
       <MobileTabBar
         isAuthenticated={isAuthenticated}

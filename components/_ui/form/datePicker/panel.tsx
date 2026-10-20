@@ -67,7 +67,7 @@ export const PanelShell: React.FC<PanelShellProps> = ({
       </button>
     </div>
 
-    <div className="mt-3 grid flex-1 auto-rows-[3.25rem] grid-cols-4 content-center gap-2">
+    <div className="mt-3 grid flex-1 auto-rows-13 grid-cols-4 content-center gap-2">
       {children}
     </div>
   </div>
@@ -95,7 +95,7 @@ export const GridCell: React.FC<GridCellProps> = ({
     aria-selected={selected}
     className={`flex items-center justify-center rounded-xl text-[0.8rem] font-semibold tabular-nums capitalize transition-colors duration-200 disabled:pointer-events-none disabled:opacity-25 ${
       selected
-        ? "bg-gradient-to-r from-[#8b5cf6] to-[#4f46e5] font-extrabold text-white"
+        ? "bg-linear-to-r from-[#8b5cf6] to-[#4f46e5] font-extrabold text-white"
         : "text-white/75 hover:bg-white/10 hover:text-white"
     } ${current && !selected ? "shadow-[inset_0_0_0_1px_rgba(124,77,255,0.45)] text-brand-300" : ""}`}
   >

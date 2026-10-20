@@ -41,7 +41,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
         whileHover={{ y: -8, scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
         transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-        className="group relative aspect-[2/3] w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.03] shadow-lift"
+        className="group relative aspect-2/3 w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-white/3 shadow-lift"
       >
         <img
           src={posterUrl}
@@ -53,7 +53,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
           className="h-full w-full object-cover transition-transform duration-700 ease-ios group-hover:scale-110"
         />
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/85 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
 
         {vote_average > 0 && (
           <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full border border-white/10 bg-black/60 px-2 py-1 backdrop-blur-md">

@@ -24,7 +24,7 @@ const UserChip = forwardRef<HTMLButtonElement, UserChipProps>(
         onClick={onClick}
         aria-label={`Conta de ${username}`}
         aria-expanded={isOpen}
-        className={`group flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] backdrop-blur-xl transition-all duration-300 ease-ios hover:border-white/20 hover:bg-white/[0.12] active:scale-95 ${
+        className={`group flex items-center gap-2 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl transition-all duration-300 ease-ios hover:border-white/20 hover:bg-white/12 active:scale-95 ${
           compact ? "p-1" : "py-1 pl-1 pr-3"
         }`}
       >
@@ -38,7 +38,7 @@ const UserChip = forwardRef<HTMLButtonElement, UserChipProps>(
           {pendingCount > 0 ? (
             <span
               aria-label={`${pendingCount} confirmação(ões) pendente(s)`}
-              className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full border-2 border-[#05050c] bg-rose-500 px-1 text-[0.6rem] font-black tabular-nums text-white"
+              className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[#05050c] bg-rose-500 px-1 text-[0.6rem] font-black tabular-nums text-white"
             >
               {pendingCount > 99 ? "99+" : pendingCount}
             </span>
@@ -52,7 +52,7 @@ const UserChip = forwardRef<HTMLButtonElement, UserChipProps>(
               <span className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-emerald-300">
                 Conectado
               </span>
-              <span className="mt-0.5 max-w-[9rem] truncate text-sm font-bold text-white">
+              <span className="mt-0.5 max-w-36 truncate text-sm font-bold text-white">
                 @{username}
               </span>
             </span>

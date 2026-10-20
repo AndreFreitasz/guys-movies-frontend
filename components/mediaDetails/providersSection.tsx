@@ -18,7 +18,7 @@ const MediaProvidersSection = memo(
     }
 
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 xl:p-7 backdrop-blur-sm">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 xl:p-7 backdrop-blur-xs">
         <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
           {title}
         </h2>

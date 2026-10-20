@@ -283,13 +283,13 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
 
       <div className="mt-6">
         {seasonsStatus === "loading" && (
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/60">
+          <div className="rounded-3xl border border-white/10 bg-white/3 p-5 text-sm text-white/60">
             Carregando temporadas...
           </div>
         )}
 
         {seasonsStatus === "error" && (
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+          <div className="rounded-3xl border border-white/10 bg-white/3 p-5">
             <p className="text-sm text-white/60">
               Não foi possível carregar as temporadas.
             </p>
@@ -304,7 +304,7 @@ const SerieSheetBody: React.FC<SerieSheetBodyProps> = ({
         )}
 
         {isTaggingCompanions && (
-          <div className="mb-4 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+          <div className="mb-4 rounded-3xl border border-white/10 bg-white/3 p-5">
             <CompanionTagForm
               target={{ type: "serie", idTmdb: serie.idTmdb }}
               description="A pessoa recebe um pedido de confirmação para as temporadas que você marcou."
@@ -418,8 +418,8 @@ const WatchedSerieSheet: React.FC<WatchedSerieSheetProps> = ({
             transition={{ type: "spring", stiffness: 420, damping: 38 }}
             className="relative w-full max-w-3xl"
           >
-            <div className="max-h-[92vh] overflow-y-auto rounded-t-[2rem] border border-white/10 bg-[#0a0a16]/95 shadow-lift sm:rounded-[2rem]">
-              <div className="sticky top-0 z-10 flex justify-center bg-gradient-to-b from-[#0a0a16] to-transparent pb-4 pt-3 sm:hidden">
+            <div className="max-h-[92vh] overflow-y-auto rounded-t-4xl border border-white/10 bg-ink-900/95 shadow-lift sm:rounded-4xl">
+              <div className="sticky top-0 z-10 flex justify-center bg-linear-to-b from-ink-900 to-transparent pb-4 pt-3 sm:hidden">
                 <span className="h-1.5 w-12 rounded-full bg-white/25" />
               </div>
 
@@ -427,7 +427,7 @@ const WatchedSerieSheet: React.FC<WatchedSerieSheetProps> = ({
                 type="button"
                 onClick={onClose}
                 aria-label="Fechar detalhes"
-                className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur transition hover:bg-white/20 hover:text-white"
+                className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition hover:bg-white/20 hover:text-white"
               >
                 <svg viewBox="0 0 20 20" className="h-4 w-4">
                   <path
@@ -447,7 +447,7 @@ const WatchedSerieSheet: React.FC<WatchedSerieSheetProps> = ({
                     target.src = FALLBACK_POSTER;
                     target.classList.add("object-contain", "p-6", "opacity-40");
                   }}
-                  className="mx-auto aspect-[2/3] w-40 self-start rounded-2xl object-cover shadow-xl sm:mx-0 sm:w-52"
+                  className="mx-auto aspect-2/3 w-40 self-start rounded-2xl object-cover shadow-xl sm:mx-0 sm:w-52"
                 />
 
                 <SerieSheetBody

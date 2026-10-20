@@ -26,8 +26,8 @@ const ProvidersSection: React.FC<{ providersState: ProvidersState }> = ({
       <div className="mt-4">
         <p className={sectionLabelClass}>Onde assistir</p>
         <div className="mt-2 flex gap-2">
-          <span className="h-6 w-20 animate-pulse rounded-lg bg-white/[0.08]" />
-          <span className="h-6 w-16 animate-pulse rounded-lg bg-white/[0.08]" />
+          <span className="h-6 w-20 animate-pulse rounded-lg bg-white/8" />
+          <span className="h-6 w-16 animate-pulse rounded-lg bg-white/8" />
         </div>
       </div>
     );
@@ -56,7 +56,7 @@ const ProvidersSection: React.FC<{ providersState: ProvidersState }> = ({
         {providersState.providers.map((provider) => (
           <span
             key={provider.id}
-            className="rounded-lg bg-white/[0.06] px-2 py-1 text-xs text-white/70"
+            className="rounded-lg bg-white/6 px-2 py-1 text-xs text-white/70"
           >
             {provider.name}
           </span>

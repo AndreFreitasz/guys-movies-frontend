@@ -40,7 +40,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
           ? "border border-red-400/40 bg-red-500/15 text-red-100"
           : isFollowing
             ? "border border-white/15 bg-white/[0.07] text-white"
-            : "border border-transparent bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-lg"
+            : "border border-transparent bg-linear-to-r from-violet-500 to-indigo-600 text-white shadow-lg"
       }`}
     >
       <Icon size={12} />

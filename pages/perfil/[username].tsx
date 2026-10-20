@@ -141,14 +141,14 @@ const Perfil: React.FC = () => {
         )}
 
         {status === "ready" && profile && (
-          <section className="relative isolate -mt-[4.25rem] overflow-hidden lg:-mt-20">
+          <section className="relative isolate -mt-17 overflow-hidden lg:-mt-20">
             <ProfileCover
               cover={profile.cover}
               isSelf={profile.isSelf}
               onChangeCover={() => setIsCoverPickerOpen(true)}
             />
 
-            <div className="relative z-10 mx-auto w-full max-w-[1100px] px-4 pt-[15rem] sm:px-6 sm:pt-[22rem] lg:px-10 lg:pt-[28rem]">
+            <div className="relative z-10 mx-auto w-full max-w-[1100px] px-4 pt-60 sm:px-6 sm:pt-88 lg:px-10 lg:pt-112">
               <ProfileHero
                 profile={profile}
                 isEditing={isEditing}

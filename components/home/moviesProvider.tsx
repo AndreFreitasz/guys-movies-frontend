@@ -31,7 +31,7 @@ const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
     <motion.section
       whileHover={{ y: -4 }}
       transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-      className="group/provider relative h-full overflow-hidden rounded-3xl border border-white/[0.07] bg-white/[0.025] p-4 backdrop-blur-xl transition-colors duration-500 hover:border-white/[0.14] sm:p-5"
+      className="group/provider relative h-full overflow-hidden rounded-3xl border border-white/[0.07] bg-white/2.5 p-4 backdrop-blur-xl transition-colors duration-500 hover:border-white/[0.14] sm:p-5"
     >
       <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-indigo-500/10 blur-3xl transition-opacity duration-500 group-hover/provider:bg-indigo-500/20" />
 
@@ -55,7 +55,7 @@ const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
         </div>
       </header>
 
-      <div className="relative mt-4 h-px w-full bg-gradient-to-r from-white/15 via-white/5 to-transparent" />
+      <div className="relative mt-4 h-px w-full bg-linear-to-r from-white/15 via-white/5 to-transparent" />
 
       <ul className="relative mt-2 space-y-0.5">
         {providerData.movies.slice(0, RANK_LIMIT).map((movie, index) => (
@@ -63,7 +63,7 @@ const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
             <Link
               href={`/movie/${movie.id}`}
               prefetch={false}
-              className="group/row flex items-center gap-2 rounded-2xl p-2 transition-all duration-300 ease-ios hover:bg-white/[0.06] active:scale-[0.98]"
+              className="group/row flex items-center gap-2 rounded-2xl p-2 transition-all duration-300 ease-ios hover:bg-white/6 active:scale-[0.98]"
             >
               <span
                 className="w-7 shrink-0 text-center text-3xl font-black leading-none text-transparent transition-all duration-300 sm:w-9 sm:text-4xl"
@@ -81,7 +81,7 @@ const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
                 height={72}
                 loading="lazy"
                 decoding="async"
-                className="h-[4.5rem] w-12 shrink-0 rounded-lg border border-white/10 object-cover transition-transform duration-500 ease-ios group-hover/row:scale-105"
+                className="h-18 w-12 shrink-0 rounded-lg border border-white/10 object-cover transition-transform duration-500 ease-ios group-hover/row:scale-105"
               />
 
               <div className="min-w-0 flex-1">
