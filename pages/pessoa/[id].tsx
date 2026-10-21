@@ -15,8 +15,10 @@ const PersonPage: NextPage<PersonPageProps> = ({ profile }) => {
       <Head>
         <title>{profile.name} - GuysMovies</title>
       </Head>
-      <PersonHero profile={profile} />
-      <CareerHighlights credits={profile.highlights} />
+      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.34),#05050c_60%)] px-4 py-12 sm:px-8 lg:py-16">
+        <PersonHero profile={profile} />
+        <CareerHighlights credits={profile.highlights} />
+      </section>
     </>
   );
 };

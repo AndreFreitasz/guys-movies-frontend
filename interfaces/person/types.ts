@@ -69,10 +69,18 @@ export interface ArtistSearchResult {
 export type TmdbPosterSize = "w92" | "w154" | "w185" | "w342" | "w500";
 export type TmdbProfileSize = "w45" | "w185" | "h632";
 
-export const tmdbImage = (
+const tmdbImage = (path: string | null, size: string): string | null =>
+  path ? `https://image.tmdb.org/t/p/${size}${path}` : null;
+
+export const tmdbPoster = (
   path: string | null,
-  size: TmdbPosterSize | TmdbProfileSize,
-): string | null => (path ? `https://image.tmdb.org/t/p/${size}${path}` : null);
+  size: TmdbPosterSize,
+): string | null => tmdbImage(path, size);
+
+export const tmdbProfile = (
+  path: string | null,
+  size: TmdbProfileSize,
+): string | null => tmdbImage(path, size);
 
 export const creditHref = (credit: PersonCredit): string =>
   credit.mediaType === "tv" ? `/serie/${credit.id}` : `/movie/${credit.id}`;

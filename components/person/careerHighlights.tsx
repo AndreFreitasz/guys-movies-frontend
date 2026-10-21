@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   creditHref,
   PersonCredit,
-  tmdbImage,
+  tmdbPoster,
 } from "../../interfaces/person/types";
 
 interface CareerHighlightsProps {
@@ -14,7 +14,7 @@ const CareerHighlights: React.FC<CareerHighlightsProps> = ({ credits }) => {
   if (!credits.length) return null;
 
   return (
-    <section className="mt-10">
+    <section className="mt-12 lg:mt-16">
       <h2 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/40">
         Definem a carreira
       </h2>
@@ -28,7 +28,7 @@ const CareerHighlights: React.FC<CareerHighlightsProps> = ({ credits }) => {
             <div className="relative aspect-[2/3] overflow-hidden rounded-xl border border-white/10 bg-white/5">
               {credit.posterPath ? (
                 <img
-                  src={tmdbImage(credit.posterPath, "w342") ?? undefined}
+                  src={tmdbPoster(credit.posterPath, "w342") ?? undefined}
                   alt={credit.title}
                   loading="lazy"
                   decoding="async"
