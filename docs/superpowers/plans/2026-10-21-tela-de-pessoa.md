@@ -64,7 +64,7 @@ export interface PersonCredit {
   id: number;
   mediaType: MediaType;
   title: string;
-  posterUrl: string | null;
+  posterPath: string | null;
   year: number | null;
   voteAverage: number | null;
   voteCount: number;
@@ -103,7 +103,7 @@ export interface PersonCreditsPage {
 export interface PersonProfile {
   id: number;
   name: string;
-  profileUrl: string | null;
+  profilePath: string | null;
   biography: string | null;
   biographyLanguage: 'pt' | 'en' | null;
   birthday: string | null;
@@ -121,7 +121,7 @@ export interface PersonProfile {
 export interface PersonSearchResult {
   id: number;
   name: string;
-  profileUrl: string | null;
+  profilePath: string | null;
   knownForDepartment: string | null;
   knownFor: string[];
 }
@@ -1545,7 +1545,7 @@ export interface PersonCredit {
   id: number;
   mediaType: MediaType;
   title: string;
-  posterUrl: string | null;
+  posterPath: string | null;
   year: number | null;
   voteAverage: number | null;
   voteCount: number;
@@ -1584,7 +1584,7 @@ export interface PersonCreditsPage {
 export interface PersonProfile {
   id: number;
   name: string;
-  profileUrl: string | null;
+  profilePath: string | null;
   biography: string | null;
   biographyLanguage: "pt" | "en" | null;
   birthday: string | null;
@@ -1602,10 +1602,18 @@ export interface PersonProfile {
 export interface ArtistSearchResult {
   id: number;
   name: string;
-  profileUrl: string | null;
+  profilePath: string | null;
   knownForDepartment: string | null;
   knownFor: string[];
 }
+
+export type TmdbPosterSize = "w92" | "w154" | "w185" | "w342" | "w500";
+export type TmdbProfileSize = "w45" | "w185" | "h632";
+
+export const tmdbImage = (
+  path: string | null,
+  size: TmdbPosterSize | TmdbProfileSize,
+): string | null => (path ? `https://image.tmdb.org/t/p/${size}${path}` : null);
 
 export const creditHref = (credit: PersonCredit): string =>
   credit.mediaType === "tv" ? `/serie/${credit.id}` : `/movie/${credit.id}`;
@@ -1722,7 +1730,11 @@ git commit -m "feat(person): add the person page with its hero"
 ```tsx
 import React from "react";
 import Link from "next/link";
-import { creditHref, PersonCredit } from "../../interfaces/person/types";
+import {
+  creditHref,
+  PersonCredit,
+  tmdbImage,
+} from "../../interfaces/person/types";
 
 interface CareerHighlightsProps {
   credits: PersonCredit[];
@@ -1744,11 +1756,14 @@ const CareerHighlights: React.FC<CareerHighlightsProps> = ({ credits }) => {
             className="group flex flex-col gap-2 transition-transform duration-300 ease-ios hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-indigo-400"
           >
             <div className="relative aspect-[2/3] overflow-hidden rounded-xl border border-white/10 bg-white/5">
-              {credit.posterUrl ? (
+              {credit.posterPath ? (
                 <img
-                  src={credit.posterUrl}
+                  src={tmdbImage(credit.posterPath, "w342") ?? undefined}
                   alt={credit.title}
                   loading="lazy"
+                  decoding="async"
+                  width={342}
+                  height={513}
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -2060,7 +2075,11 @@ linha: incluir `router` e `fetchPage` provocaria um laço de `replace`.
 ```tsx
 import React from "react";
 import Link from "next/link";
-import { creditHref, PersonCredit } from "../../interfaces/person/types";
+import {
+  creditHref,
+  PersonCredit,
+  tmdbImage,
+} from "../../interfaces/person/types";
 
 interface CreditListProps {
   items: PersonCredit[];
@@ -2138,11 +2157,14 @@ const CreditList: React.FC<CreditListProps> = ({
           className="grid grid-cols-[38px_1fr_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-2.5 transition-colors duration-200 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-indigo-400"
         >
           <div className="h-[54px] w-[38px] overflow-hidden rounded-md border border-white/10 bg-white/5">
-            {credit.posterUrl && (
+            {credit.posterPath && (
               <img
-                src={credit.posterUrl}
+                src={tmdbImage(credit.posterPath, "w154") ?? undefined}
                 alt=""
                 loading="lazy"
+                decoding="async"
+                width={154}
+                height={231}
                 className="h-full w-full object-cover"
               />
             )}
