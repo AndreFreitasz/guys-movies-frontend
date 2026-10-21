@@ -31,7 +31,10 @@ import { usePendingCount } from "../../../hooks/usePendingCount";
 
 const SCROLL_THRESHOLD = 12;
 
+let hasPlayedEntrance = false;
+
 const Header = () => {
+  const [playEntrance] = useState(() => !hasPlayedEntrance);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -51,6 +54,10 @@ const Header = () => {
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > SCROLL_THRESHOLD);
   });
+
+  useEffect(() => {
+    hasPlayedEntrance = true;
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -135,7 +142,7 @@ const Header = () => {
   return (
     <>
       <motion.header
-        initial={{ y: -24, opacity: 0 }}
+        initial={playEntrance ? { y: -24, opacity: 0 } : false}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-ios ${

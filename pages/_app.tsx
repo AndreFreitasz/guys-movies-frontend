@@ -22,7 +22,7 @@ const figtree = Figtree({
   variable: "--font-figtree",
 });
 
-const ROUTE_CHANGE_DELAY = 180;
+const ROUTE_CHANGE_DELAY = 80;
 
 function RouteProgressBar() {
   const router = useRouter();
@@ -63,7 +63,7 @@ function RouteProgressBar() {
           exit={{ opacity: 0 }}
           role="progressbar"
           aria-label="Carregando página"
-          className="fixed inset-x-0 top-0 z-100 h-0.5 overflow-hidden bg-transparent"
+          className="fixed inset-x-0 top-0 z-100 h-1 overflow-hidden bg-white/10"
         >
           <div className="h-full w-1/3 animate-[routeProgress_1s_ease-in-out_infinite] bg-white shadow-[0_0_18px_rgba(255,255,255,0.75)]" />
         </motion.div>
@@ -94,16 +94,9 @@ function MyApp({ Component, pageProps, router }: AppProps) {
       <MotionConfig reducedMotion="user">
         <AuthProvider>
           <RouteProgressBar />
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={routeKey}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-            >
-              <Component {...pageProps} />
-            </motion.div>
-          </AnimatePresence>
+          <div key={routeKey}>
+            <Component {...pageProps} />
+          </div>
           <ToastContainer
             position="bottom-right"
             theme="dark"

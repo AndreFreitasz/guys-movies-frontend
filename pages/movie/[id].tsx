@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { GetServerSideProps, NextPage } from "next";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -27,7 +27,6 @@ import {
   WatchSourceValue,
 } from "../../constants/watchProviders";
 import { authFetch } from "../../utils/authFetch";
-import { setPublicCache } from "../../utils/httpCache";
 
 interface MovieProps {
   movie: MovieResponse;
@@ -306,7 +305,15 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+const DETAIL_REVALIDATE_SECONDS = 3600;
+const DETAIL_RETRY_SECONDS = 60;
+
+export const getStaticPaths: GetStaticPaths = async () => ({
+  paths: [],
+  fallback: "blocking",
+});
+
+export const getStaticProps: GetStaticProps = async (context) => {
   const { id } = context.params!;
 
   try {
@@ -315,20 +322,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     );
 
     if (!response.ok) {
-      return { notFound: true };
+      return { notFound: true, revalidate: DETAIL_RETRY_SECONDS };
     }
 
     const movie = await response.json();
 
     if (!movie?.id) {
-      return { notFound: true };
+      return { notFound: true, revalidate: DETAIL_RETRY_SECONDS };
     }
 
-    setPublicCache(context.res, 3600, 86400);
-
-    return { props: { movie } };
+    return {
+      revalidate: DETAIL_REVALIDATE_SECONDS,
+      props: { movie },
+    };
   } catch {
-    return { notFound: true };
+    return { notFound: true, revalidate: DETAIL_RETRY_SECONDS };
   }
 };
 

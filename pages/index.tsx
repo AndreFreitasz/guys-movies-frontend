@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import Head from "next/head";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import Header from "../components/_ui/header";
 import Footer from "../components/_ui/footer";
@@ -15,7 +15,6 @@ import SectionRow from "../components/home/sectionRow";
 import MoviesProvider from "../components/home/moviesProvider";
 import MovieCard from "../components/home/movieCard";
 import CatalogErrorState from "../components/_ui/catalogErrorState";
-import { setPublicCache } from "../utils/httpCache";
 
 interface Movie {
   id: number;
@@ -85,7 +84,7 @@ const Home: React.FC<HomeProps> = ({
       })),
     [popularMovies],
   );
-  const retry = useCallback(() => router.replace(router.asPath), [router]);
+  const retry = useCallback(() => router.reload(), [router]);
   const hasCatalog = initialProviderData.length > 0;
 
   useEffect(() => {
@@ -333,7 +332,10 @@ const pickProviderData = (providers: any) =>
       }))
     : [];
 
-export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+const CATALOG_REVALIDATE_SECONDS = 300;
+const CATALOG_RETRY_SECONDS = 30;
+
+export const getStaticProps: GetStaticProps = async () => {
   try {
     const [
       providerRes,
@@ -397,9 +399,8 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       comedyRes.json(),
     ]);
 
-    setPublicCache(res, 300, 1800);
-
     return {
+      revalidate: CATALOG_REVALIDATE_SECONDS,
       props: {
         initialProviderData: pickProviderData(providerData),
         initialPopularMovies: pickMovies(popularMovies, true),
@@ -417,6 +418,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     const errorMessage =
       err instanceof Error ? err.message : "An unknown error occurred";
     return {
+      revalidate: CATALOG_RETRY_SECONDS,
       props: {
         initialProviderData: [],
         initialPopularMovies: [],

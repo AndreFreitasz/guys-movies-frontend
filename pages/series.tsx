@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import Head from "next/head";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 
@@ -11,7 +11,6 @@ import Carousel from "../components/_ui/carousel";
 import MediaHero, { HeroItem } from "../components/_ui/mediaHero";
 import CatalogErrorState from "../components/_ui/catalogErrorState";
 import { SerieProps } from "../interfaces/series/types";
-import { setPublicCache } from "../utils/httpCache";
 
 const posterResponsive = [
   { breakpoint: 1536, settings: { slidesToShow: 6, slidesToScroll: 4 } },
@@ -23,7 +22,7 @@ const posterResponsive = [
 
 const Serie = ({ providerData, popularSeries, error }: SerieProps) => {
   const router = useRouter();
-  const retry = useCallback(() => router.replace(router.asPath), [router]);
+  const retry = useCallback(() => router.reload(), [router]);
 
   const heroItems = useMemo<HeroItem[]>(
     () =>
@@ -192,7 +191,10 @@ const pickHeroSeries = (series: any) =>
       }))
     : [];
 
-export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+const CATALOG_REVALIDATE_SECONDS = 300;
+const CATALOG_RETRY_SECONDS = 30;
+
+export const getStaticProps: GetStaticProps = async () => {
   try {
     const [providerRes, popularRes] = await Promise.all([
       fetch(`${process.env.NEXT_PUBLIC_URL_API}/series/popularByProviders`),
@@ -210,9 +212,8 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       popularRes.json(),
     ]);
 
-    setPublicCache(res, 300, 1800);
-
     return {
+      revalidate: CATALOG_REVALIDATE_SECONDS,
       props: {
         providerData: pickProviderSeries(providerData),
         popularSeries: pickHeroSeries(popularSeries),
@@ -223,6 +224,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     const errorMessage =
       err instanceof Error ? err.message : "An unknown error occurred";
     return {
+      revalidate: CATALOG_RETRY_SECONDS,
       props: {
         providerData: [],
         popularSeries: [],
