@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 
+import CareerHighlights from "../../components/person/careerHighlights";
 import PersonHero from "../../components/person/personHero";
 import { PersonProfile } from "../../interfaces/person/types";
 
@@ -15,6 +16,7 @@ const PersonPage: NextPage<PersonPageProps> = ({ profile }) => {
         <title>{profile.name} - GuysMovies</title>
       </Head>
       <PersonHero profile={profile} />
+      <CareerHighlights credits={profile.highlights} />
     </>
   );
 };
