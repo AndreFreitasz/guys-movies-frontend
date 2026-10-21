@@ -7,8 +7,6 @@ import React, {
 } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Header from "../components/_ui/header";
-import Footer from "../components/_ui/footer";
 import CatalogErrorState from "../components/_ui/catalogErrorState";
 import MovieCard from "../components/home/movieCard";
 import SearchResultGrid, {
@@ -174,7 +172,6 @@ const Busca: React.FC = () => {
           content="Busque filmes e séries pelo título."
         />
       </Head>
-      <Header />
 
       <main className="relative mx-auto w-full max-w-[1600px] px-4 pb-16 pt-8 sm:px-6 lg:px-10 xl:px-14">
         <div className="aurora" />
@@ -287,8 +284,6 @@ const Busca: React.FC = () => {
           )}
         </div>
       </main>
-
-      <Footer />
     </>
   );
 };

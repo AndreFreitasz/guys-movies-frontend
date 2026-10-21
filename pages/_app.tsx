@@ -10,6 +10,8 @@ import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { AuthProvider } from "../hooks/authContext";
+import Header from "../components/_ui/header";
+import Footer from "../components/_ui/footer";
 
 const ToastContainer = dynamic(
   () => import("react-toastify").then((mod) => mod.ToastContainer),
@@ -72,8 +74,17 @@ function RouteProgressBar() {
   );
 }
 
+type ShellAwareComponent = AppProps["Component"] & { hideShell?: boolean };
+
 function MyApp({ Component, pageProps, router }: AppProps) {
   const routeKey = router.asPath.split("?")[0];
+  const { hideShell } = Component as ShellAwareComponent;
+
+  const page = (
+    <div key={routeKey}>
+      <Component {...pageProps} />
+    </div>
+  );
 
   return (
     <div
@@ -94,9 +105,15 @@ function MyApp({ Component, pageProps, router }: AppProps) {
       <MotionConfig reducedMotion="user">
         <AuthProvider>
           <RouteProgressBar />
-          <div key={routeKey}>
-            <Component {...pageProps} />
-          </div>
+          {hideShell ? (
+            page
+          ) : (
+            <>
+              <Header />
+              {page}
+              <Footer />
+            </>
+          )}
           <ToastContainer
             position="bottom-right"
             theme="dark"

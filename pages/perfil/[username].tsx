@@ -3,8 +3,6 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import Header from "../../components/_ui/header";
-import Footer from "../../components/_ui/footer";
 import ProfileCover from "../../components/profile/profileCover";
 import ProfileHero from "../../components/profile/profileHero";
 import ProfileEditor, {
@@ -85,7 +83,6 @@ const Perfil: React.FC = () => {
         <title>{pageTitle}</title>
         <meta name="description" content="Perfil de usuário no GuysMovies." />
       </Head>
-      <Header />
 
       <main className="relative w-full pb-16">
         {(authLoading ||
@@ -263,8 +260,6 @@ const Perfil: React.FC = () => {
           onRemove={() => saveCover(null)}
         />
       )}
-
-      <Footer />
     </>
   );
 };

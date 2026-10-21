@@ -4,8 +4,6 @@ import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 
-import Header from "../components/_ui/header";
-import Footer from "../components/_ui/footer";
 import SerieCard from "../components/series/seriesCard";
 import Carousel from "../components/_ui/carousel";
 import MediaHero, { HeroItem } from "../components/_ui/mediaHero";
@@ -46,13 +44,11 @@ const Serie = ({ providerData, popularSeries, error }: SerieProps) => {
         <Head>
           <title>GuysMovies - Séries</title>
         </Head>
-        <Header />
         <CatalogErrorState
           title="Não conseguimos carregar as séries"
           message="Tente novamente em alguns instantes."
           onRetry={retry}
         />
-        <Footer />
       </>
     );
   }
@@ -66,7 +62,6 @@ const Serie = ({ providerData, popularSeries, error }: SerieProps) => {
           content="As séries mais populares de cada plataforma de streaming."
         />
       </Head>
-      <Header />
 
       <main className="relative overflow-x-hidden">
         <MediaHero items={heroItems} />
@@ -149,8 +144,6 @@ const Serie = ({ providerData, popularSeries, error }: SerieProps) => {
           ))}
         </div>
       </main>
-
-      <Footer />
     </>
   );
 };

@@ -8,8 +8,6 @@ import React, {
 import Head from "next/head";
 import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
-import Header from "../components/_ui/header";
-import Footer from "../components/_ui/footer";
 import MediaHero, { HeroItem } from "../components/_ui/mediaHero";
 import SectionRow from "../components/home/sectionRow";
 import MoviesProvider from "../components/home/moviesProvider";
@@ -149,7 +147,6 @@ const Home: React.FC<HomeProps> = ({
         <Head>
           <title>GuysMovies - Erro</title>
         </Head>
-        <Header />
         <CatalogErrorState
           title="Não conseguimos carregar o catálogo"
           message={
@@ -158,7 +155,6 @@ const Home: React.FC<HomeProps> = ({
           }
           onRetry={retry}
         />
-        <Footer />
       </>
     );
   }
@@ -176,7 +172,6 @@ const Home: React.FC<HomeProps> = ({
           content="Descubra filmes populares, aclamados pela crítica e disponíveis nos principais streamings."
         />
       </Head>
-      <Header />
 
       <main className="relative overflow-x-hidden">
         <MediaHero items={heroItems} />
@@ -280,8 +275,6 @@ const Home: React.FC<HomeProps> = ({
           <div ref={sentinelRef} aria-hidden className="h-px w-full" />
         </div>
       </main>
-
-      <Footer />
     </>
   );
 };

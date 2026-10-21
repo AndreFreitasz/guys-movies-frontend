@@ -50,6 +50,7 @@ const Header = () => {
   const { isAuthenticated, user, authLoading, logout } = useAuth();
   const { scrollY } = useScroll();
   const pending = usePendingCount(isAuthenticated);
+  const reloadPending = pending.reload;
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > SCROLL_THRESHOLD);
@@ -91,6 +92,11 @@ const Header = () => {
     router.events.on("routeChangeStart", closeOverlays);
     return () => router.events.off("routeChangeStart", closeOverlays);
   }, [router.events]);
+
+  useEffect(() => {
+    router.events.on("routeChangeComplete", reloadPending);
+    return () => router.events.off("routeChangeComplete", reloadPending);
+  }, [reloadPending, router.events]);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {

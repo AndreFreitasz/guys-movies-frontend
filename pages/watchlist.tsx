@@ -4,8 +4,6 @@ import Head from "next/head";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import Header from "../components/_ui/header";
-import Footer from "../components/_ui/footer";
 import CatalogErrorState from "../components/_ui/catalogErrorState";
 import WatchlistGrid from "../components/watchlist/watchlistGrid";
 import WatchlistToolbar from "../components/watchlist/watchlistToolbar";
@@ -58,11 +56,9 @@ const PageShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <Head>
       <title>GuysMovies - Watchlist</title>
     </Head>
-    <Header />
     <main className="relative mx-auto w-full max-w-[1600px] px-4 pb-16 pt-8 sm:px-6 lg:px-10 xl:px-14">
       {children}
     </main>
-    <Footer />
   </>
 );
 

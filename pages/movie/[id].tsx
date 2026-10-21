@@ -3,8 +3,6 @@ import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
-import Footer from "../../components/_ui/footer";
-import Header from "../../components/_ui/header";
 import LoadingSpinner from "../../components/_ui/loadingSpinner";
 import WatchedDateForm, {
   WatchedDateFormMode,
@@ -188,7 +186,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
       <Head>
         <title>GuysMovie: {movie.title}</title>
       </Head>
-      <Header />
       {loading ? (
         <LoadingSpinner />
       ) : (
@@ -272,7 +269,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
           <MediaCastSection title="Elenco principal" cast={castMembers} />
         </MediaDetailLayout>
       )}
-      <Footer />
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
