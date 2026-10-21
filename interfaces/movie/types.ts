@@ -1,10 +1,12 @@
 export interface CastMember {
+  id?: number;
   name: string;
   character: string;
   profile_path: string;
 }
 
 export interface Director {
+  id?: number;
   name: string;
   profile_path: string;
 }
