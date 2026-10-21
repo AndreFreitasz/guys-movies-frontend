@@ -19,6 +19,9 @@ cruzamento com a biblioteca do usuário. Dois pontos de entrada: a aba nova
 | Contagem de gêneros | Interativa: clicar filtra a filmografia | usuário |
 | Onde agrega | Backend, uma chamada TMDB cacheada | terminal |
 | Renderização | ISR, igual a `/movie/[id]` e `/serie/[id]` | terminal |
+| Layout | Opção B, "Cinemático": destaques em pôster abrem a tela | mockup |
+| Créditos de ruído | Descartados (participações como "Self", Talk/News/Reality) | terminal |
+| Ordenação padrão | "Relevância" = nota × log(votos) | terminal |
 
 ---
 
@@ -37,6 +40,42 @@ Medidos contra a API real com a chave do projeto, em `/person/31` (Tom Hanks):
   `Crew`, `Creator`. São eles que viram abas.
 - `biography` em pt-BR veio preenchida (500 caracteres), mas não há garantia para
   gente menos conhecida — exige fallback.
+
+## Os dados crus mentem sobre a pessoa
+
+O achado mais importante da apuração. Sem tratamento, a tela do Tom Hanks afirmaria
+que o gênero nº 1 dele é **Documentário (151)**, seguido de **Talk (42)**; que a
+carreira vai de **1944** a 2027; e a filmografia por popularidade abriria com
+*Tonight Show*, *Late Show* e *Late Night*.
+
+A causa: o `combined_credits` mistura a obra da pessoa com as aparições dela **como
+ela mesma** — talk shows, premiações, documentários de arquivo.
+
+### Filtro de ruído
+
+Um crédito é descartado quando:
+
+- `character` casa com `/^(self|himself|herself)\b/i`; ou
+- é `media_type: "tv"` e tem algum dos gêneros `10767` (Talk), `10763` (News),
+  `10764` (Reality).
+
+Documentário **não** é filtrado por gênero — isso destruiria a obra de um
+documentarista de verdade. Quem some é a participação como convidado.
+
+Efeito medido em `/person/31`: **284 → 122 créditos de elenco, 162 descartados
+(57%)**. Os gêneros passam a ser Drama 90, Comédia 77, Documentário 54 — o retrato
+verdadeiro.
+
+### Ordenação "Relevância"
+
+`popularity` do TMDB também não serve: infla séries de longa duração e devolve
+*Os Simpsons* e *O Barco do Amor* no topo do Tom Hanks. Três critérios foram
+comparados no terminal; o escolhido é **`vote_average × log10(vote_count)`**, com
+piso de 200 votos, que devolve a lista definitiva: Forrest Gump, À Espera de um
+Milagre, O Resgate do Soldado Ryan, Toy Story, Prenda-Me se For Capaz.
+
+É o `sort` padrão e o critério dos destaques do topo. `popularity` cru não é
+oferecido como opção.
 
 ## 1. Backend: módulo `src/person`
 
@@ -107,7 +146,7 @@ cada título da pessoa, 372 chamadas extras ao TMDB no caso do Tom Hanks. Entra
 | `GET` | `/search/person?q=` | Artistas para a aba nova da busca |
 
 Query de `/person/:id/credits`: `department`, `media` (`all`/`movie`/`tv`),
-`genre` (id), `sort` (`popularity`/`year`/`rating`), `page`. Página de 20.
+`genre` (id), `sort` (`relevance`/`year`/`rating`), `page`. Página de 20.
 Filtro e ordenação rodam sobre o agregado em cache, sem nova ida ao TMDB.
 
 O departamento padrão é o `known_for_department` da pessoa quando ele existe entre
@@ -131,16 +170,41 @@ biblioteca carrega **no cliente**, após a autenticação resolver.
 
 A rota usa `/pessoa/` e não `/perfil/`, que já pertence aos usuários do app.
 
+### Layout: Opção B, validada em mockup
+
+A ordem vertical da tela, de cima para baixo:
+
+1. **Hero** sobre fundo em degradê de índigo, foto circular de 128px ao lado do
+   nome, departamento principal como sobrelinha, e uma linha de metadados
+   (idade, local, total de títulos, ano de estreia)
+2. **"Definem a carreira"** — seis pôsteres grandes em grade, escolhidos pela
+   ordenação de Relevância. É o momento de reconhecimento que sustenta a retenção
+3. **Cruzamento com a biblioteca** — faixa com "viu X de Y", barra de progresso e
+   nota média
+4. **Gêneros** — barras horizontais clicáveis que filtram a filmografia
+5. **Filmografia** — abas de departamento, filtro Filmes·Séries, ordenação e a
+   lista paginada
+
+A bio completa fica no hero, truncada, com "ler mais".
+
+Consequência conhecida e aceita: os gêneros saem de vista ao rolar a filmografia.
+Se isso incomodar no uso, tornar a faixa de gêneros fixa é um ajuste pequeno e
+posterior, não um redesenho.
+
 ### Componentes (`components/person/`)
 
 | Arquivo | Responsabilidade |
 |---|---|
-| `personHero.tsx` | Foto, nome, departamento principal, nascimento/idade, bio com "ler mais" |
-| `careerStats.tsx` | Tiles de números da carreira |
-| `genreBreakdown.tsx` | Distribuição de gêneros, clicável, controla o filtro |
+| `personHero.tsx` | Foto circular, nome, departamento, metadados, bio com "ler mais" |
+| `careerHighlights.tsx` | Os seis pôsteres de destaque do topo |
+| `libraryCrossover.tsx` | "Você viu 7 de 42", progresso e sua nota média |
+| `genreBreakdown.tsx` | Barras de gênero, clicáveis, controlam o filtro |
 | `departmentTabs.tsx` | Abas derivadas dos departamentos |
 | `creditList.tsx` | Lista paginada, com o papel explícito em cada item |
-| `libraryCrossover.tsx` | "Você viu 7 de 42", pendentes e sua nota média |
+
+As barras de gênero são **série única**: a cor codifica seleção, não identidade.
+Um só tom de índigo, destacado quando ativo — não é paleta categórica e por isso
+não exige a validação de contraste entre matizes.
 
 Hook `hooks/usePersonCredits.ts` concentra paginação e os filtros (departamento,
 mídia, gênero, ordenação), espelhando o padrão de `useWatchedFilters`.
