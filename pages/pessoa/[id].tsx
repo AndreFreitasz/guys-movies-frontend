@@ -1,7 +1,9 @@
 import Head from "next/head";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import { useState } from "react";
 
 import CareerHighlights from "../../components/person/careerHighlights";
+import GenreBreakdown from "../../components/person/genreBreakdown";
 import PersonHero from "../../components/person/personHero";
 import { PersonProfile } from "../../interfaces/person/types";
 
@@ -10,6 +12,8 @@ interface PersonPageProps {
 }
 
 const PersonPage: NextPage<PersonPageProps> = ({ profile }) => {
+  const [activeGenre, setActiveGenre] = useState<number | null>(null);
+
   return (
     <>
       <Head>
@@ -19,6 +23,13 @@ const PersonPage: NextPage<PersonPageProps> = ({ profile }) => {
         <PersonHero profile={profile} />
         <CareerHighlights credits={profile.highlights} />
       </section>
+      <div className="px-4 pb-12 sm:px-8 lg:pb-16">
+        <GenreBreakdown
+          genres={profile.genres}
+          activeGenre={activeGenre}
+          onSelect={setActiveGenre}
+        />
+      </div>
     </>
   );
 };
