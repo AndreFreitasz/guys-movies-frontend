@@ -1610,10 +1610,18 @@ export interface ArtistSearchResult {
 export type TmdbPosterSize = "w92" | "w154" | "w185" | "w342" | "w500";
 export type TmdbProfileSize = "w45" | "w185" | "h632";
 
-export const tmdbImage = (
+const tmdbImage = (path: string | null, size: string): string | null =>
+  path ? `https://image.tmdb.org/t/p/${size}${path}` : null;
+
+export const tmdbPoster = (
   path: string | null,
-  size: TmdbPosterSize | TmdbProfileSize,
-): string | null => (path ? `https://image.tmdb.org/t/p/${size}${path}` : null);
+  size: TmdbPosterSize,
+): string | null => tmdbImage(path, size);
+
+export const tmdbProfile = (
+  path: string | null,
+  size: TmdbProfileSize,
+): string | null => tmdbImage(path, size);
 
 export const creditHref = (credit: PersonCredit): string =>
   credit.mediaType === "tv" ? `/serie/${credit.id}` : `/movie/${credit.id}`;
@@ -1733,7 +1741,7 @@ import Link from "next/link";
 import {
   creditHref,
   PersonCredit,
-  tmdbImage,
+  tmdbPoster,
 } from "../../interfaces/person/types";
 
 interface CareerHighlightsProps {
@@ -1758,7 +1766,7 @@ const CareerHighlights: React.FC<CareerHighlightsProps> = ({ credits }) => {
             <div className="relative aspect-[2/3] overflow-hidden rounded-xl border border-white/10 bg-white/5">
               {credit.posterPath ? (
                 <img
-                  src={tmdbImage(credit.posterPath, "w342") ?? undefined}
+                  src={tmdbPoster(credit.posterPath, "w342") ?? undefined}
                   alt={credit.title}
                   loading="lazy"
                   decoding="async"
@@ -2078,7 +2086,7 @@ import Link from "next/link";
 import {
   creditHref,
   PersonCredit,
-  tmdbImage,
+  tmdbPoster,
 } from "../../interfaces/person/types";
 
 interface CreditListProps {
@@ -2159,7 +2167,7 @@ const CreditList: React.FC<CreditListProps> = ({
           <div className="h-[54px] w-[38px] overflow-hidden rounded-md border border-white/10 bg-white/5">
             {credit.posterPath && (
               <img
-                src={tmdbImage(credit.posterPath, "w154") ?? undefined}
+                src={tmdbPoster(credit.posterPath, "w154") ?? undefined}
                 alt=""
                 loading="lazy"
                 decoding="async"
