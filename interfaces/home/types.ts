@@ -5,6 +5,7 @@ export interface Movie {
   banner_url: string;
   overview: string;
   vote_average: number;
+  release_date?: string | null;
 }
 
 export interface Provider {

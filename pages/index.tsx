@@ -302,12 +302,8 @@ const pickMovieFields = (movie: any, withHeroFields: boolean): Movie => ({
   poster_path: movie.poster_path,
   overview: truncateOverview(movie.overview),
   vote_average: movie.vote_average ?? 0,
-  ...(withHeroFields
-    ? {
-        backdrop_path: movie.backdrop_path ?? null,
-        release_date: movie.release_date ?? null,
-      }
-    : {}),
+  release_date: movie.release_date ?? null,
+  ...(withHeroFields ? { backdrop_path: movie.backdrop_path ?? null } : {}),
 });
 
 const pickMovies = (movies: any, withHeroFields = false): Movie[] =>
@@ -332,6 +328,7 @@ const pickProviderData = (providers: any) =>
             title: movie.title,
             poster_path: movie.poster_path,
             overview: truncateOverview(movie.overview),
+            release_date: movie.release_date ?? null,
           })),
       }))
     : [];

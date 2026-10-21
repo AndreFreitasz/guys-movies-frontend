@@ -72,6 +72,7 @@ const SearchResultGrid: React.FC<SearchResultGridProps> = ({
             posterUrl={result.poster_url}
             overview={result.overview}
             vote_average={result.vote_average}
+            release_date={result.release_date}
             href={
               result.type === "movie"
                 ? `/movie/${result.id}`

@@ -1,4 +1,5 @@
 import React from "react";
+import YearBadge from "../_ui/yearBadge";
 import Link from "next/link";
 import { FaTimes } from "react-icons/fa";
 import {
@@ -29,6 +30,7 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({
     <div className="group relative">
       <Link href={href} className="block">
         <div className="relative aspect-2/3 overflow-hidden rounded-2xl bg-white/4">
+          <YearBadge date={item.releaseDate} />
           <img
             src={resolvePosterUrl(item.posterPath)}
             alt={item.title}
@@ -63,7 +65,6 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({
         <p className="mt-2 line-clamp-2 text-sm font-bold text-white">
           {item.title}
         </p>
-        {year && <p className="text-xs text-white/40">{year}</p>}
       </Link>
 
       <div className="mt-2 flex h-6 items-center gap-1.5">

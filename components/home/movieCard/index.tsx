@@ -1,9 +1,11 @@
 import React from "react";
+import YearBadge from "../../_ui/yearBadge";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaStar, FaPlay } from "react-icons/fa";
 
 interface MovieCardProps {
+  release_date?: string | null;
   id: number;
   title: string;
   poster_path?: string;
@@ -29,6 +31,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
   posterUrl: posterUrlProp,
   overview,
   vote_average,
+  release_date,
   href,
 }) => {
   const posterUrl =
@@ -43,6 +46,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
         transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
         className="group relative aspect-2/3 w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-white/3 shadow-lift"
       >
+        <YearBadge date={release_date} />
         <img
           src={posterUrl}
           alt={title}

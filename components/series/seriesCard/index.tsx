@@ -3,6 +3,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaStar, FaPlay } from "react-icons/fa";
 import { Serie } from "../../../interfaces/series/types";
+import YearBadge from "../../_ui/yearBadge";
 
 const POSTER_BASE_URL = "https://image.tmdb.org/t/p/w342";
 const FALLBACK_POSTER = "/icons/home/cinema.png";
@@ -19,6 +20,7 @@ const SerieCard = ({
   poster_path,
   overview,
   vote_average,
+  first_air_date,
 }: Serie) => {
   const imageUrl = poster_path
     ? `${POSTER_BASE_URL}${poster_path}`
@@ -33,6 +35,7 @@ const SerieCard = ({
         transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
         className="group relative aspect-2/3 w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-white/3 shadow-lift"
       >
+        <YearBadge date={first_air_date} />
         <img
           src={imageUrl}
           alt={`Pôster de ${name}`}

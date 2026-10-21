@@ -1,4 +1,5 @@
 import React from "react";
+import YearBadge from "../_ui/yearBadge";
 import { motion } from "framer-motion";
 import { FaPlus } from "react-icons/fa";
 import Link from "next/link";
@@ -92,7 +93,8 @@ const FavoriteShelf: React.FC<FavoriteShelfProps> = ({
             >
               <Link href={href} className="block">
                 <span className="block rounded-[1.15rem] bg-linear-to-br from-brand-400/70 via-white/10 to-brand-500/40 p-px shadow-lift transition-transform duration-500 ease-ios group-hover:-translate-y-1.5">
-                  <span className="block overflow-hidden rounded-[1.1rem]">
+                  <span className="relative block overflow-hidden rounded-[1.1rem]">
+                    <YearBadge date={favorite.year} />
                     <img
                       src={resolvePosterUrl(favorite.posterPath)}
                       alt={favorite.title}
@@ -106,7 +108,6 @@ const FavoriteShelf: React.FC<FavoriteShelfProps> = ({
                 </span>
                 <span className="block text-[0.65rem] font-semibold text-white/45">
                   {favorite.type === "movie" ? "Filme" : "Série"}
-                  {favorite.year !== null && ` · ${favorite.year}`}
                 </span>
               </Link>
             </motion.div>

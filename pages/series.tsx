@@ -142,6 +142,7 @@ const Serie = ({ providerData, popularSeries, error }: SerieProps) => {
                     poster_path={serie.poster_path}
                     overview={serie.overview}
                     vote_average={serie.vote_average}
+                    first_air_date={serie.first_air_date}
                   />
                 )}
               />
@@ -170,6 +171,7 @@ const pickProviderSeries = (providers: any) =>
             poster_path: serie.poster_path,
             overview: serie.overview,
             vote_average: serie.vote_average,
+            first_air_date: serie.first_air_date ?? null,
           }),
         ),
       }))

@@ -1,3 +1,4 @@
+import YearBadge from "../_ui/yearBadge";
 import React from "react";
 import { motion } from "framer-motion";
 import { WatchedMovieItem } from "../../interfaces/watched/types";
@@ -45,6 +46,7 @@ const WatchedTile: React.FC<WatchedTileProps> = ({
     className="group relative flex w-full flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/3 text-left backdrop-blur-xl transition-colors duration-300 hover:border-white/25 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-400"
   >
     <div className="relative aspect-2/3 w-full overflow-hidden">
+      <YearBadge date={movie.releaseDate} />
       <img
         src={movie.posterPath || FALLBACK_POSTER}
         alt={movie.title ?? "Pôster do filme"}
