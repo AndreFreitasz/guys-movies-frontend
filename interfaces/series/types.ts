@@ -25,6 +25,10 @@ export interface SerieResponse extends Serie {
   providers: Providers;
   cast?: CastMember[];
   seasons?: SerieSeason[];
+  critic_scores?: {
+    rottenTomatoes: number | null;
+    metacritic: number | null;
+  };
 }
 
 export interface ProviderSeries {

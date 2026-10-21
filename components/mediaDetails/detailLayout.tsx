@@ -39,9 +39,9 @@ const MediaDetailLayout = memo(
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1600px] px-4 pb-16 pt-6 sm:px-6 sm:pt-8 lg:px-10">
-          <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-[minmax(0,300px)_1fr] lg:items-start lg:gap-x-12 lg:gap-y-8">
+          <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-[minmax(0,300px)_1fr] lg:items-start lg:gap-x-12 lg:gap-y-5">
             <div className="flex items-start gap-4 sm:gap-6 lg:contents">
-              <div className="w-24 shrink-0 sm:w-36 lg:col-start-1 lg:row-start-1 lg:w-auto">
+              <div className="w-24 shrink-0 sm:w-36 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:w-auto">
                 {poster}
               </div>
               <div className="min-w-0 flex-1 lg:col-start-2 lg:row-start-1">
@@ -55,7 +55,7 @@ const MediaDetailLayout = memo(
               {children}
             </div>
 
-            <div className="lg:col-span-1 lg:col-start-1 lg:row-span-2 lg:row-start-2">
+            <div className="lg:col-span-1 lg:col-start-1 lg:row-start-3">
               {details}
             </div>
           </div>

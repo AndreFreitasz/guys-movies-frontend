@@ -33,7 +33,6 @@ interface WatchedDateConfig {
 
 interface MediaExperiencePanelProps {
   heading: string;
-  description: string;
   watchedConfig?: ExperienceActionConfig;
   waitingConfig: ExperienceActionConfig;
   ratingConfig: RatingConfig;
@@ -48,7 +47,6 @@ const iconMap = {
 const MediaExperiencePanel = memo(
   ({
     heading,
-    description,
     watchedConfig,
     waitingConfig,
     ratingConfig,
@@ -100,16 +98,11 @@ const MediaExperiencePanel = memo(
     };
 
     return (
-      <div className="rounded-3xl border border-white/10 bg-linear-to-br from-indigo-500/20 via-indigo-400/10 to-transparent p-5 md:p-6 xl:p-7 backdrop-blur-sm">
-        <div className="flex flex-col gap-5 md:gap-6">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
-              {heading}
-            </h2>
-            <p className="hidden text-xs text-white/60 md:block md:max-w-sm">
-              {description}
-            </p>
-          </div>
+      <div className="rounded-3xl border border-white/10 bg-linear-to-br from-indigo-500/20 via-indigo-400/10 to-transparent p-4 backdrop-blur-sm sm:p-5">
+        <div className="flex flex-col gap-4">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-100">
+            {heading}
+          </h2>
 
           <div
             className={`grid gap-3 ${watchedConfig ? "sm:grid-cols-2" : ""}`}

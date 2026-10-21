@@ -34,4 +34,8 @@ export interface MovieResponse {
   cast?: CastMember[];
   director?: Director;
   providers: Providers;
+  critic_scores?: {
+    rottenTomatoes: number | null;
+    metacritic: number | null;
+  };
 }

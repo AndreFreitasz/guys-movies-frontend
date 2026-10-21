@@ -19,7 +19,6 @@ import {
   MediaPosterCard,
   MediaProvidersSection,
   MediaQuickDetails,
-  MediaSynopsis,
   QuickDetailItem,
 } from "../../components/mediaDetails";
 import SeasonChecklist, {
@@ -260,12 +259,14 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
               title={serie.name}
               voteAverage={serie.vote_average ?? 0}
               mediaId={serie.id}
+              date={serie.first_air_date}
+              criticScores={serie.critic_scores}
+              overview={serie.overview}
             />
           }
           actions={
             <MediaExperiencePanel
               heading="Sua experiência"
-              description="Gerencie o que você já assistiu, organize sua watchlist e registre sua avaliação personalizada."
               waitingConfig={{
                 isActive: isWaiting,
                 isLoading: isWaitingLoading,
@@ -306,8 +307,6 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
             onUnmarkAll={handleUnmarkAllClick}
             onTagCompanions={handleTagCompanionsClick}
           />
-
-          <MediaSynopsis title="Sinopse" overview={serie.overview ?? ""} />
 
           <MediaProvidersSection
             title="Onde assistir"

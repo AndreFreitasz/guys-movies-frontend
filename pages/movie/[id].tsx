@@ -18,7 +18,6 @@ import {
   MediaPosterCard,
   MediaProvidersSection,
   MediaQuickDetails,
-  MediaSynopsis,
   QuickDetailItem,
 } from "../../components/mediaDetails";
 import { useWatchedMedia } from "../../hooks/useWatchedMedia";
@@ -216,12 +215,14 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
               title={movie.title}
               voteAverage={movie.vote_average}
               mediaId={movie.id}
+              date={movie.release_date}
+              criticScores={movie.critic_scores}
+              overview={movie.overview}
             />
           }
           actions={
             <MediaExperiencePanel
               heading="Sua experiência"
-              description="Gerencie rapidamente o que já assistiu, o que quer ver e registre sua nota personalizando suas recomendações."
               watchedConfig={{
                 isActive: isWatched,
                 isLoading: watchedLoading,
@@ -264,8 +265,6 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
             />
           }
         >
-          <MediaSynopsis title="Sinopse" overview={movie.overview} />
-
           <MediaProvidersSection
             title="Onde assistir"
             providers={movie.providers}
