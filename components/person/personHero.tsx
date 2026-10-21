@@ -49,6 +49,11 @@ const PersonHero = ({ profile }: PersonHeroProps) => {
   const initials = profile.name.substring(0, 2);
   const profileImageUrl = tmdbProfile(profile.profilePath, "w185");
 
+  const departmentLabel =
+    profile.departments.find(
+      (department) => department.key === profile.defaultDepartment,
+    )?.label ?? profile.departments[0]?.label;
+
   return (
     <div className="relative overflow-hidden">
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 sm:flex-row sm:items-center">
@@ -70,9 +75,9 @@ const PersonHero = ({ profile }: PersonHeroProps) => {
         </div>
 
         <div className="min-w-0 flex-1">
-          {profile.knownForDepartment && (
+          {departmentLabel && (
             <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-indigo-300">
-              {profile.knownForDepartment}
+              {departmentLabel}
             </p>
           )}
 
