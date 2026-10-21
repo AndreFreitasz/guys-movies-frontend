@@ -132,6 +132,11 @@ créditos duplicados do TMDB (mesmo `id` e mesmo `job`) são deduplicados.
 - **`stats`** — total de títulos, intervalo de décadas ativas, gênero predominante,
   título melhor avaliado, primeiro e último ano em atividade.
 
+**Nota média do usuário na seção de biblioteca foi cortada.** `useUserLibrary`
+devolve apenas conjuntos de ids (`watchedMovies`, `watchedSeries`,
+`watchlistMovies`, `watchlistSeries`), sem notas. Mostrar a média exigiria um
+endpoint novo, e a contagem "viu X de Y" já entrega a retenção pretendida.
+
 **Colaborador mais frequente foi cortado.** Ele estava no design aprovado, mas a
 apuração mostrou que não sai do payload de `/person`: exigiria buscar o elenco de
 cada título da pessoa, 372 chamadas extras ao TMDB no caso do Tom Hanks. Entra
@@ -143,7 +148,7 @@ cada título da pessoa, 372 chamadas extras ao TMDB no caso do Tom Hanks. Entra
 |---|---|---|
 | `GET` | `/person/:id` | Cabeçalho, bio, stats, gêneros, abas e a **primeira página** de créditos do departamento padrão |
 | `GET` | `/person/:id/credits` | Uma página de créditos |
-| `GET` | `/search/person?q=` | Artistas para a aba nova da busca |
+| `GET` | `/person/search?q=` | Artistas para a aba nova da busca |
 
 Query de `/person/:id/credits`: `department`, `media` (`all`/`movie`/`tv`),
 `genre` (id), `sort` (`relevance`/`year`/`rating`), `page`. Página de 20.
@@ -179,8 +184,7 @@ A ordem vertical da tela, de cima para baixo:
    (idade, local, total de títulos, ano de estreia)
 2. **"Definem a carreira"** — seis pôsteres grandes em grade, escolhidos pela
    ordenação de Relevância. É o momento de reconhecimento que sustenta a retenção
-3. **Cruzamento com a biblioteca** — faixa com "viu X de Y", barra de progresso e
-   nota média
+3. **Cruzamento com a biblioteca** — faixa com "viu X de Y" e barra de progresso
 4. **Gêneros** — barras horizontais clicáveis que filtram a filmografia
 5. **Filmografia** — abas de departamento, filtro Filmes·Séries, ordenação e a
    lista paginada
@@ -197,7 +201,7 @@ posterior, não um redesenho.
 |---|---|
 | `personHero.tsx` | Foto circular, nome, departamento, metadados, bio com "ler mais" |
 | `careerHighlights.tsx` | Os seis pôsteres de destaque do topo |
-| `libraryCrossover.tsx` | "Você viu 7 de 42", progresso e sua nota média |
+| `libraryCrossover.tsx` | "Você viu 7 de 42" e barra de progresso |
 | `genreBreakdown.tsx` | Barras de gênero, clicáveis, controlam o filtro |
 | `departmentTabs.tsx` | Abas derivadas dos departamentos |
 | `creditList.tsx` | Lista paginada, com o papel explícito em cada item |
@@ -226,7 +230,7 @@ pela skill `frontend-design` antes de fechar.
 
 `SearchTypeFilterValue` ganha `artists`. O rótulo de `people` passa de "Pessoas"
 para "Usuários" — o valor interno segue `people` para não mexer no que já funciona.
-A aba nova consome `/search/person`.
+A aba nova consome `/person/search`.
 
 ### Página de filme e série
 
