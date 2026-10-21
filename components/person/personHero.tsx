@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { PersonProfile, personAge } from "../../interfaces/person/types";
+import {
+  PersonProfile,
+  personAge,
+  tmdbImage,
+} from "../../interfaces/person/types";
 
 interface PersonHeroProps {
   profile: PersonProfile;
@@ -43,15 +47,19 @@ const PersonHero = ({ profile }: PersonHeroProps) => {
         : `${biography.slice(0, BIOGRAPHY_PREVIEW_LENGTH).trimEnd()}...`;
 
   const initials = profile.name.substring(0, 2);
+  const profileImageUrl = tmdbImage(profile.profilePath, "w185");
 
   return (
     <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.34),#05050c_60%)] px-4 py-12 sm:px-8 lg:py-16">
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 sm:flex-row sm:items-center">
         <div className="h-32 w-32 shrink-0 overflow-hidden rounded-full border border-white/10 bg-black/40">
-          {profile.profileUrl ? (
+          {profileImageUrl ? (
             <img
-              src={profile.profileUrl}
+              src={profileImageUrl}
               alt={profile.name}
+              width={185}
+              height={185}
+              decoding="async"
               className="h-full w-full object-cover"
             />
           ) : (

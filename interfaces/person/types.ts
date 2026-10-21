@@ -4,7 +4,7 @@ export interface PersonCredit {
   id: number;
   mediaType: MediaType;
   title: string;
-  posterUrl: string | null;
+  posterPath: string | null;
   year: number | null;
   voteAverage: number | null;
   voteCount: number;
@@ -43,7 +43,7 @@ export interface PersonCreditsPage {
 export interface PersonProfile {
   id: number;
   name: string;
-  profileUrl: string | null;
+  profilePath: string | null;
   biography: string | null;
   biographyLanguage: "pt" | "en" | null;
   birthday: string | null;
@@ -61,10 +61,18 @@ export interface PersonProfile {
 export interface ArtistSearchResult {
   id: number;
   name: string;
-  profileUrl: string | null;
+  profilePath: string | null;
   knownForDepartment: string | null;
   knownFor: string[];
 }
+
+export type TmdbPosterSize = "w92" | "w154" | "w185" | "w342" | "w500";
+export type TmdbProfileSize = "w45" | "w185" | "h632";
+
+export const tmdbImage = (
+  path: string | null,
+  size: TmdbPosterSize | TmdbProfileSize,
+): string | null => (path ? `https://image.tmdb.org/t/p/${size}${path}` : null);
 
 export const creditHref = (credit: PersonCredit): string =>
   credit.mediaType === "tv" ? `/serie/${credit.id}` : `/movie/${credit.id}`;
