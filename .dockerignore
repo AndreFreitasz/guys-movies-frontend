@@ -15,3 +15,5 @@ coverage
 README.md
 Dockerfile
 docker-compose.yml
+graphify-out
+public/dev-graph

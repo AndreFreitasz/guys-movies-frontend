@@ -37,3 +37,10 @@ next-env.d.ts
 
 # local env
 .env
+
+# graphify (artefatos gerados e hook local com caminho absoluto)
+graphify-out/
+public/dev-graph/
+.claude/settings.json
+.claude/*.graphify-bak
+.superpowers/
