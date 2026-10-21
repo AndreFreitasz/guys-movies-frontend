@@ -64,6 +64,7 @@ export type TimelineEvent =
       title: string;
       posterPath: string | null;
       rating: number | null;
+      year: number | null;
       occurredAt: string;
       companions: UserSummary[];
     }
@@ -74,6 +75,7 @@ export type TimelineEvent =
       posterPath: string | null;
       seasonNumber: number;
       episodeCount: number;
+      year: number | null;
       occurredAt: string;
       companions: UserSummary[];
     };

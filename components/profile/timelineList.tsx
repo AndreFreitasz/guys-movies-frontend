@@ -1,4 +1,5 @@
 import React from "react";
+import { formatYear } from "../../utils/formatYear";
 import Avatar from "./avatar";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -138,6 +139,11 @@ const TimelineList: React.FC<TimelineListProps> = ({
                             {event.title}
                           </span>
                         </>
+                      )}
+                      {formatYear(event.year) && (
+                        <span className="ml-1.5 text-xs font-semibold text-white/35">
+                          {formatYear(event.year)}
+                        </span>
                       )}
                     </span>
                     <span className="mt-1 block text-xs text-white/40">
