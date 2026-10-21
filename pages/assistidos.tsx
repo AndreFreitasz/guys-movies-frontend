@@ -22,6 +22,9 @@ import WatchedToolbar, {
 import WatchedDetailSheet from "../components/watched/watchedDetailSheet";
 import WatchedSerieSheet from "../components/watched/watchedSerieSheet";
 import FilterBar, { CompanionOption } from "../components/watched/filterBar";
+import CollectionTabs, {
+  WatchedTab,
+} from "../components/watched/collectionTabs";
 import FilterDrawer from "../components/watched/filterDrawer";
 import LibrarySummary from "../components/watched/librarySummary";
 import { useAuth } from "../hooks/authContext";
@@ -43,8 +46,6 @@ import {
 import { UserSummary } from "../interfaces/profile/types";
 
 const SKELETON_COUNT = 10;
-
-type WatchedTab = "movies" | "series";
 
 const MOVIE_SORT_OPTIONS: WatchedSortOption<WatchedSortKey>[] = [
   { key: "recent", label: "Recentes" },
@@ -609,18 +610,17 @@ const WatchedPage = () => {
         <p className="text-[0.65rem] font-bold uppercase tracking-[0.28em] text-indigo-300">
           Sua coleção
         </p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
-          {activeTab === "movies" ? (
-            <>
-              Filmes <span className="brand-text">assistidos</span>
-            </>
-          ) : (
-            <>
-              Séries <span className="brand-text">assistidas</span>
-            </>
-          )}
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">
+
+        <div className="mt-4">
+          <CollectionTabs
+            activeTab={activeTab}
+            movieCount={data?.items.length ?? null}
+            serieCount={serieData?.items.length ?? null}
+            onChange={switchTab}
+          />
+        </div>
+
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/55">
           {activeTab === "movies"
             ? "Tudo o que você marcou como assistido fica aqui. Use a busca e os filtros para reencontrar um filme, e toque em qualquer pôster para ver a nota que deu, a direção e a data em que assistiu."
             : "Tudo o que você já assistiu fica aqui, temporada por temporada. Toque em qualquer pôster para ver o progresso, marcar temporadas e acompanhar quando completou."}
@@ -630,39 +630,6 @@ const WatchedPage = () => {
           enabled={Boolean(user) && !authLoading}
           filtered={filteredSummary}
         />
-
-        <div
-          role="tablist"
-          aria-label="Alternar entre filmes e séries"
-          className="mt-6 inline-flex rounded-2xl border border-white/10 bg-black/25 p-1"
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "movies"}
-            onClick={() => switchTab("movies")}
-            className={`rounded-xl px-4 py-2 text-xs font-bold transition-colors ${
-              activeTab === "movies"
-                ? "bg-white/12 text-white"
-                : "text-white/50 hover:text-white/80"
-            }`}
-          >
-            Filmes
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "series"}
-            onClick={() => switchTab("series")}
-            className={`rounded-xl px-4 py-2 text-xs font-bold transition-colors ${
-              activeTab === "series"
-                ? "bg-white/12 text-white"
-                : "text-white/50 hover:text-white/80"
-            }`}
-          >
-            Séries
-          </button>
-        </div>
       </motion.header>
 
       {activeTab === "movies" && (
