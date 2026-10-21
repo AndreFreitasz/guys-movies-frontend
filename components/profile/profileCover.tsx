@@ -8,10 +8,7 @@ interface ProfileCoverProps {
   onChangeCover: () => void;
 }
 
-const NOISE_URL =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E\")";
-
-const BOTTOM_FADE = "linear-gradient(to top, transparent 0%, black 62%)";
+const BOTTOM_FADE = "linear-gradient(to top, transparent 1%, black 56%)";
 
 const FADE_MASK: React.CSSProperties = {
   WebkitMaskImage: BOTTOM_FADE,
@@ -24,25 +21,37 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
   onChangeCover,
 }) => {
   const wide = resolveBackdropUrl(cover?.backdropPath ?? null, "original");
-  const narrow = resolveBackdropUrl(cover?.backdropPath ?? null, "w780");
+  const narrow = resolveBackdropUrl(cover?.backdropPath ?? null, "w1280");
 
   return (
     <>
       <div
         aria-hidden={!cover}
-        className="pointer-events-none absolute inset-x-0 top-0 h-104 sm:h-140 lg:h-172"
+        className="pointer-events-none absolute inset-x-0 top-0 aspect-video md:aspect-auto md:h-[62vh] md:max-h-[780px]"
       >
         {narrow ? (
-          <picture className="block h-full w-full">
-            <source media="(min-width: 768px)" srcSet={wide ?? undefined} />
-            <img
-              src={narrow}
-              alt={`Capa do perfil: ${cover?.title ?? ""}`}
-              decoding="async"
-              className="h-full w-full object-cover object-top opacity-[0.76]"
-              style={FADE_MASK}
-            />
-          </picture>
+          <>
+            <div className="absolute inset-0 overflow-hidden">
+              <img
+                src={narrow}
+                alt=""
+                aria-hidden
+                decoding="async"
+                className="h-full w-full scale-125 object-cover opacity-50 blur-3xl"
+              />
+            </div>
+
+            <picture className="relative block h-full w-full">
+              <source media="(min-width: 768px)" srcSet={wide ?? undefined} />
+              <img
+                src={narrow}
+                alt={`Capa do perfil: ${cover?.title ?? ""}`}
+                decoding="async"
+                className="mx-auto h-full w-full max-w-[1700px] object-contain object-top"
+                style={FADE_MASK}
+              />
+            </picture>
+          </>
         ) : (
           <div
             className="h-full w-full bg-linear-to-br from-ink-700 via-ink-800 to-ink-950"
@@ -50,14 +59,7 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({
           />
         )}
 
-        <div className="absolute inset-0 bg-linear-to-b from-black/50 via-black/28 to-[#05050c]" />
-        <div className="absolute inset-0 bg-linear-to-r from-black/52 via-transparent to-[#05050c]/80" />
-        <div className="absolute inset-0 backdrop-blur-[2px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(124,77,255,0.14),transparent_62%)]" />
-        <div
-          className="absolute inset-0 opacity-[0.12] mix-blend-overlay"
-          style={{ backgroundImage: NOISE_URL }}
-        />
+        <div className="absolute inset-0 bg-linear-to-t from-[#05050c] via-[#05050c]/45 to-transparent" />
       </div>
 
       {isSelf && (
