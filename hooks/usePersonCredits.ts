@@ -127,7 +127,6 @@ export const usePersonCredits = ({
 
     if (!hasUrlOverride) return;
 
-    isFirstRun.current = false;
     setDepartmentState(seededDepartment);
     setMediaState(seededMedia);
     setSortState(seededSort);
