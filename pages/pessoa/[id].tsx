@@ -6,6 +6,7 @@ import CareerHighlights from "../../components/person/careerHighlights";
 import CreditList from "../../components/person/creditList";
 import DepartmentTabs from "../../components/person/departmentTabs";
 import GenreBreakdown from "../../components/person/genreBreakdown";
+import LibraryCrossover from "../../components/person/libraryCrossover";
 import PersonHero from "../../components/person/personHero";
 import { PersonProfile } from "../../interfaces/person/types";
 import {
@@ -57,6 +58,8 @@ const PersonPage: NextPage<PersonPageProps> = ({ profile }) => {
         <CareerHighlights credits={profile.highlights} />
       </section>
       <div className="px-4 pb-12 sm:px-8 lg:pb-16">
+        <LibraryCrossover credits={profile.credits.items} />
+
         <GenreBreakdown
           genres={profile.genres}
           activeGenre={activeGenre}
