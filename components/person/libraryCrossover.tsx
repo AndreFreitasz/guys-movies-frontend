@@ -1,25 +1,14 @@
 import React, { useMemo } from "react";
 import { useAuth } from "../../hooks/authContext";
 import { useUserLibrary } from "../../hooks/useUserLibrary";
-import { PersonCredit } from "../../interfaces/person/types";
 
 interface LibraryCrossoverProps {
-  credits: PersonCredit[];
+  movieIds: number[];
 }
 
-const LibraryCrossover: React.FC<LibraryCrossoverProps> = ({ credits }) => {
+const LibraryCrossover: React.FC<LibraryCrossoverProps> = ({ movieIds }) => {
   const { isAuthenticated, authLoading } = useAuth();
   const { watchedMovies, isReady } = useUserLibrary();
-
-  const movieIds = useMemo(
-    () =>
-      new Set(
-        credits
-          .filter((credit) => credit.mediaType === "movie")
-          .map((credit) => credit.id),
-      ),
-    [credits],
-  );
 
   const watchedCount = useMemo(() => {
     let count = 0;
@@ -42,7 +31,7 @@ const LibraryCrossover: React.FC<LibraryCrossoverProps> = ({ credits }) => {
     );
   }
 
-  const total = movieIds.size;
+  const total = movieIds.length;
   if (!total) return null;
 
   const percent = Math.round((watchedCount / total) * 100);

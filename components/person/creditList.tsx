@@ -111,14 +111,25 @@ const CreditList: React.FC<CreditListProps> = ({
       ))}
 
       {hasMore && (
-        <button
-          type="button"
-          onClick={onLoadMore}
-          disabled={status === "loading"}
-          className="mt-3 min-h-[44px] w-full rounded-2xl border border-white/10 text-sm font-semibold text-white/70 disabled:opacity-60"
-        >
-          {status === "loading" ? "Carregando..." : "Carregar mais"}
-        </button>
+        <>
+          {status === "failed" && (
+            <p className="mt-3 text-center text-sm text-white/60">
+              Não foi possível carregar mais títulos.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={onLoadMore}
+            disabled={status === "loading"}
+            className="mt-3 min-h-[44px] w-full rounded-2xl border border-white/10 text-sm font-semibold text-white/70 disabled:opacity-60"
+          >
+            {status === "loading"
+              ? "Carregando..."
+              : status === "failed"
+                ? "Tentar de novo"
+                : "Carregar mais"}
+          </button>
+        </>
       )}
     </div>
   );

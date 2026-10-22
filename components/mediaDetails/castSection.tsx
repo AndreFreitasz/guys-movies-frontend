@@ -29,7 +29,7 @@ const MediaCastSection = memo(
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/10 bg-black/40">
                   {member.profile_path ? (
                     <img
-                      src={`https://image.tmdb.org/t/p/w185${member.profile_path}`}
+                      src={member.profile_path}
                       alt={member.name}
                       className="h-full w-full object-cover"
                       loading="lazy"

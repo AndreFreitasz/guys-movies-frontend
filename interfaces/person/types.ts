@@ -55,6 +55,7 @@ export interface PersonProfile {
   stats: PersonStats;
   highlights: PersonCredit[];
   defaultDepartment: string;
+  movieIds: number[];
   credits: PersonCreditsPage;
 }
 
@@ -85,19 +86,43 @@ export const tmdbProfile = (
 export const creditHref = (credit: PersonCredit): string =>
   credit.mediaType === "tv" ? `/serie/${credit.id}` : `/movie/${credit.id}`;
 
+interface IsoDateParts {
+  year: number;
+  month: number;
+  day: number;
+}
+
+const parseIsoDateParts = (value: string): IsoDateParts | null => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (!match) return null;
+
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]) - 1,
+    day: Number(match[3]),
+  };
+};
+
 export const personAge = (
   birthday: string | null,
   deathday: string | null,
 ): number | null => {
   if (!birthday) return null;
 
-  const born = new Date(birthday);
-  const end = deathday ? new Date(deathday) : new Date();
-  if (Number.isNaN(born.getTime()) || Number.isNaN(end.getTime())) return null;
+  const born = parseIsoDateParts(birthday);
+  if (!born) return null;
 
-  let age = end.getFullYear() - born.getFullYear();
-  const monthDelta = end.getMonth() - born.getMonth();
-  if (monthDelta < 0 || (monthDelta === 0 && end.getDate() < born.getDate())) {
+  const deathParts = deathday ? parseIsoDateParts(deathday) : null;
+  const now = new Date();
+  const end = deathParts ?? {
+    year: now.getFullYear(),
+    month: now.getMonth(),
+    day: now.getDate(),
+  };
+
+  let age = end.year - born.year;
+  const monthDelta = end.month - born.month;
+  if (monthDelta < 0 || (monthDelta === 0 && end.day < born.day)) {
     age -= 1;
   }
 

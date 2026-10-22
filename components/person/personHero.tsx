@@ -16,10 +16,10 @@ const PersonHero = ({ profile }: PersonHeroProps) => {
 
   const age = personAge(profile.birthday, profile.deathday);
   const birthYear = profile.birthday
-    ? new Date(profile.birthday).getFullYear()
+    ? Number(profile.birthday.slice(0, 4))
     : null;
   const deathYear = profile.deathday
-    ? new Date(profile.deathday).getFullYear()
+    ? Number(profile.deathday.slice(0, 4))
     : null;
 
   const ageLabel =

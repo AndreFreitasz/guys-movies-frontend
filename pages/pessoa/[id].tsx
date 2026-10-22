@@ -1,6 +1,5 @@
 import Head from "next/head";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
-import { useState } from "react";
 
 import CareerHighlights from "../../components/person/careerHighlights";
 import CreditList from "../../components/person/creditList";
@@ -32,21 +31,15 @@ const SORT_OPTIONS: { value: CreditSort; label: string }[] = [
 ];
 
 const PersonPage: NextPage<PersonPageProps> = ({ profile }) => {
-  const [activeGenre, setActiveGenre] = useState<number | null>(null);
-
   const credits = usePersonCredits({
     personId: profile.id,
     initialPage: profile.credits,
     defaultDepartment: profile.defaultDepartment,
+    departments: profile.departments.map((department) => department.key),
   });
 
-  const handleGenreChange = (genreId: number | null) => {
-    setActiveGenre(genreId);
-    credits.setGenre(genreId);
-  };
-
   const activeGenreName =
-    profile.genres.find((genre) => genre.id === activeGenre)?.name ?? null;
+    profile.genres.find((genre) => genre.id === credits.genre)?.name ?? null;
 
   return (
     <>
@@ -58,12 +51,12 @@ const PersonPage: NextPage<PersonPageProps> = ({ profile }) => {
         <CareerHighlights credits={profile.highlights} />
       </section>
       <div className="px-4 pb-12 sm:px-8 lg:pb-16">
-        <LibraryCrossover credits={profile.credits.items} />
+        <LibraryCrossover movieIds={profile.movieIds} />
 
         <GenreBreakdown
           genres={profile.genres}
-          activeGenre={activeGenre}
-          onSelect={handleGenreChange}
+          activeGenre={credits.genre}
+          onSelect={credits.setGenre}
         />
 
         <section className="mt-10">
@@ -123,7 +116,7 @@ const PersonPage: NextPage<PersonPageProps> = ({ profile }) => {
             hasMore={credits.hasMore}
             activeGenreName={activeGenreName}
             onLoadMore={credits.loadMore}
-            onClearGenre={() => handleGenreChange(null)}
+            onClearGenre={() => credits.setGenre(null)}
             onRetry={credits.retry}
           />
         </section>

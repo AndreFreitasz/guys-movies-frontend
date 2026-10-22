@@ -9,15 +9,6 @@ interface ArtistResultsProps {
   onRetry: () => void;
 }
 
-const DEPARTMENT_LABELS: Record<string, string> = {
-  Acting: "Atuação",
-  Directing: "Direção",
-  Writing: "Roteiro",
-  Production: "Produção",
-  Creator: "Criação",
-  Crew: "Equipe",
-};
-
 const ArtistResults: React.FC<ArtistResultsProps> = ({
   artists,
   status,
@@ -72,9 +63,6 @@ const ArtistResults: React.FC<ArtistResultsProps> = ({
     <div className="mx-auto max-w-2xl space-y-1">
       {artists.map((artist) => {
         const profileUrl = tmdbProfile(artist.profilePath, "w185");
-        const departmentLabel = artist.knownForDepartment
-          ? DEPARTMENT_LABELS[artist.knownForDepartment]
-          : undefined;
 
         return (
           <Link
@@ -100,9 +88,9 @@ const ArtistResults: React.FC<ArtistResultsProps> = ({
               <p className="truncate text-sm font-semibold leading-snug text-white">
                 {artist.name}
               </p>
-              {departmentLabel && (
+              {artist.knownForDepartment && (
                 <p className="text-xs uppercase tracking-[0.2em] text-white/50">
-                  {departmentLabel}
+                  {artist.knownForDepartment}
                 </p>
               )}
               {artist.knownFor.length > 0 && (

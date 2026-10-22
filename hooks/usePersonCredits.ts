@@ -14,12 +14,44 @@ interface Options {
   personId: number;
   initialPage: PersonCreditsPage;
   defaultDepartment: string;
+  departments: string[];
 }
+
+const MEDIA_VALUES: MediaFilter[] = ["all", "movie", "tv"];
+const SORT_VALUES: CreditSort[] = ["relevance", "year", "rating"];
+
+const readUrlQuery = (): URLSearchParams =>
+  typeof window === "undefined"
+    ? new URLSearchParams()
+    : new URLSearchParams(window.location.search);
+
+const resolveInitialDepartment = (
+  value: string | null,
+  departments: string[],
+  fallback: string,
+): string => (value && departments.includes(value) ? value : fallback);
+
+const resolveInitialMedia = (value: string | null): MediaFilter =>
+  value && (MEDIA_VALUES as string[]).includes(value)
+    ? (value as MediaFilter)
+    : "all";
+
+const resolveInitialSort = (value: string | null): CreditSort =>
+  value && (SORT_VALUES as string[]).includes(value)
+    ? (value as CreditSort)
+    : "relevance";
+
+const resolveInitialGenre = (value: string | null): number | null => {
+  if (!value) return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+};
 
 export const usePersonCredits = ({
   personId,
   initialPage,
   defaultDepartment,
+  departments,
 }: Options) => {
   const router = useRouter();
 
@@ -75,6 +107,33 @@ export const usePersonCredits = ({
     },
     [department, genre, media, personId, sort],
   );
+
+  useEffect(() => {
+    const query = readUrlQuery();
+    const seededDepartment = resolveInitialDepartment(
+      query.get("departamento"),
+      departments,
+      defaultDepartment,
+    );
+    const seededMedia = resolveInitialMedia(query.get("midia"));
+    const seededSort = resolveInitialSort(query.get("ordem"));
+    const seededGenre = resolveInitialGenre(query.get("genero"));
+
+    const hasUrlOverride =
+      seededDepartment !== defaultDepartment ||
+      seededMedia !== "all" ||
+      seededSort !== "relevance" ||
+      seededGenre !== null;
+
+    if (!hasUrlOverride) return;
+
+    isFirstRun.current = false;
+    setDepartmentState(seededDepartment);
+    setMediaState(seededMedia);
+    setSortState(seededSort);
+    setGenreState(seededGenre);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isFirstRun.current) {
