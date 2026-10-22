@@ -18,8 +18,10 @@ import SearchTypeFilter, {
 } from "../components/search/searchTypeFilter";
 import { useSearch } from "../hooks/useSearch";
 import { usePeopleSearch } from "../hooks/usePeopleSearch";
+import { useArtistSearch } from "../hooks/useArtistSearch";
 import { useAuth } from "../hooks/authContext";
 import PeopleResults from "../components/search/peopleResults";
+import ArtistResults from "../components/search/artistResults";
 import { useUserLibrary } from "../hooks/useUserLibrary";
 
 interface PopularMovie {
@@ -60,6 +62,7 @@ const Busca: React.FC = () => {
     submittedTerm,
     typeFilter === "people" && isAuthenticated,
   );
+  const artistSearch = useArtistSearch(submittedTerm, typeFilter === "artists");
   const { watchedMovies, watchedSeries, watchlistMovies, watchlistSeries } =
     useUserLibrary();
 
@@ -155,8 +158,16 @@ const Busca: React.FC = () => {
       movie: results.filter((item) => item.type === "movie").length,
       serie: results.filter((item) => item.type === "serie").length,
       people: people.status === "ready" ? people.users.length : null,
+      artists:
+        artistSearch.status === "ready" ? artistSearch.artists.length : null,
     }),
-    [people.status, people.users.length, results],
+    [
+      artistSearch.artists.length,
+      artistSearch.status,
+      people.status,
+      people.users.length,
+      results,
+    ],
   );
 
   const hasTerm = submittedTerm.length > 0;
@@ -227,6 +238,13 @@ const Busca: React.FC = () => {
               onLoadMore={people.loadMore}
               onRetry={people.retry}
               onFollowStateChange={people.setFollowState}
+            />
+          ) : typeFilter === "artists" ? (
+            <ArtistResults
+              artists={artistSearch.artists}
+              status={artistSearch.status}
+              term={submittedTerm}
+              onRetry={artistSearch.retry}
             />
           ) : error ? (
             <CatalogErrorState

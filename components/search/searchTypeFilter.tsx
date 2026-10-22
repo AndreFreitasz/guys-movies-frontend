@@ -1,18 +1,26 @@
 import React from "react";
 
-export type SearchTypeFilterValue = "all" | "movie" | "serie" | "people";
+export type SearchTypeFilterValue =
+  "all" | "movie" | "serie" | "people" | "artists";
 
 interface SearchTypeFilterProps {
   value: SearchTypeFilterValue;
   onChange: (value: SearchTypeFilterValue) => void;
-  counts: { all: number; movie: number; serie: number; people: number | null };
+  counts: {
+    all: number;
+    movie: number;
+    serie: number;
+    people: number | null;
+    artists: number | null;
+  };
 }
 
 const OPTIONS: { value: SearchTypeFilterValue; label: string }[] = [
   { value: "all", label: "Tudo" },
   { value: "movie", label: "Filmes" },
   { value: "serie", label: "Séries" },
-  { value: "people", label: "Pessoas" },
+  { value: "artists", label: "Artistas" },
+  { value: "people", label: "Usuários" },
 ];
 
 const SearchTypeFilter: React.FC<SearchTypeFilterProps> = ({
