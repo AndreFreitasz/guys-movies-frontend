@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
@@ -158,16 +159,35 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     return movie.genres.join(" • ");
   }, [movie.genres]);
 
+  const directorValue = useMemo(() => {
+    if (!movie.director) {
+      return "Não informado";
+    }
+
+    if (movie.director.id) {
+      return (
+        <Link
+          href={`/pessoa/${movie.director.id}`}
+          className="text-indigo-300 hover:text-indigo-200"
+        >
+          {movie.director.name}
+        </Link>
+      );
+    }
+
+    return movie.director.name;
+  }, [movie.director]);
+
   const quickDetails = useMemo<QuickDetailItem[]>(
     () => [
       { label: "Lançamento", value: formattedDate },
       {
         label: "Diretor",
-        value: movie.director?.name ?? "Não informado",
+        value: directorValue,
       },
       { label: "Gêneros", value: genresLabel },
     ],
-    [formattedDate, genresLabel, movie.director?.name],
+    [directorValue, formattedDate, genresLabel],
   );
 
   const adultBadge = useMemo(() => {
