@@ -7,7 +7,6 @@ coverage
 .gitignore
 .env
 .env.*
-.vercel
 .vscode
 .idea
 *.log

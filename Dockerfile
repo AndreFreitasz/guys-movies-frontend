@@ -41,6 +41,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.mjs ./next.config.mjs
 
+ENV PORT=3000
+
 EXPOSE 3000
 
-CMD ["npx", "next", "start", "-p", "3000", "-H", "0.0.0.0"]
+# O Render injeta PORT; localmente cai no padrão 3000.
+CMD ["sh", "-c", "exec node_modules/.bin/next start -p ${PORT:-3000} -H 0.0.0.0"]

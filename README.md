@@ -351,13 +351,17 @@ docker-compose.yml  Next em modo desenvolvimento com hot reload
 
 ## Deploy
 
-O frontend roda na [Vercel](https://vercel.com), com deploy automático a cada
-commit na `main`. O domínio de produção é `www.guysmovies.space`, e o apex
-redireciona para ele.
+O frontend roda no [Render](https://render.com) como Web Service Docker
+(`guys-movies-frontend`), com deploy automático a cada commit na `main`, no
+mesmo workspace da API. Ele usa `getServerSideProps`, então não pode ser um
+Static Site. O Dockerfile lê a porta da variável `PORT` que o Render injeta.
 
-A `NEXT_PUBLIC_URL_API` é configurada no painel do projeto na Vercel. Como ela é
+A `NEXT_PUBLIC_URL_API` é configurada no painel do serviço no Render. Como ela é
 embutida no bundle em tempo de build, mudar o valor exige um novo deploy, não só
 um restart.
+
+No plano gratuito do Render a instância hiberna após alguns minutos sem
+tráfego, e o primeiro acesso depois disso demora cerca de um minuto.
 
 Ao trocar o domínio do frontend, também é obrigatório atualizar `CORS_ORIGINS`
 no painel do Render, onde a API roda. Sem isso o navegador bloqueia as chamadas
