@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { authFetch } from "../../utils/authFetch";
+import { formatDateOnly } from "../../utils/dateOnly";
 import { useAuth } from "../../hooks/authContext";
 import { useWatchedSeasons } from "../../hooks/useWatchedSeasons";
 import SeasonChecklist, { SeasonOption } from "../series/seasonChecklist";
@@ -29,15 +30,12 @@ interface WatchedSerieSheetProps {
 
 const FALLBACK_POSTER = "/icons/home/cinema.png";
 
-const formatCompletedAt = (value: string): string => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleDateString("pt-BR", {
+const formatCompletedAt = (value: string): string =>
+  formatDateOnly(value, {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  });
-};
+  }) ?? "";
 
 interface SerieSheetBodyProps {
   serie: WatchedSerieItem;

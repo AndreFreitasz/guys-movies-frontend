@@ -30,6 +30,7 @@ import {
   WatchSourceValue,
 } from "../../constants/watchProviders";
 import { authFetch } from "../../utils/authFetch";
+import { formatDateOnly } from "../../utils/dateOnly";
 
 interface SerieProps {
   serie: SerieResponse;
@@ -183,16 +184,10 @@ const SeriePage: NextPage<SerieProps> = ({ serie }) => {
     [requireUser, serie.id],
   );
 
-  const formattedDate = useMemo(() => {
-    if (!serie.first_air_date) {
-      return "Data não informada";
-    }
-    const date = new Date(serie.first_air_date);
-    if (Number.isNaN(date.getTime())) {
-      return "Data não informada";
-    }
-    return date.toLocaleDateString("pt-BR");
-  }, [serie.first_air_date]);
+  const formattedDate = useMemo(
+    () => formatDateOnly(serie.first_air_date) ?? "Data não informada",
+    [serie.first_air_date],
+  );
 
   const creators = useMemo(() => {
     if (!serie.created_by || serie.created_by.length === 0) {

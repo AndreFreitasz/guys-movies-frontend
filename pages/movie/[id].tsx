@@ -26,6 +26,7 @@ import {
   WatchSourceValue,
 } from "../../constants/watchProviders";
 import { authFetch } from "../../utils/authFetch";
+import { formatDateOnly } from "../../utils/dateOnly";
 
 interface MovieProps {
   movie: MovieResponse;
@@ -146,13 +147,10 @@ const Movie: NextPage<MovieProps> = ({ movie }) => {
     [movie.id, requireUser],
   );
 
-  const formattedDate = useMemo(() => {
-    const date = new Date(movie.release_date);
-    if (Number.isNaN(date.getTime())) {
-      return "Data não informada";
-    }
-    return date.toLocaleDateString("pt-BR");
-  }, [movie.release_date]);
+  const formattedDate = useMemo(
+    () => formatDateOnly(movie.release_date) ?? "Data não informada",
+    [movie.release_date],
+  );
 
   const genresLabel = useMemo(() => {
     if (!movie.genres?.length) return "Não informado";

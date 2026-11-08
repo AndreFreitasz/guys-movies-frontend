@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { WatchedMovieItem } from "../../interfaces/watched/types";
 import RatingStars from "./ratingStars";
 import CompanionStrip from "./companionStrip";
+import { formatDateOnly } from "../../utils/dateOnly";
 
 interface WatchedTileProps {
   movie: WatchedMovieItem;
@@ -13,18 +14,12 @@ interface WatchedTileProps {
 
 const FALLBACK_POSTER = "/icons/home/cinema.png";
 
-export const formatWatchedDate = (value: string | null): string => {
-  if (!value) return "Data não registrada";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Data não registrada";
-
-  return date.toLocaleDateString("pt-BR", {
+export const formatWatchedDate = (value: string | null): string =>
+  formatDateOnly(value, {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  });
-};
+  }) ?? "Data não registrada";
 
 const WatchedTile: React.FC<WatchedTileProps> = ({
   movie,

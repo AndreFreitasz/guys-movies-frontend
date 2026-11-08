@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import DatePicker from "../_ui/form/datePicker";
 import WatchSourceSelect, { WatchSourceValueState } from "./watchSourceSelect";
 import CompanionPicker from "./companionPicker";
+import { parseDateOnly } from "../../utils/dateOnly";
 import { CompanionTarget, tagCompanions } from "../../utils/tagCompanions";
 import { UserSummary } from "../../interfaces/profile/types";
 import {
@@ -31,10 +32,8 @@ interface WatchedDateFormProps {
 }
 
 const toInputValue = (value: string | null): string => {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return format(date, "yyyy-MM-dd");
+  const date = parseDateOnly(value);
+  return date ? format(date, "yyyy-MM-dd") : "";
 };
 
 const WatchedDateForm: React.FC<WatchedDateFormProps> = ({
