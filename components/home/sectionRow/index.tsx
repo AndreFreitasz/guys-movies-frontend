@@ -68,7 +68,7 @@ const SectionRow = <T,>({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.65, ease: [0.32, 0.72, 0, 1] }}
-      className="mt-14 lg:mt-20"
+      className="mt-14 [contain-intrinsic-size:auto_420px] [content-visibility:auto] lg:mt-20"
     >
       <Carousel
         header={header}

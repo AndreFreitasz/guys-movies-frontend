@@ -49,7 +49,7 @@ const SerieCard = ({
         <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/85 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
 
         {score > 0 && (
-          <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full border border-white/10 bg-black/60 px-2 py-1 backdrop-blur-md">
+          <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full border border-white/10 bg-black/75 px-2 py-1">
             <FaStar className="text-amber-400" size={9} />
             <span
               className={`text-[0.65rem] font-black ${getScoreTone(score)}`}
@@ -60,7 +60,7 @@ const SerieCard = ({
         )}
 
         <div className="absolute inset-x-0 bottom-0 p-3">
-          <h3 className="line-clamp-2 text-sm font-bold leading-snug text-white drop-shadow-lg">
+          <h3 className="line-clamp-2 text-sm font-bold leading-snug text-white text-shadow-lg">
             {name}
           </h3>
           <div className="grid grid-rows-[0fr] transition-all duration-500 ease-ios group-hover:grid-rows-[1fr]">

@@ -1,6 +1,6 @@
-@import 'react-toastify/dist/ReactToastify.css' layer(base);
+@import "react-toastify/dist/ReactToastify.css" layer(base);
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   --color-background: var(--background);
@@ -129,7 +129,6 @@
       rgb(var(--accent-indigo) / 0.16) 0%,
       transparent 75%
     );
-  filter: blur(20px);
   animation: auroraDrift 24s ease-in-out infinite alternate;
 }
 

@@ -31,9 +31,9 @@ const MoviesProvider: React.FC<MoviesProviderProps> = ({ providerData }) => {
     <motion.section
       whileHover={{ y: -4 }}
       transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-      className="group/provider relative h-full overflow-hidden rounded-3xl border border-white/[0.07] bg-white/2.5 p-4 backdrop-blur-xl transition-colors duration-500 hover:border-white/[0.14] sm:p-5"
+      className="group/provider relative h-full overflow-hidden rounded-3xl border border-white/[0.07] bg-white/2.5 p-4 transition-colors duration-500 hover:border-white/[0.14] sm:p-5"
     >
-      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-indigo-500/10 blur-3xl transition-opacity duration-500 group-hover/provider:bg-indigo-500/20" />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgb(99_102_241/0.16)_0%,transparent_70%)] opacity-70 transition-opacity duration-500 group-hover/provider:opacity-100" />
 
       <header className="relative flex items-center gap-3">
         <img

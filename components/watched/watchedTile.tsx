@@ -38,7 +38,7 @@ const WatchedTile: React.FC<WatchedTileProps> = ({
     }}
     whileHover={{ y: -6 }}
     whileTap={{ scale: 0.97 }}
-    className="group relative flex w-full flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/3 text-left backdrop-blur-xl transition-colors duration-300 hover:border-white/25 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-400"
+    className="group relative flex w-full flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/3 text-left transition-colors duration-300 hover:border-white/25 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-400"
   >
     <div className="relative aspect-2/3 w-full overflow-hidden">
       <YearBadge date={movie.releaseDate} />
@@ -58,7 +58,7 @@ const WatchedTile: React.FC<WatchedTileProps> = ({
       <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/90 via-black/10 to-transparent" />
 
       {movie.rating !== null && (
-        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-xs font-semibold text-amber-300 backdrop-blur-md">
+        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/75 px-2.5 py-1 text-xs font-semibold text-amber-300">
           <svg viewBox="0 0 20 20" className="h-3 w-3">
             <path
               fill="currentColor"
